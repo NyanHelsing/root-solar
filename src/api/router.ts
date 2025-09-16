@@ -2,7 +2,7 @@ import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 
 import { type Context } from "./context.ts";
-import { getSentimentNetworkStatus } from "../net/runtime.ts";
+import { getNetworkStatus } from "../net/status.ts";
 
 export const t = initTRPC.context<Context>().create();
 
@@ -47,7 +47,7 @@ export const router = t.router({
   removeSentiment: t.procedure
     .input(removeSentimentInput)
     .mutation(({ input, ctx }) => ctx.sentiments.remove(input)),
-  networkStatus: t.procedure.query(() => getSentimentNetworkStatus()),
+  networkStatus: t.procedure.query(() => getNetworkStatus()),
 });
 
 export type ApiRouter = typeof router;
