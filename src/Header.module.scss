@@ -18,3 +18,40 @@ header {
         cy: 0.5em;
     }
 }
+
+.status-indicator {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #9aa0a6;
+}
+
+.status-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.status-text {
+    line-height: 1;
+}
+
+.status-ready {
+    color: #21a366;
+}
+
+.status-starting {
+    color: #f5a524;
+}
+
+.status-error {
+    color: #e55757;
+}
+
+.status-offline {
+    color: #70757a;
+}
