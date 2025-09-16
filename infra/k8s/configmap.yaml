@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: root-solar-configmap
+  namespace: root-solar
+data:
+  PORT: 3000
+  DB_PATH: /data/app.sqlite

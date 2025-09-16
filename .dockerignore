@@ -1,0 +1,10 @@
+# Keep the image lean and builds fast
+node_modules
+npm-debug.log*
+.git
+.gitignore
+Dockerfile
+.dockerignore
+data
+dist/*.map
+infra

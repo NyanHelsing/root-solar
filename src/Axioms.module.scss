@@ -1,0 +1,32 @@
+.axioms {
+    h1 {
+        padding: 0.6rem 0rem;
+        font-size: 2.4rem;
+    }
+    p {
+        font-size: 1.6rem;
+        padding: 0.6rem 0rem;
+    }
+}
+
+.axioms > ul {
+    background-color: #ccc;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-block: 8px;
+    margin: 0;
+}
+.axioms > ul > li {
+    border-radius: 2.5px;
+    box-shadow: 0 1px 2.5px -1px rgba(0, 0, 0, 0.5);
+    list-style-type: none;
+    padding: 8px 10px;
+    background-color: #fff;
+
+    transition: transform 120ms;
+    &:hover {
+        transform: translateY(-0.35px);
+        box-shadow: 0 1px 3px -1px rgba(0, 0, 0, 0.5);
+    }
+}

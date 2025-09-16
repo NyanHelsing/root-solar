@@ -1,0 +1,11 @@
+[env]
+DB_PATH = "{{config_root}}/data/app.sqlite"
+
+[tools]
+pnpm = "latest"
+
+[tasks.dev]
+run = "pnpm rsbuild dev"
+
+[tasks.start]
+run = "pnpm start"
