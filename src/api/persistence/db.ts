@@ -17,12 +17,16 @@ let dbPromise: Promise<Surreal> | null = null;
 
 const ensureSeeds = async (db: Surreal) => {
   const existing = await db.select<{ id: number }>(TABLE);
-  if (!existing || existing.length === 0) {
-    await Promise.all(
-      seedAxioms.map(async (axiom) => {
-        await db.upsert(new RecordId(TABLE, axiom.id), axiom);
-      }),
-    );
+  const existingIds = new Set((existing ?? []).map((item) => item.id));
+  if (existingIds.size === seedAxioms.length) {
+    return;
+  }
+
+  for (const axiom of seedAxioms) {
+    if (existingIds.has(axiom.id)) {
+      continue;
+    }
+    await db.upsert(new RecordId(TABLE, axiom.id), axiom);
   }
 };
 

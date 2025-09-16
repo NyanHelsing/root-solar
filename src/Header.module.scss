@@ -4,6 +4,9 @@ header {
     gap: 10px;
     justify-content: flex-start;
     align-items: center;
+    > :last-child {
+        margin-left: auto;
+    }
 }
 
 .root-solar-logo {

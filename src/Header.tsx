@@ -1,4 +1,5 @@
 import styles from "./Header.module.scss";
+import NetworkStatusIndicator from "./NetworkStatusIndicator.tsx";
 
 function RootSolarIcon() {
   return (
@@ -13,9 +14,7 @@ export default function Header() {
     <header>
       <RootSolarIcon />
       <h1>root.solar</h1>
-      <nav>
-        <a></a>
-      </nav>
+      <NetworkStatusIndicator />
     </header>
   );
 }

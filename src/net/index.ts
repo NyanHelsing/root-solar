@@ -33,6 +33,13 @@ type Logger = Pick<Console, "debug" | "error">;
 
 const defaultLogger: Logger = console;
 
+export type SentimentNetworkStatus =
+  | { state: "starting" }
+  | { state: "ready"; peerId: string; protocol: string }
+  | { state: "error"; message: string }
+  | { state: "stopped" }
+  | { state: "offline" };
+
 const toUint8Array = (chunk: Uint8Array | Uint8ArrayList) => {
   return chunk instanceof Uint8ArrayList ? chunk.subarray() : chunk;
 };
@@ -195,6 +202,8 @@ export interface SentimentNetwork {
     recordId: string,
   ) => Promise<SentimentFraction | null>;
   close: () => Promise<void>;
+  getStatus: () => SentimentNetworkStatus;
+  onStatusChange: (listener: (status: SentimentNetworkStatus) => void) => () => void;
 }
 
 export const createSentimentNetwork = async ({
@@ -203,6 +212,20 @@ export const createSentimentNetwork = async ({
   protocol = SENTIMENT_PROTOCOL,
   logger = defaultLogger,
 }: SentimentNetworkOptions): Promise<SentimentNetwork> => {
+  const listeners = new Set<(status: SentimentNetworkStatus) => void>();
+  let currentStatus: SentimentNetworkStatus = { state: "starting" };
+
+  const updateStatus = (status: SentimentNetworkStatus) => {
+    currentStatus = status;
+    for (const listener of listeners) {
+      try {
+        listener(status);
+      } catch (error) {
+        logger.debug("sentiment network listener error", error);
+      }
+    }
+  };
+
   const handler: StreamHandler = async ({ stream }) => {
     let recordId: string | undefined;
     try {
@@ -235,7 +258,18 @@ export const createSentimentNetwork = async ({
     }
   };
 
-  await libp2p.handle(protocol, handler);
+  try {
+    await libp2p.handle(protocol, handler);
+    updateStatus({
+      state: "ready",
+      peerId: libp2p.peerId.toString(),
+      protocol,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    updateStatus({ state: "error", message });
+    throw error;
+  }
 
   const querySentiment = async (
     peerId: PeerId,
@@ -277,9 +311,22 @@ export const createSentimentNetwork = async ({
 
   const close = async () => {
     await libp2p.unhandle(protocol);
+    updateStatus({ state: "stopped" });
   };
 
   logger.debug(`Registered sentiment protocol handler for ${protocol}`);
 
-  return { protocol, querySentiment, close };
+  return {
+    protocol,
+    querySentiment,
+    close,
+    getStatus: () => currentStatus,
+    onStatusChange: (listener) => {
+      listeners.add(listener);
+      listener(currentStatus);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+  } satisfies SentimentNetwork;
 };
