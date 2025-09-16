@@ -1,43 +1,32 @@
-import { EntitySchema } from "@mikro-orm/core";
+import { RecordId } from "surrealdb";
 
-interface AxiomConstructorParameters {
+import type { Context } from "../../../context.ts";
+
+export type AxiomRecord = {
   id: number;
   title: string;
-  details: string;
-}
-export class Axiom {
-  id!: number;
-  title = "";
-  details = "";
+  details?: string;
+};
 
-  static find(em, query) {
-    return em.find(this, query);
-  }
+const TABLE = "axiom" as const;
 
-  constructor({ id, title, details }: AxiomConstructorParameters) {
-    this.id = id;
-    this.title = title;
-    this.details = details;
-  }
-}
+export type AxiomModel = ReturnType<typeof createAxiomModel>;
 
-export const schema = new EntitySchema<Axiom>({
-  class: Axiom,
-  properties: {
-    id: { type: "number", primary: true },
-    title: { type: "string" },
-    details: { type: "string" },
-  },
-});
-
-export const seed = async (orm) => {
-  const em = orm.em.fork();
-
-  const testAxiom = new Axiom({
-    id: 0,
-    title: "Test Axiom",
-    details: "an axiom for testing",
-  });
-
-  await em.persist(testAxiom).flush();
+export const createAxiomModel = (ctx: Context) => {
+  return {
+    async list() {
+      const records = await ctx.db.select<AxiomRecord>(TABLE);
+      return (records ?? []).sort((a, b) => a.id - b.id);
+    },
+    async create(input: AxiomRecord) {
+      const record = await ctx.db.upsert<AxiomRecord>(
+        new RecordId(TABLE, input.id),
+        input,
+      );
+      return record;
+    },
+  } satisfies {
+    list: () => Promise<AxiomRecord[]>;
+    create: (input: AxiomRecord) => Promise<AxiomRecord>;
+  };
 };

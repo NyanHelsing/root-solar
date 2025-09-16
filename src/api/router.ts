@@ -1,24 +1,21 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 
-import { Axiom } from "./persistence/entities/index.ts";
 import { type Context } from "./context.ts";
 
 export const t = initTRPC.context<Context>().create();
 
+const createAxiomInput = z.object({
+  id: z.number(),
+  title: z.string().min(5),
+  details: z.string().min(5).optional(),
+});
+
 export const router = t.router({
-  listAxioms: t.procedure
-    .input(z.string())
-    .query(({ input, ctx }) => Axiom.find(ctx.em, input)),
+  listAxioms: t.procedure.query(({ ctx }) => ctx.axioms.list()),
   createAxiom: t.procedure
-    .input(
-      z.object({
-        id: z.number(),
-        title: z.string().min(5),
-        details: z.string().min(5),
-      }),
-    )
-    .mutation(({ input, ctx }) => new Axiom(input).persist().flush()),
+    .input(createAxiomInput)
+    .mutation(({ input, ctx }) => ctx.axioms.create(input)),
 });
 
 export type ApiRouter = typeof router;

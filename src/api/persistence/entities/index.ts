@@ -1,2 +1,2 @@
-export { Axiom } from "./axiom/entity.ts";
-export { Being } from "./being/entity.ts";
+export { createAxiomModel } from "./axiom/entity.ts";
+export type { AxiomModel, AxiomRecord } from "./axiom/entity.ts";
