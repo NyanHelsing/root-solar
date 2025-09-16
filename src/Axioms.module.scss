@@ -9,6 +9,26 @@
     }
 }
 
+.summary {
+    font-size: 1.4rem;
+    color: #444;
+    strong {
+        color: #222;
+    }
+}
+
+.loading {
+    font-size: 1.2rem;
+    color: #787878;
+    margin: 0.4rem 0 0.8rem;
+}
+
+.empty {
+    font-size: 1.2rem;
+    color: #5a5d60;
+    margin: 0.4rem 0 0.8rem;
+}
+
 .axioms > ul {
     background-color: #ccc;
     display: flex;

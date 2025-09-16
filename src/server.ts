@@ -1,101 +1,133 @@
-import express from "express";
 import { noise } from "@chainsafe/libp2p-noise";
 import { yamux } from "@chainsafe/libp2p-yamux";
+import { identify } from "@libp2p/identify";
 import { tcp } from "@libp2p/tcp";
-import { createLibp2p, type Libp2pOptions } from "libp2p";
+import express from "express";
+import { createLibp2p } from "libp2p";
 
-import { apiMiddleware } from "./api/middleware.ts";
 import { Context } from "./api/context.ts";
+import { apiMiddleware } from "./api/middleware.ts";
 import { getDb } from "./api/persistence/db.ts";
 import {
   createModelBackedSentimentProvider,
   createSentimentNetwork,
-  type SentimentNetworkStatus,
 } from "./net/index.ts";
-import {
-  clearSentimentNetwork,
-  registerSentimentNetwork,
-  setSentimentNetworkStatus,
-} from "./net/runtime.ts";
+import { setNetworkStatus } from "./net/status.ts";
 
 const PORT = process.env.PORT || 3000;
 
-const startServer = async () => {
-  setSentimentNetworkStatus({ state: "starting" });
-
-  let libp2pNode: Awaited<ReturnType<typeof createLibp2p>> | null = null;
-  let activeNetwork: Awaited<ReturnType<typeof createSentimentNetwork>> | null = null;
+const start = async () => {
+  setNetworkStatus({ state: "starting" });
 
   try {
-    const libp2pConfig: Libp2pOptions = {
+    const db = await getDb();
+    const context = new Context({ db });
+    const libp2p = await createLibp2p({
+      start: false,
       addresses: {
         listen: ["/ip4/0.0.0.0/tcp/0"],
       },
       transports: [tcp()],
-      connectionEncrypters: [noise()],
       streamMuxers: [yamux()],
-    };
+      connectionEncrypters: [noise()],
+      services: {
+        identify: identify(),
+      },
+    });
 
-    const libp2p = await createLibp2p(libp2pConfig);
-    libp2pNode = libp2p;
-    const db = await getDb();
-    const context = new Context({ db });
     const sentimentNetwork = await createSentimentNetwork({
       libp2p,
       getSentiment: createModelBackedSentimentProvider(context.sentiments),
     });
-    activeNetwork = sentimentNetwork;
-    registerSentimentNetwork(sentimentNetwork);
+
+    await libp2p.start();
+
+    const app = express()
+      .use(
+        "/",
+        express.Router().get("/health", (req, res) => {
+          res.status(200).send("ok");
+        }),
+      )
+      .use("/api", apiMiddleware);
+
+    const server = app.listen(PORT, () => {
+      setNetworkStatus({
+        state: "ready",
+        protocol: sentimentNetwork.protocol,
+        peerId: libp2p.peerId.toString(),
+      });
+      console.info(`Server listening on ${PORT}`);
+    });
+
+    let shuttingDown = false;
+    const shutdown = async (
+      options: { reason?: string; markOffline?: boolean } = {},
+    ) => {
+      if (shuttingDown) {
+        return;
+      }
+      shuttingDown = true;
+      const reason = options.reason ? ` (${options.reason})` : "";
+      console.info(`Shutting down${reason}`);
+
+      try {
+        await sentimentNetwork.close();
+      } catch (error) {
+        console.error("Failed to close sentiment network", error);
+      }
+
+      try {
+        await libp2p.stop();
+      } catch (error) {
+        console.error("Failed to stop libp2p", error);
+      }
+
+      await new Promise<void>((resolve) => {
+        if (server.listening) {
+          server.close(() => {
+            resolve();
+          });
+          return;
+        }
+        resolve();
+      });
+
+      if (options.markOffline !== false) {
+        setNetworkStatus({ state: "offline" });
+      }
+    };
+
+    server.on("error", (error) => {
+      setNetworkStatus({
+        state: "error",
+        message: error instanceof Error ? error.message : String(error),
+      });
+      shutdown({ reason: "server error", markOffline: false }).catch(
+        (shutdownError) => {
+          console.error("Error during shutdown", shutdownError);
+        },
+      );
+    });
+
+    process.once("SIGINT", () => {
+      shutdown({ reason: "SIGINT" }).catch((error) => {
+        console.error("Error during shutdown", error);
+      });
+    });
+    process.once("SIGTERM", () => {
+      shutdown({ reason: "SIGTERM" }).catch((error) => {
+        console.error("Error during shutdown", error);
+      });
+    });
   } catch (error) {
-    const status: SentimentNetworkStatus = {
+    setNetworkStatus({
       state: "error",
       message: error instanceof Error ? error.message : String(error),
-    };
-    setSentimentNetworkStatus(status);
-    console.error("Failed to start sentiment network", error);
+    });
+    console.error("Failed to start server", error);
+    process.exitCode = 1;
   }
-
-  const app = express()
-    .use(
-      "/",
-      express.Router().get("/health", (_req, res) => {
-        res.status(200).send("ok");
-      }),
-    )
-    .use("/api", apiMiddleware);
-
-  const server = app.listen(PORT, () => {
-    console.info(`Server listening on ${PORT}`);
-  });
-
-  const shutdown = async () => {
-    server.close();
-    if (activeNetwork) {
-      await activeNetwork.close().catch((error) => {
-        console.error("Failed to close sentiment network", error);
-      });
-    }
-    if (libp2pNode) {
-      await libp2pNode.stop().catch((error) => {
-        console.error("Failed to stop libp2p node", error);
-      });
-    }
-    clearSentimentNetwork();
-  };
-
-  process.on("SIGINT", () => {
-    shutdown().finally(() => {
-      process.exit(0);
-    });
-  });
-  process.on("SIGTERM", () => {
-    shutdown().finally(() => {
-      process.exit(0);
-    });
-  });
 };
 
-startServer().catch((error) => {
-  console.error("Server failed to start", error);
-  process.exit(1);
-});
+void start();

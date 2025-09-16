@@ -1,5 +1,5 @@
 import styles from "./Header.module.scss";
-import NetworkStatusIndicator from "./NetworkStatusIndicator.tsx";
+import NetworkStatusIndicator from "./features/network/NetworkStatusIndicator.tsx";
 
 function RootSolarIcon() {
   return (
