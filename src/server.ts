@@ -1,5 +1,8 @@
 import express from "express";
-import { createLibp2p } from "libp2p";
+import { noise } from "@chainsafe/libp2p-noise";
+import { yamux } from "@chainsafe/libp2p-yamux";
+import { tcp } from "@libp2p/tcp";
+import { createLibp2p, type Libp2pOptions } from "libp2p";
 
 import { apiMiddleware } from "./api/middleware.ts";
 import { Context } from "./api/context.ts";
@@ -24,7 +27,16 @@ const startServer = async () => {
   let activeNetwork: Awaited<ReturnType<typeof createSentimentNetwork>> | null = null;
 
   try {
-    const libp2p = await createLibp2p();
+    const libp2pConfig: Libp2pOptions = {
+      addresses: {
+        listen: ["/ip4/0.0.0.0/tcp/0"],
+      },
+      transports: [tcp()],
+      connectionEncrypters: [noise()],
+      streamMuxers: [yamux()],
+    };
+
+    const libp2p = await createLibp2p(libp2pConfig);
     libp2pNode = libp2p;
     const db = await getDb();
     const context = new Context({ db });
