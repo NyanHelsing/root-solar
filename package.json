@@ -4,10 +4,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@mikro-orm/cli": "^6.5.2",
-    "@mikro-orm/core": "^6.5.2",
-    "@mikro-orm/reflection": "^6.5.2",
-    "@mikro-orm/sqlite": "^6.5.2",
     "@nats-io/nats-core": "^3.1.0",
     "@nats-io/transport-node": "^3.1.0",
     "@rsbuild/core": "^1.4.15",

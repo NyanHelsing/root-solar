@@ -1,5 +1,7 @@
 [env]
-DB_PATH = "{{config_root}}/data/app.sqlite"
+SURREAL_DB_URL = "surrealkv://{{config_root}}/root-solar"
+SURREAL_NAMESPACE = "root-solar"
+SURREAL_DATABASE = "root-solar"
 
 [tools]
 pnpm = "latest"

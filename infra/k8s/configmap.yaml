@@ -4,5 +4,7 @@ metadata:
   name: root-solar-configmap
   namespace: root-solar
 data:
-  PORT: 3000
-  DB_PATH: /data/app.sqlite
+  PORT: "3000"
+  SURREAL_DB_URL: surrealkv:///data/root-solar
+  SURREAL_NAMESPACE: root-solar
+  SURREAL_DATABASE: root-solar

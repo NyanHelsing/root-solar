@@ -41,13 +41,23 @@ spec:
             - name: PORT
               valueFrom:
                 configMapKeyRef:
-                  name: root-solar-config
+                  name: root-solar-configmap
                   key: PORT
-            - name: DB_PATH
+            - name: SURREAL_DB_URL
               valueFrom:
                 configMapKeyRef:
-                  name: root-solar-config
-                  key: DB_PATH
+                  name: root-solar-configmap
+                  key: SURREAL_DB_URL
+            - name: SURREAL_NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: root-solar-configmap
+                  key: SURREAL_NAMESPACE
+            - name: SURREAL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: root-solar-configmap
+                  key: SURREAL_DATABASE
           ports:
             - name: http
               containerPort: 3000
@@ -83,5 +93,5 @@ spec:
               drop: ["ALL"]
       volumes:
         - name: data
-          persistenVolumeClaim:
+          persistentVolumeClaim:
             claimName: root-solar-pvc
