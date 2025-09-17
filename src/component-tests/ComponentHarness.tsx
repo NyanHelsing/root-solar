@@ -7,7 +7,7 @@ import Footer from "../Footer.tsx";
 import Header from "../Header.tsx";
 import Hero from "../Hero.tsx";
 import Main from "../Main.tsx";
-import NetworkStatusIndicator from "../NetworkStatusIndicator.tsx";
+import NetworkStatusIndicator from "../features/network/NetworkStatusIndicator.tsx";
 
 const registry: Record<string, ComponentType<Record<string, unknown>>> = {
   axiom: Axiom,
