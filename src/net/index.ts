@@ -157,13 +157,7 @@ const parseSentimentRecordId = (recordId: string) => {
     throw new Error(`Invalid sentiment record identifier: ${recordId}`);
   }
 
-  const beingId = Number.parseInt(beingRaw, 10);
-  const axiomId = Number.parseInt(axiomRaw, 10);
-  if (!Number.isInteger(beingId) || !Number.isInteger(axiomId)) {
-    throw new Error(`Invalid sentiment record identifier: ${recordId}`);
-  }
-
-  return { beingId, type, axiomId };
+  return { beingId: beingRaw, type, axiomId: axiomRaw };
 };
 
 export const createModelBackedSentimentProvider = (

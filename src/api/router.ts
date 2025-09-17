@@ -7,27 +7,26 @@ import { getNetworkStatus } from "../net/status.ts";
 export const t = initTRPC.context<Context>().create();
 
 const createAxiomInput = z.object({
-  id: z.number().int(),
   title: z.string().min(5),
   details: z.string().min(5).optional(),
 });
 
 const sentimentInput = z.object({
-  beingId: z.number().int(),
-  axiomId: z.number().int(),
+  beingId: z.string().min(1),
+  axiomId: z.string().min(1),
   type: z.string().min(1),
   weight: z.number().int().min(0),
   maxWeight: z.number().int().min(0).optional(),
 });
 
 const listSentimentsInput = z.object({
-  beingId: z.number().int(),
+  beingId: z.string().min(1),
   type: z.string().min(1).optional(),
 });
 
 const removeSentimentInput = z.object({
-  beingId: z.number().int(),
-  axiomId: z.number().int(),
+  beingId: z.string().min(1),
+  axiomId: z.string().min(1),
   type: z.string().min(1),
 });
 

@@ -1,5 +1,5 @@
 import { surrealdbNodeEngines } from "@surrealdb/node";
-import { RecordId, Surreal } from "surrealdb";
+import { RecordId, StringRecordId, Surreal } from "surrealdb";
 
 import { seedAxioms } from "../../data/index.ts";
 
@@ -16,11 +16,11 @@ const TABLE = "axiom" as const;
 let dbPromise: Promise<Surreal> | null = null;
 
 const ensureSeeds = async (db: Surreal) => {
-  const existing = await db.select<{ id: number }>(TABLE);
+  const existing = await db.select<{ id: string | RecordId }>(TABLE);
   if (!existing || existing.length === 0) {
     await Promise.all(
-      seedAxioms.map(async (axiom) => {
-        await db.upsert(new RecordId(TABLE, axiom.id), axiom);
+      seedAxioms.map(async ({ id, ...axiom }) => {
+        await db.upsert(new StringRecordId(id), axiom);
       }),
     );
   }

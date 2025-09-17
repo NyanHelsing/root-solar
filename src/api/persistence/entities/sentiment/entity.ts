@@ -1,4 +1,4 @@
-import { RecordId } from "surrealdb";
+import { RecordId, StringRecordId } from "surrealdb";
 
 import type { Context } from "../../../context.ts";
 
@@ -7,8 +7,8 @@ const BEING_TABLE = "being" as const;
 
 export type SentimentRecord = {
   id: string;
-  beingId: number;
-  axiomId: number;
+  beingId: string;
+  axiomId: string;
   type: string;
   weight: number;
 };
@@ -18,6 +18,28 @@ export type SentimentAllocation = SentimentRecord & {
   ratio: number;
   maxWeight?: number;
 };
+
+type RawSentimentRecord = Omit<
+  SentimentRecord,
+  "id" | "beingId" | "axiomId"
+> & {
+  id: string | RecordId;
+  beingId: string | number;
+  axiomId: string | number;
+};
+
+const toSentimentRecord = (record: RawSentimentRecord): SentimentRecord => ({
+  ...record,
+  id: typeof record.id === "string" ? record.id : record.id.toString(),
+  beingId:
+    typeof record.beingId === "string"
+      ? record.beingId
+      : record.beingId.toString(),
+  axiomId:
+    typeof record.axiomId === "string"
+      ? record.axiomId
+      : record.axiomId.toString(),
+});
 
 const unwrapSingle = <T>(value: T | T[] | null): T | null => {
   if (value === null) {
@@ -31,7 +53,7 @@ const unwrapSingle = <T>(value: T | T[] | null): T | null => {
 
 const selectSentiments = async (
   ctx: Context,
-  { beingId, type }: { beingId: number; type?: string },
+  { beingId, type }: { beingId: string; type?: string },
 ) => {
   const statement = type
     ? "SELECT * FROM type::table($table) WHERE beingId = $beingId AND type = $type"
@@ -45,9 +67,10 @@ const selectSentiments = async (
     params.type = type;
   }
 
-  const [queryResult] = await ctx.db.query<[
-    (SentimentRecord[] | null)?,
-  ]>(statement, params);
+  const [queryResult] = await ctx.db.query<[(RawSentimentRecord[] | null)?]>(
+    statement,
+    params,
+  );
 
   if (!queryResult || queryResult.status !== "OK") {
     return [] as SentimentRecord[];
@@ -58,16 +81,14 @@ const selectSentiments = async (
     return [] as SentimentRecord[];
   }
 
-  return records;
+  return records.map(toSentimentRecord);
 };
 
-const ensureBeingExists = async (ctx: Context, beingId: number) => {
-  const record = await ctx.db.select(
-    new RecordId(BEING_TABLE, beingId),
-  );
+const ensureBeingExists = async (ctx: Context, beingId: string) => {
+  const record = await ctx.db.select(new StringRecordId(beingId));
   const being = unwrapSingle(record);
   if (!being) {
-    throw new Error(`Being ${beingId} does not exist`);
+    return await ctx.beings.create({ name: "superuser" });
   }
 };
 
@@ -88,14 +109,12 @@ export const createSentimentModel = (ctx: Context) => {
       weight,
       maxWeight,
     }: {
-      beingId: number;
-      axiomId: number;
+      beingId: string;
+      axiomId: string;
       type: string;
       weight: number;
       maxWeight?: number;
     }) {
-      assertInteger(beingId, "beingId");
-      assertInteger(axiomId, "axiomId");
       assertInteger(weight, "weight");
       if (weight < 0) {
         throw new Error("weight must be non-negative");
@@ -130,7 +149,7 @@ export const createSentimentModel = (ctx: Context) => {
         return null;
       }
 
-      const record = await ctx.db.upsert<SentimentRecord>(
+      const record = await ctx.db.upsert<RawSentimentRecord>(
         new RecordId(SENTIMENT_TABLE, sentimentId),
         {
           id: sentimentId,
@@ -148,18 +167,22 @@ export const createSentimentModel = (ctx: Context) => {
       const ratio = newTotalWeight === 0 ? 0 : weight / newTotalWeight;
 
       return {
-        ...stored,
+        ...toSentimentRecord(stored),
         totalWeightForType: newTotalWeight,
         ratio,
         maxWeight,
       } satisfies SentimentAllocation;
     },
-    async listForBeing(beingId: number, options?: { type?: string }) {
-      assertInteger(beingId, "beingId");
-      const sentiments = await selectSentiments(ctx, {
-        beingId,
-        type: options?.type,
-      });
+    async listForBeing(beingId: string, options?: { type?: string }) {
+      //const sentiments = await selectSentiments(ctx, {
+      //  beingId,
+      //  type: options?.type,
+      //});
+      const [sentiments] = await ctx.db.query<[SentimentAllocation[]]>(
+        `SELECT * FROM ${SENTIMENT_TABLE} WHERE beingId = $beingId`,
+        { beingId },
+      );
+      console.log({ sentiments });
       if (sentiments.length === 0) {
         return [] as SentimentAllocation[];
       }
@@ -174,9 +197,8 @@ export const createSentimentModel = (ctx: Context) => {
 
       return sentiments.map((sentiment) => {
         const totalWeightForType = totals.get(sentiment.type) ?? 0;
-        const ratio = totalWeightForType === 0
-          ? 0
-          : sentiment.weight / totalWeightForType;
+        const ratio =
+          totalWeightForType === 0 ? 0 : sentiment.weight / totalWeightForType;
         return {
           ...sentiment,
           totalWeightForType,
@@ -189,31 +211,29 @@ export const createSentimentModel = (ctx: Context) => {
       axiomId,
       type,
     }: {
-      beingId: number;
-      axiomId: number;
+      beingId: string;
+      axiomId: string;
       type: string;
     }) {
-      assertInteger(beingId, "beingId");
-      assertInteger(axiomId, "axiomId");
       await ctx.db.delete(
         new RecordId(SENTIMENT_TABLE, `${beingId}:${type}:${axiomId}`),
       );
     },
   } satisfies {
     upsert: (input: {
-      beingId: number;
-      axiomId: number;
+      beingId: string;
+      axiomId: string;
       type: string;
       weight: number;
       maxWeight?: number;
     }) => Promise<SentimentAllocation | null>;
     listForBeing: (
-      beingId: number,
+      beingId: string,
       options?: { type?: string },
     ) => Promise<SentimentAllocation[]>;
     remove: (input: {
-      beingId: number;
-      axiomId: number;
+      beingId: string;
+      axiomId: string;
       type: string;
     }) => Promise<void>;
   };

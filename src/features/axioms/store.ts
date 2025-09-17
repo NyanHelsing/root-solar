@@ -9,7 +9,7 @@ export const SENTIMENT_TYPE = "priority" as const;
 export const MAX_SENTIMENT_WEIGHT = 100;
 
 export type AxiomSentiment = {
-  id: number;
+  id: string;
   title: string;
   weight: number;
   ratio: number;
@@ -30,7 +30,7 @@ const computeRatios = (records: AxiomSentiment[]) => {
 };
 
 const mergeAxioms = (axioms: AxiomRecord[], sentiments: SentimentAllocation[]) => {
-  const allocations = new Map<number, SentimentAllocation>();
+  const allocations = new Map<string, SentimentAllocation>();
   for (const sentiment of sentiments) {
     allocations.set(sentiment.axiomId, sentiment);
   }
@@ -78,7 +78,7 @@ export const axiomsLoadingAtom = atom((get) => get(isLoadingAtom));
 
 export const setAxiomWeightAtom = atom(
   null,
-  async (get, set, update: { axiomId: number; weight: number }) => {
+  async (get, set, update: { axiomId: string; weight: number }) => {
     const safeWeight = Math.max(0, Math.min(MAX_SENTIMENT_WEIGHT, Math.round(update.weight)));
     const being = get(beingAtom);
     try {
