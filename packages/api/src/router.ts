@@ -4,6 +4,13 @@ import { z } from "zod";
 import { createAppLogger } from "@root-solar/observability";
 import { type Context } from "./context.ts";
 import { getNetworkStatus } from "@root-solar/net/status";
+import {
+  beingRegistrationStartInputSchema,
+  beingRegistrationCompleteInputSchema,
+  createBeingRegistrationHandlers,
+  type BeingRegistrationProfile,
+} from "@root-solar/auth/procedures";
+import type { BeingRecord } from "./persistence/entities/being/entity.ts";
 
 export const t = initTRPC.context<Context>().create();
 
@@ -54,6 +61,25 @@ const loggingMiddleware = t.middleware(async ({ path, type, input, next }) => {
 
 const procedure = t.procedure.use(loggingMiddleware);
 
+const createBeingRegistrationResolver = (ctx: Context) =>
+  createBeingRegistrationHandlers<BeingRecord & BeingRegistrationProfile>({
+    store: ctx.authRegistrations,
+    upsertBeing: async ({
+      name,
+      signingPublicKey,
+      encryptionPublicKey,
+      intentBase64,
+      messageBase64,
+    }) =>
+      await ctx.beings.create({
+        name,
+        signingPublicKey,
+        encryptionPublicKey,
+        intentBase64,
+        messageBase64,
+      }),
+  });
+
 const createAxiomInput = z.object({
   title: z.string().min(5),
   details: z.string().min(5).optional(),
@@ -94,6 +120,16 @@ export const router = t.router({
   removeSentiment: procedure
     .input(removeSentimentInput)
     .mutation(({ input, ctx }) => ctx.sentiments.remove(input)),
+  startBeingRegistration: procedure
+    .input(beingRegistrationStartInputSchema)
+    .mutation(({ ctx, input }) =>
+      createBeingRegistrationResolver(ctx).start(input),
+    ),
+  completeBeingRegistration: procedure
+    .input(beingRegistrationCompleteInputSchema)
+    .mutation(({ ctx, input }) =>
+      createBeingRegistrationResolver(ctx).complete(input),
+    ),
   networkStatus: procedure.query(() => getNetworkStatus()),
 });
 

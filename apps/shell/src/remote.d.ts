@@ -8,3 +8,11 @@ declare module "snb/App" {
   export const ComponentHarness: ComponentType<{ componentName?: string }>;
   export function SearchAndBrowseApp(): JSX.Element;
 }
+
+declare module "auth/App" {
+  import type { ComponentType } from "react";
+
+  const AuthApp: ComponentType;
+  export default AuthApp;
+  export { AuthApp };
+}

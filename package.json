@@ -1,11 +1,13 @@
 {
   "scripts": {
     "start": "node src/server.ts",
-    "build": "pnpm run build:snb && pnpm run build:shell",
+    "build": "pnpm run build:auth && pnpm run build:snb && pnpm run build:shell",
     "build:shell": "rsbuild build --config apps/shell/rsbuild.config.ts",
     "build:snb": "rsbuild build --config apps/snb/rsbuild.config.ts",
+    "build:auth": "rsbuild build --config apps/auth/rsbuild.config.ts",
     "dev:shell": "rsbuild dev --config apps/shell/rsbuild.config.ts",
     "dev:snb": "rsbuild dev --config apps/snb/rsbuild.config.ts",
+    "dev:auth": "rsbuild dev --config apps/auth/rsbuild.config.ts",
     "test": "pnpm run test:unit && pnpm run test:component && pnpm run test:integration",
     "test:unit": "node --experimental-strip-types --test \"src/**/*.unit.test.ts\" \"packages/**/src/**/*.unit.test.ts\"",
     "test:component": "playwright test -c playwright-ct.config.ts",
@@ -21,6 +23,7 @@
     "@nats-io/nats-core": "^3.1.0",
     "@nats-io/transport-node": "^3.1.0",
     "@root-solar/api": "workspace:*",
+    "@root-solar/auth": "workspace:*",
     "@root-solar/net": "workspace:*",
     "@root-solar/observability": "workspace:*",
     "@root-solar/server": "workspace:*",

@@ -11,6 +11,10 @@ const beingLogger = createAppLogger("persistence:being", {
 export type BeingRecord = {
   id: string;
   name: string;
+  signingPublicKey?: string;
+  encryptionPublicKey?: string;
+  intentBase64?: string;
+  messageBase64?: string;
 };
 
 const TABLE = "being" as const;
@@ -67,7 +71,7 @@ export const createBeingModel = (ctx: Context) => {
         id: typeof stored.id === "string" ? stored.id : stored.id.toString(),
       } satisfies BeingRecord;
     },
-    async create(input: BeingRecord) {
+    async create(input: Omit<BeingRecord, "id">) {
       const id = nanoid();
       beingLogger.debug("Creating being", {
         id,
