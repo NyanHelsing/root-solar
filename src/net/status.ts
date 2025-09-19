@@ -1,4 +1,4 @@
-import { createAppLogger } from "../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 
 export type NetworkStatus =
   | { state: "offline" }

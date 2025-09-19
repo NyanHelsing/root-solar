@@ -1,6 +1,6 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 
-import { createAppLogger } from "../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import {
   createAxiomModel,
   type AxiomModel,

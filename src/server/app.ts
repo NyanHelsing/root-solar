@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createAppLogger } from "../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import { apiMiddleware } from "../api/middleware.ts";
 
 const appLogger = createAppLogger("server:app", {

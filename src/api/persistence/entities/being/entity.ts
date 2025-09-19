@@ -1,6 +1,6 @@
 import { RecordId, StringRecordId } from "surrealdb";
 
-import { createAppLogger } from "../../../../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import type { Context } from "../../../context.ts";
 import { nanoid } from "nanoid";
 

@@ -1,7 +1,7 @@
 import { surrealdbNodeEngines } from "@surrealdb/node";
 import { RecordId, StringRecordId, Surreal } from "surrealdb";
 
-import { createAppLogger } from "../../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import { seedAxioms } from "../../data/index.ts";
 
 const dbLogger = createAppLogger("persistence:db", {

@@ -1,6 +1,6 @@
 import { Context } from "../api/context.ts";
 import { getDb } from "../api/persistence/db.ts";
-import { createAppLogger } from "../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 
 const contextLogger = createAppLogger("server:context", {
   tags: ["server", "context"],

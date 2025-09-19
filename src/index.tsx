@@ -2,18 +2,33 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Route } from "wouter";
 
-import { LogLevel } from "@catsle/caretta";
+import {
+  LogLevel,
+  createAppLogger,
+  initializeObservability,
+  parseLogLevel,
+} from "@root-solar/observability";
 
 import Header from "./Header.tsx";
 import Hero from "./Hero.tsx";
 import Main from "./Main.tsx";
 import Footer from "./Footer.tsx";
 import ComponentHarness from "./component-tests/ComponentHarness.tsx";
-import { createAppLogger, initializeLogging } from "./logging/index.ts";
 
 import "./index.css";
 
-const resolvedLevel = initializeLogging();
+const environment = process.env.NODE_ENV ?? "development";
+const desiredLevel =
+  parseLogLevel(process.env.LOG_LEVEL)
+  ?? (environment === "development" ? LogLevel.DEBUG : LogLevel.INFO);
+
+const resolvedLevel = initializeObservability({
+  level: desiredLevel,
+  metadata: {
+    environment,
+    platform: typeof window === "undefined" ? "unknown" : "browser",
+  },
+});
 const clientBootstrapLogger = createAppLogger("client:bootstrap", {
   tags: ["client", "bootstrap"],
 });

@@ -1,9 +1,23 @@
-import { LogLevel } from "@catsle/caretta";
-
-import { createAppLogger, initializeLogging } from "./logging/index.ts";
+import {
+  LogLevel,
+  createAppLogger,
+  initializeObservability,
+  parseLogLevel,
+} from "@root-solar/observability";
 import { startServer } from "./server/index.ts";
 
-const resolvedLevel = initializeLogging();
+const environment = process.env.NODE_ENV ?? "development";
+const desiredLevel =
+  parseLogLevel(process.env.LOG_LEVEL)
+  ?? (environment === "development" ? LogLevel.DEBUG : LogLevel.INFO);
+
+const resolvedLevel = initializeObservability({
+  level: desiredLevel,
+  metadata: {
+    environment,
+    platform: "node",
+  },
+});
 const bootstrapLogger = createAppLogger("server:bootstrap", {
   tags: ["server", "startup"],
 });
