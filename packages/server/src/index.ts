@@ -207,3 +207,11 @@ export const startServer = async () => {
     process.exitCode = 1;
   }
 };
+
+export { createBaseApp } from "./app.ts";
+export { createServerContext } from "./context.ts";
+export { setupFrontend } from "./frontend/index.ts";
+export type { FrontendLifecycle } from "./frontend/index.ts";
+export { createNetwork, shutdownNetwork } from "./network.ts";
+export type { NetworkResources } from "./network.ts";
+export { ENV, IS_DEVELOPMENT, PORT } from "./config.ts";

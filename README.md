@@ -42,6 +42,7 @@ The project runs on three planes (consensus, coordination, persistence). Read th
 - **Everything:** `mise run dev`
 - **API only:** `mise run start`
 - **Client only:** run `pnpm run dev:snb` (remote) alongside `pnpm run dev:shell` (host)
+- **Serve remotes in production:** assets emit under `/static/modules/{mfe}`. Set `SNB_REMOTE_URL=/static/modules/snb` (default) so the server hosts `/static/modules/snb/remoteEntry.js`. Use `SHELL_HTML` if your template is renamed (defaults to `index.html`).
 - **Container baseline:** `podman run root-solar` as shown above for production-style runs.
 
 ## Developing

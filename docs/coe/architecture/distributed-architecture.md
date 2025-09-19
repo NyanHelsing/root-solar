@@ -30,7 +30,7 @@ root.solar operates as a layered mesh that balances human-coordinated governance
 | **Federation Edges** | Schema negotiation, sync fabric | libp2p, NATS JetStream, signature services |
 
 ## Package Placement Heuristics
-- If the package will live with HTTP lifecycle concerns, keep it under `src/server` or `src/features` depending on exposure.
+- HTTP lifecycle concerns (Express middleware, SSR hosting) belong in the `@root-solar/server` workspace package (`packages/server`), keeping the runtime entry thin.
 - Messaging or streaming adapters now live in the `@root-solar/net` workspace package (`packages/net`). House domain-specific adapters there when multiple surfaces reuse them.
 - Persistence models and repositories live in the `@root-solar/api` workspace package (`packages/api/src/persistence`), with shared entity definitions exported via `entities/index.ts`.
 - libp2p sentiment helpers and shared network state sit in `@root-solar/net` (`packages/net`). Import adapters from there instead of wiring libp2p directly in feature code.
