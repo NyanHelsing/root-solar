@@ -29,6 +29,9 @@ importers:
       '@root-solar/api':
         specifier: workspace:*
         version: link:packages/api
+      '@root-solar/net':
+        specifier: workspace:*
+        version: link:packages/net
       '@root-solar/observability':
         specifier: workspace:*
         version: link:packages/observability
@@ -138,6 +141,21 @@ importers:
       openpgp:
         specifier: ^5.11.1
         version: 5.11.3
+
+  packages/net:
+    dependencies:
+      '@libp2p/interface':
+        specifier: ^2.11.0
+        version: 2.11.0
+      '@root-solar/observability':
+        specifier: workspace:*
+        version: link:../observability
+      libp2p:
+        specifier: ^2.10.0
+        version: 2.10.0
+      uint8arraylist:
+        specifier: ^2.4.8
+        version: 2.4.8
 
   packages/observability:
     dependencies:
