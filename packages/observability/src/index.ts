@@ -2,6 +2,15 @@ import { LogLevel, type LogLevelType, Logger, createLogger } from "@catsle/caret
 
 const APP_NAMESPACE = "root-solar";
 
+const toDefinedEntries = (metadata: Record<string, unknown>) =>
+  Object.entries(metadata).filter(([, value]) => typeof value !== "undefined");
+
+const applyMetadata = (
+  setter: (key: string, value: unknown) => void,
+  metadata: Record<string, unknown>,
+) =>
+  toDefinedEntries(metadata).forEach(([key, value]) => setter(key, value));
+
 export interface InitializeObservabilityOptions {
   level?: LogLevelType;
   metadata?: Record<string, unknown>;
@@ -13,17 +22,11 @@ export const initializeObservability = ({
 }: InitializeObservabilityOptions = {}): LogLevelType => {
   Logger.setGlobalLevel(level);
 
-  const combinedMetadata = {
+  applyMetadata(Logger.setGlobalMetadata, {
     app: APP_NAMESPACE,
     logLevel: LogLevel.getName(level),
     ...metadata,
-  } satisfies Record<string, unknown>;
-
-  for (const [key, value] of Object.entries(combinedMetadata)) {
-    if (typeof value !== "undefined") {
-      Logger.setGlobalMetadata(key, value);
-    }
-  }
+  });
 
   return level;
 };
@@ -42,15 +45,10 @@ export const createAppLogger = (
     : `${APP_NAMESPACE}:${context}`;
   const logger = createLogger(scopedContext);
 
-  if (tags?.length) {
-    logger.setMetadata("tags", tags);
-  }
-
-  for (const [key, value] of Object.entries(metadata)) {
-    if (typeof value !== "undefined") {
-      logger.setMetadata(key, value);
-    }
-  }
+  applyMetadata((key, value) => logger.setMetadata(key, value), {
+    ...(tags?.length ? { tags } : {}),
+    ...metadata,
+  });
 
   return logger;
 };
@@ -59,23 +57,13 @@ export { Logger, LogLevel } from "@catsle/caretta";
 export type { LogLevelType } from "@catsle/caretta";
 export type AppLogger = ReturnType<typeof createAppLogger>;
 
-export const parseLogLevel = (value?: string): LogLevelType | undefined => {
-  if (!value) {
-    return undefined;
-  }
-
-  switch (value.trim().toUpperCase()) {
-    case "DEBUG":
-      return LogLevel.DEBUG;
-    case "INFO":
-      return LogLevel.INFO;
-    case "WARN":
-      return LogLevel.WARN;
-    case "ERROR":
-      return LogLevel.ERROR;
-    case "ALWAYS":
-      return LogLevel.ALWAYS;
-    default:
-      return undefined;
-  }
+const levelByName: Record<string, LogLevelType> = {
+  DEBUG: LogLevel.DEBUG,
+  INFO: LogLevel.INFO,
+  WARN: LogLevel.WARN,
+  ERROR: LogLevel.ERROR,
+  ALWAYS: LogLevel.ALWAYS,
 };
+
+export const parseLogLevel = (value?: string) =>
+  levelByName[value?.trim().toUpperCase() ?? ""];
