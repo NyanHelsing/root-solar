@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { RecordId } from "surrealdb";
 
-import { createAppLogger } from "../../../../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import type { Context } from "../../../context.ts";
 
 const axiomLogger = createAppLogger("persistence:axiom", {

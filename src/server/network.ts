@@ -5,7 +5,7 @@ import { tcp } from "@libp2p/tcp";
 import { createLibp2p, type Libp2p } from "libp2p";
 
 import type { Context } from "../api/context.ts";
-import { createAppLogger } from "../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import {
   createModelBackedSentimentProvider,
   createSentimentNetwork,

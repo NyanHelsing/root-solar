@@ -1,6 +1,6 @@
 import type { Application } from "express";
 
-import { createAppLogger } from "../../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import { IS_DEVELOPMENT } from "../config.ts";
 
 import { setupDevFrontend } from "./dev-server.ts";

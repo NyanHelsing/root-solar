@@ -1,7 +1,7 @@
 import { createRsbuild, mergeRsbuildConfig } from "@rsbuild/core";
 import type { Application } from "express";
 
-import { createAppLogger } from "../../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import type { FrontendLifecycle } from "./types.ts";
 
 const devFrontendLogger = createAppLogger("server:frontend:dev", {

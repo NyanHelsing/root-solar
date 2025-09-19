@@ -3,7 +3,7 @@ import { atom } from "jotai";
 import { client } from "../../api/client.ts";
 import type { AxiomRecord } from "../../api/persistence/entities/index.ts";
 import type { SentimentAllocation } from "../../api/persistence/entities/index.ts";
-import { createAppLogger } from "../../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import { beingAtom } from "../beings/store.ts";
 
 export const SENTIMENT_TYPE = "priority" as const;

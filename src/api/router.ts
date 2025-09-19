@@ -1,7 +1,7 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 
-import { createAppLogger } from "../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import { type Context } from "./context.ts";
 import { getNetworkStatus } from "../net/status.ts";
 

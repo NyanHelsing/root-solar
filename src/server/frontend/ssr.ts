@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import express from "express";
 import type { Application, NextFunction, Request, Response } from "express";
 
-import { createAppLogger } from "../../logging/index.ts";
+import { createAppLogger } from "@root-solar/observability";
 import type { FrontendLifecycle } from "./types.ts";
 
 const prodFrontendLogger = createAppLogger("server:frontend:prod", {
