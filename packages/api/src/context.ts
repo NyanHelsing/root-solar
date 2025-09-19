@@ -8,8 +8,10 @@ import {
   type BeingModel,
   createSentimentModel,
   type SentimentModel,
+  createBeingRegistrationStore,
 } from "./persistence/entities/index.ts";
 import { getDb } from "./persistence/db.ts";
+import type { BeingRegistrationStore } from "@root-solar/auth/procedures";
 
 const apiContextLogger = createAppLogger("api:context", {
   tags: ["api", "context"],
@@ -20,12 +22,14 @@ export class Context {
   axioms: AxiomModel;
   beings: BeingModel;
   sentiments: SentimentModel;
+  authRegistrations: BeingRegistrationStore;
 
   constructor({ db }: { db: Awaited<ReturnType<typeof getDb>> }) {
     this.db = db;
     this.axioms = createAxiomModel(this);
     this.beings = createBeingModel(this);
     this.sentiments = createSentimentModel(this);
+    this.authRegistrations = createBeingRegistrationStore(this);
     apiContextLogger.debug("API context constructed", {
       tags: ["startup"],
     });

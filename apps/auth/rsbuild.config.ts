@@ -8,11 +8,10 @@ import { pluginSass } from "@rsbuild/plugin-sass";
 import { pluginModuleFederation } from "@module-federation/rsbuild-plugin";
 
 import {
+  DEFAULT_AUTH_DIST_SUBDIR,
   DEFAULT_AUTH_MOUNT,
-  DEFAULT_SHELL_MOUNT,
-  DEFAULT_SNB_MOUNT,
   resolveAssetPrefix,
-  resolveBaseUrl,
+  resolveDistSubdir,
   resolveMountPath,
 } from "../../config/mfePaths.ts";
 
@@ -20,31 +19,19 @@ const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json") as {
   dependencies?: Record<string, string>;
 };
-const dependencyVersion = (name: string) =>
-  packageJson.dependencies?.[name] ?? "*";
+const dependencyVersion = (name: string) => packageJson.dependencies?.[name] ?? "*";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const shellMountPath = resolveMountPath(
-  process.env.SHELL_STATIC_PATH,
-  DEFAULT_SHELL_MOUNT,
+const authDistSubdir = resolveDistSubdir(
+  process.env.AUTH_DIST_SUBDIR,
+  DEFAULT_AUTH_DIST_SUBDIR,
 );
-const shellAssetPrefix = resolveAssetPrefix(
-  process.env.SHELL_ASSET_PREFIX,
-  shellMountPath,
-);
-
-const snbMountPath = resolveMountPath(
-  process.env.SNB_REMOTE_PATH,
-  DEFAULT_SNB_MOUNT,
-);
-const remoteBase = resolveBaseUrl(process.env.SNB_REMOTE_URL, snbMountPath);
-
 const authMountPath = resolveMountPath(
   process.env.AUTH_REMOTE_PATH,
   DEFAULT_AUTH_MOUNT,
 );
-const authRemoteBase = resolveBaseUrl(
-  process.env.AUTH_REMOTE_URL,
+const authAssetPrefix = resolveAssetPrefix(
+  process.env.AUTH_ASSET_PREFIX,
   authMountPath,
 );
 
@@ -53,10 +40,10 @@ export default defineConfig({
     pluginReact(),
     pluginSass(),
     pluginModuleFederation({
-      name: "shell",
-      remotes: {
-        snb: `snb@${remoteBase}/remoteEntry.js`,
-        auth: `auth@${authRemoteBase}/remoteEntry.js`,
+      name: "auth",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./App": "./apps/auth/src/App.tsx",
       },
       shared: {
         react: {
@@ -67,37 +54,33 @@ export default defineConfig({
           singleton: true,
           requiredVersion: dependencyVersion("react-dom"),
         },
-        wouter: {
+        "@root-solar/api": {
           singleton: true,
-          requiredVersion: dependencyVersion("wouter"),
+          requiredVersion: dependencyVersion("@root-solar/api"),
         },
-        jotai: {
+        "@root-solar/auth": {
           singleton: true,
-          requiredVersion: dependencyVersion("jotai"),
-        },
-        "jotai-optics": {
-          singleton: true,
-          requiredVersion: dependencyVersion("jotai-optics"),
+          requiredVersion: dependencyVersion("@root-solar/auth"),
         },
         "@root-solar/observability": {
           singleton: true,
           requiredVersion: dependencyVersion("@root-solar/observability"),
         },
-        "react-icons": {
-          singleton: true,
-          requiredVersion: dependencyVersion("react-icons"),
-        },
       },
     }),
   ],
+  server: {
+    port: 3102,
+    strictPort: true,
+  },
   source: {
     entry: {
-      shell: "./apps/shell/src/index.tsx",
+      auth: "./apps/auth/src/index.tsx",
     },
   },
   output: {
     distPath: {
-      root: path.join(dirname, "../../dist/shell"),
+      root: path.join(dirname, "../../dist", authDistSubdir),
       js: "js",
       jsAsync: "js/async",
       css: "css",
@@ -109,9 +92,12 @@ export default defineConfig({
       assets: "assets",
       wasm: "wasm",
     },
-    assetPrefix: shellAssetPrefix,
-    filename: {
-      html: "../index.html",
+    assetPrefix: authAssetPrefix,
+    htmlPath: "auth",
+  },
+  tools: {
+    rspack: {
+      plugins: [],
     },
   },
 });

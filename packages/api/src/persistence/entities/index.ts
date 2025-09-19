@@ -8,3 +8,4 @@ export type {
   SentimentModel,
   SentimentRecord,
 } from "./sentiment/entity.ts";
+export { createBeingRegistrationStore } from "./auth/being-registration.ts";

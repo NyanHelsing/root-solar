@@ -2,8 +2,10 @@ const PROTOCOL_REGEX = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//;
 
 export const DEFAULT_SHELL_MOUNT = "/static/modules/shell";
 export const DEFAULT_SNB_MOUNT = "/static/modules/snb";
+export const DEFAULT_AUTH_MOUNT = "/static/modules/auth";
 export const DEFAULT_SHELL_DIST_SUBDIR = "shell";
 export const DEFAULT_SNB_DIST_SUBDIR = "snb";
+export const DEFAULT_AUTH_DIST_SUBDIR = "auth";
 
 const ensureLeadingSlash = (value: string) =>
   value.startsWith("/") ? value : `/${value}`;
