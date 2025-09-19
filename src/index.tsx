@@ -19,7 +19,7 @@ import "./index.css";
 
 const environment = process.env.NODE_ENV ?? "development";
 const desiredLevel =
-  parseLogLevel(process.env.LOG_LEVEL)
+  parseLogLevel(process.env.PUBLIC_LOG_LEVEL)
   ?? (environment === "development" ? LogLevel.DEBUG : LogLevel.INFO);
 
 const resolvedLevel = initializeObservability({

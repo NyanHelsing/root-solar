@@ -1,10 +1,16 @@
 [env]
+LOG_LEVEL = "debug"
+PUBLIC_LOG_LEVEL = "debug"
+PORT = "3000"
 SURREAL_DB_URL = "surrealkv://{{config_root}}/root-solar"
 SURREAL_NAMESPACE = "root-solar"
 SURREAL_DATABASE = "root-solar"
 
 [tools]
 pnpm = "latest"
+
+[tasks.build]
+run = "pnpm rsbuild build"
 
 [tasks.dev]
 run = "pnpm rsbuild dev"
