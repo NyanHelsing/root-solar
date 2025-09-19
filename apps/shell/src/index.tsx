@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
+import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import { Route } from "wouter";
 
 import {
   LogLevel,
@@ -9,13 +9,9 @@ import {
   parseLogLevel,
 } from "@root-solar/observability";
 
-import Header from "./Header.tsx";
-import Hero from "./Hero.tsx";
-import Main from "./Main.tsx";
-import Footer from "./Footer.tsx";
-import ComponentHarness from "./component-tests/ComponentHarness.tsx";
+import AppShell from "./AppShell.tsx";
 
-import "./index.css";
+import "../../shared/styles/global.css";
 
 const environment = process.env.NODE_ENV ?? "development";
 const desiredLevel =
@@ -33,7 +29,7 @@ const clientBootstrapLogger = createAppLogger("client:bootstrap", {
   tags: ["client", "bootstrap"],
 });
 
-clientBootstrapLogger.info("Rendering React application", {
+clientBootstrapLogger.info("Rendering shell micro frontend", {
   logLevel: LogLevel.getName(resolvedLevel),
 });
 
@@ -47,20 +43,18 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <Header />
-    <Route path="/">
-      <Hero />
-    </Route>
-    <Route path="/__component__/:componentName">
-      {(params) => (
-        <ComponentHarness componentName={params?.componentName} />
-      )}
-    </Route>
-    <Main />
-    <Footer />
+    <Suspense
+      fallback={
+        <div role="status" aria-live="polite">
+          Loading application shell…
+        </div>
+      }
+    >
+      <AppShell />
+    </Suspense>
   </StrictMode>,
 );
 
-clientBootstrapLogger.info("React application rendered", {
+clientBootstrapLogger.info("Shell micro frontend rendered", {
   tags: ["client", "bootstrap"],
 });

@@ -8,20 +8,22 @@ const devFrontendLogger = createAppLogger("server:frontend:dev", {
   tags: ["server", "frontend", "dev"],
 });
 
-const loadRsbuildConfig = async () => {
+const loadRsbuildConfigs = async () => {
   const module = await import("../../../rsbuild.config.ts");
-  return module.default ?? {};
+  const shellConfig = module.shellConfig ?? module.default ?? {};
+  const snbConfig = module.snbConfig ?? {};
+  return { shellConfig, snbConfig };
 };
 
 export const setupDevFrontend = async (
   app: Application,
 ): Promise<FrontendLifecycle> => {
-  const config = await loadRsbuildConfig();
-  devFrontendLogger.debug("Loaded rsbuild config for dev server", {
+  const { shellConfig, snbConfig } = await loadRsbuildConfigs();
+  devFrontendLogger.debug("Loaded rsbuild configs for dev server", {
     tags: ["startup"],
   });
-  const rsbuild = await createRsbuild({
-    rsbuildConfig: mergeRsbuildConfig(config, {
+  const shellRsbuild = await createRsbuild({
+    rsbuildConfig: mergeRsbuildConfig(shellConfig, {
       server: {
         middlewareMode: true,
       },
@@ -29,12 +31,29 @@ export const setupDevFrontend = async (
     loadEnv: true,
   });
 
+  const snbRsbuild = await createRsbuild({
+    rsbuildConfig: snbConfig,
+    loadEnv: true,
+  });
+
+  devFrontendLogger.info("Starting SNB remote dev server", {
+    tags: ["startup", "frontend", "snb"],
+  });
+
+  const snbDevServer = await snbRsbuild.createDevServer();
+  await snbDevServer.listen();
+  snbDevServer.printUrls();
+  devFrontendLogger.info("SNB remote dev server ready", {
+    tags: ["startup", "frontend", "snb"],
+    port: snbDevServer.port,
+  });
+
   devFrontendLogger.info("Starting rsbuild dev server", {
     tags: ["startup"],
   });
 
-  const devServer = await rsbuild.createDevServer();
-  app.use(devServer.middlewares);
+  const shellDevServer = await shellRsbuild.createDevServer();
+  app.use(shellDevServer.middlewares);
   devFrontendLogger.info("Dev server middleware attached", {
     tags: ["startup"],
   });
@@ -44,9 +63,9 @@ export const setupDevFrontend = async (
       devFrontendLogger.debug("Binding dev server to HTTP listener", {
         tags: ["startup"],
       });
-      devServer.connectWebSocket({ server });
-      await devServer.afterListen();
-      devServer.printUrls();
+      shellDevServer.connectWebSocket({ server });
+      await shellDevServer.afterListen();
+      shellDevServer.printUrls();
       devFrontendLogger.info("Dev server ready", {
         tags: ["startup"],
       });
@@ -55,7 +74,7 @@ export const setupDevFrontend = async (
       devFrontendLogger.debug("Closing dev server", {
         tags: ["shutdown"],
       });
-      await devServer.close();
+      await Promise.all([shellDevServer.close(), snbDevServer.close()]);
       devFrontendLogger.info("Dev server closed", {
         tags: ["shutdown"],
       });

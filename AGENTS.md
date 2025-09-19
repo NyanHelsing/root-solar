@@ -10,16 +10,18 @@ root.solar curates a living canon of operating principles so humans and autonomo
 See `README.md` for cloning instructions, Podman quick start, component-specific commands, and development resources.
 
 ## Project Structure & Module Organization
-TypeScript sources live in `src/`. `src/server.ts` boots the Express API and wires TRPC middleware from `src/api/`, while React UI modules sit alongside styling in `.tsx` and `.module.scss` pairs. Helpers sit in `src/data` and `src/data-providers`. SurrealDB persistence lives in `src/api/persistence`, with entity models under `entities/` and connection helpers in `db.ts`. Static assets go in `assets/`, automation in `infra/`, and `root-solar/rpc/` holds RPC contracts. Workspace packages live under `packages/` (for example, `@root-solar/observability`, `@root-solar/auth`).
+TypeScript sources for the API runtime live in `src/`, with `src/server.ts` booting the Express entry point. Shared TRPC router, client, context, and persistence helpers are published from the `@root-solar/api` workspace package (`packages/api`). The module-federated client is split between `apps/shell` (host shell) and `apps/snb` (search & browse remote), with shared styling in `apps/shared`. Additional helpers stay in `src/data-providers`. Static assets go in `assets/`, automation in `infra/`, and `root-solar/rpc/` holds RPC contracts. Workspace packages live under `packages/` (for example, `@root-solar/observability`, `@root-solar/auth`).
 
 ## Build, Test, and Development Commands
-- `mise run dev` (alias: `pnpm rsbuild dev`): launches the RSBuild dev server with React reloading.
+- `mise run dev`: launches the Express server, shell host, and SNB remote together with hot reload.
 - `mise run start` (alias: `pnpm start`): runs the production Express entry point on `PORT` (defaults to 3000).
+- `pnpm run dev:snb`: runs the search & browse remote standalone.
+- `pnpm run dev:shell`: runs the shell host standalone (expects the remote to be available).
 - `pnpm dlx surrealdb sql --ns root-solar --db root-solar`: open an interactive Surreal shell against the embedded SurrealKV store for data inspection.
 - Package-specific tests: `pnpm --filter <package-name> test` (for example, `@root-solar/auth`).
 
 ## Coding Style & Naming Conventions
-Follow TypeScript strictness and keep 2-space indentation, double-quoted strings, and terminating semicolons to match existing files. React components live in PascalCase files (`Main.tsx`, `Hero.tsx`) exporting the component as default to support `React.lazy`, with matching SCSS modules (`Hero.module.scss`). Co-locate hooks and utilities next to the features that consume them. For workspace packages, follow `packages/your-package/src` layout with named exports from `src/index.ts`. Keep Surreal queries encapsulated inside repository helpers under `src/api/persistence`.
+Follow TypeScript strictness and keep 2-space indentation, double-quoted strings, and terminating semicolons to match existing files. React components live in PascalCase files (`Main.tsx`, `Hero.tsx`) exporting the component as default to support `React.lazy`, with matching SCSS modules (`Hero.module.scss`). Co-locate hooks and utilities next to the features that consume them. For workspace packages, follow `packages/your-package/src` layout with named exports from `src/index.ts`. Keep Surreal queries encapsulated inside the repositories exposed by `@root-solar/api` rather than issuing raw queries from feature code.
 
 ## SurrealDB Usage
 All persistence flows use the native Surreal driver via `surrealkv://root-solar`, so development runs without an external daemon. Fetch a database handle with `getDb()` and scope queries to the `root-solar` namespace/database. Wrap mutations in reusable functions (for example, `Axiom.find` / `Axiom.persist`) so callers avoid raw query strings. When you need new tables or relations, document the schema in `entities/` and include a helper to seed representative data.

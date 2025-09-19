@@ -41,7 +41,7 @@ The project runs on three planes (consensus, coordination, persistence). Read th
 ## Starting Components Individually
 - **Everything:** `mise run dev`
 - **API only:** `mise run start`
-- **Client only:** `pnpm rsbuild dev`
+- **Client only:** run `pnpm run dev:snb` (remote) alongside `pnpm run dev:shell` (host)
 - **Container baseline:** `podman run root-solar` as shown above for production-style runs.
 
 ## Developing

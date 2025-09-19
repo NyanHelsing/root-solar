@@ -2,7 +2,7 @@ import type { Libp2p } from "libp2p";
 import type { PeerId, Stream } from "@libp2p/interface";
 import { Uint8ArrayList } from "uint8arraylist";
 
-import type { SentimentModel } from "../api/persistence/entities/index.ts";
+import type { SentimentModel } from "@root-solar/api";
 import { createAppLogger, type AppLogger } from "@root-solar/observability";
 
 const encoder = new TextEncoder();
