@@ -32,9 +32,9 @@
       "types": "./src/persistence/entities/index.ts",
       "default": "./src/persistence/entities/index.ts"
     },
-    "./net": {
-      "types": "./src/net/status.ts",
-      "default": "./src/net/status.ts"
+    "./net/sentiment-provider": {
+      "types": "./src/net/sentiment-provider.ts",
+      "default": "./src/net/sentiment-provider.ts"
     }
   },
   "main": "./src/index.ts",

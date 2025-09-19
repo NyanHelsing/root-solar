@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { createAppLogger } from "@root-solar/observability";
 import { type Context } from "./context.ts";
-import { getNetworkStatus } from "../net/status.ts";
+import { getNetworkStatus } from "@root-solar/net/status";
 
 export const t = initTRPC.context<Context>().create();
 

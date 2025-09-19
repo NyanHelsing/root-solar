@@ -7,10 +7,14 @@ let currentStatus: SentimentNetworkStatus = { state: "offline" };
 export const registerSentimentNetwork = (instance: SentimentNetwork) => {
   network = instance;
   unsubscribe?.();
-  currentStatus = instance.getStatus();
-  unsubscribe = instance.onStatusChange((status) => {
+  const status = instance.getStatus?.();
+  if (status) {
+    currentStatus = status;
+  }
+  const off = instance.onStatusChange?.((status) => {
     currentStatus = status;
   });
+  unsubscribe = typeof off === "function" ? off : undefined;
 };
 
 export const clearSentimentNetwork = () => {

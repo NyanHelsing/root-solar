@@ -7,13 +7,14 @@
     "dev:shell": "rsbuild dev --config apps/shell/rsbuild.config.ts",
     "dev:snb": "rsbuild dev --config apps/snb/rsbuild.config.ts",
     "test": "pnpm run test:unit && pnpm run test:component && pnpm run test:integration",
-    "test:unit": "node --experimental-strip-types --test \"src/**/*.unit.test.ts\"",
+    "test:unit": "node --experimental-strip-types --test \"src/**/*.unit.test.ts\" \"packages/**/src/**/*.unit.test.ts\"",
     "test:component": "playwright test -c playwright-ct.config.ts",
     "test:integration": "playwright test -c playwright.config.ts"
   },
   "type": "module",
   "dependencies": {
     "@root-solar/api": "workspace:*",
+    "@root-solar/net": "workspace:*",
     "@root-solar/observability": "workspace:*",
     "@chainsafe/libp2p-noise": "^16.1.4",
     "@chainsafe/libp2p-yamux": "^7.0.4",

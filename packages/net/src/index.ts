@@ -2,7 +2,6 @@ import type { Libp2p } from "libp2p";
 import type { PeerId, Stream } from "@libp2p/interface";
 import { Uint8ArrayList } from "uint8arraylist";
 
-import type { SentimentModel } from "@root-solar/api";
 import { createAppLogger, type AppLogger } from "@root-solar/observability";
 
 const encoder = new TextEncoder();
@@ -125,69 +124,18 @@ const isSentimentResponse = (value: unknown): value is SentimentResponse => {
   );
 };
 
-const gcd = (a: number, b: number): number => {
-  let x = Math.abs(Math.trunc(a));
-  let y = Math.abs(Math.trunc(b));
-  while (y !== 0) {
-    const remainder = x % y;
-    x = y;
-    y = remainder;
-  }
-  return x === 0 ? 1 : x;
-};
-
-const normaliseFraction = (numerator: number, denominator: number) => {
-  if (numerator <= 0) {
-    return { numerator: 0, denominator: 1 } satisfies SentimentFraction;
-  }
-  if (denominator <= 0) {
-    return { numerator: 0, denominator: 1 } satisfies SentimentFraction;
-  }
-
-  let safeNumerator = Math.trunc(numerator);
-  let safeDenominator = Math.trunc(denominator);
-
-  if (safeNumerator >= safeDenominator) {
-    safeDenominator = safeNumerator + 1;
-  }
-
-  const divisor = gcd(safeNumerator, safeDenominator);
-  return {
-    numerator: safeNumerator / divisor,
-    denominator: safeDenominator / divisor,
-  } satisfies SentimentFraction;
-};
-
-const parseSentimentRecordId = (recordId: string) => {
-  const [beingRaw, type, axiomRaw] = recordId.split(":");
-  if (!beingRaw || !type || !axiomRaw) {
-    throw new Error(`Invalid sentiment record identifier: ${recordId}`);
-  }
-
-  return { beingId: beingRaw, type, axiomId: axiomRaw };
-};
-
-export const createModelBackedSentimentProvider = (
-  sentiments: SentimentModel,
-): SentimentProvider => {
-  return async (recordId) => {
-    const { beingId, type, axiomId } = parseSentimentRecordId(recordId);
-    const allocations = await sentiments.listForBeing(beingId, { type });
-    const match = allocations.find((allocation) => allocation.axiomId === axiomId);
-    if (!match) {
-      return null;
-    }
-
-    return normaliseFraction(match.weight, match.totalWeightForType);
-  };
-};
-
 export interface SentimentNetworkOptions {
   libp2p: Libp2p;
   getSentiment: SentimentProvider;
   protocol?: string;
   logger?: Logger;
 }
+
+export type SentimentNetworkStatus =
+  | { state: "offline" }
+  | { state: "starting" }
+  | { state: "ready"; protocol: string; peerId?: string }
+  | { state: "error"; message: string };
 
 export interface SentimentNetwork {
   protocol: string;
@@ -196,6 +144,10 @@ export interface SentimentNetwork {
     recordId: string,
   ) => Promise<SentimentFraction | null>;
   close: () => Promise<void>;
+  getStatus?: () => SentimentNetworkStatus;
+  onStatusChange?: (
+    listener: (status: SentimentNetworkStatus) => void,
+  ) => void | (() => void);
 }
 
 export const createSentimentNetwork = async ({
@@ -336,3 +288,6 @@ export const createSentimentNetwork = async ({
 
   return { protocol, querySentiment, close };
 };
+
+export { getSentimentNetwork, getSentimentNetworkStatus, registerSentimentNetwork, clearSentimentNetwork, setSentimentNetworkStatus } from "./runtime.ts";
+export { getNetworkStatus, setNetworkStatus, type NetworkStatus } from "./status.ts";

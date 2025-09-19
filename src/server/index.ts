@@ -1,7 +1,7 @@
 import type { Server } from "node:http";
 
 import { createAppLogger } from "@root-solar/observability";
-import { setNetworkStatus } from "@root-solar/api/net";
+import { setNetworkStatus } from "@root-solar/net/status";
 
 import { createBaseApp } from "./app.ts";
 import { createServerContext } from "./context.ts";

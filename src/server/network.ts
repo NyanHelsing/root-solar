@@ -5,12 +5,12 @@ import { tcp } from "@libp2p/tcp";
 import { createLibp2p, type Libp2p } from "libp2p";
 
 import type { Context } from "@root-solar/api";
-import { createAppLogger } from "@root-solar/observability";
+import { createModelBackedSentimentProvider } from "@root-solar/api";
 import {
-  createModelBackedSentimentProvider,
   createSentimentNetwork,
   type SentimentNetwork,
-} from "../net/index.ts";
+} from "@root-solar/net";
+import { createAppLogger } from "@root-solar/observability";
 
 const networkLogger = createAppLogger("server:network", {
   tags: ["server", "network"],
