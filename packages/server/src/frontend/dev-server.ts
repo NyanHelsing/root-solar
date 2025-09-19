@@ -1,15 +1,38 @@
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
 import { createRsbuild, mergeRsbuildConfig } from "@rsbuild/core";
 import type { Application } from "express";
 
 import { createAppLogger } from "@root-solar/observability";
+import {
+  DEFAULT_SNB_MOUNT,
+  resolveMountPath,
+} from "../../../../config/mfePaths.ts";
 import type { FrontendLifecycle } from "./types.ts";
 
 const devFrontendLogger = createAppLogger("server:frontend:dev", {
   tags: ["server", "frontend", "dev"],
 });
 
+const ROOT_DIR = process.env.ROOT_SOLAR_ROOT
+  ? path.resolve(process.env.ROOT_SOLAR_ROOT)
+  : process.cwd();
+
 const loadRsbuildConfigs = async () => {
-  const module = await import("../../../rsbuild.config.ts");
+  const remotePath = resolveMountPath(
+    process.env.SNB_REMOTE_PATH,
+    DEFAULT_SNB_MOUNT,
+  );
+  if (!process.env.SNB_REMOTE_PATH) {
+    process.env.SNB_REMOTE_PATH = remotePath;
+  }
+  if (!process.env.SNB_REMOTE_URL) {
+    process.env.SNB_REMOTE_URL = `http://localhost:3101${remotePath}`;
+  }
+  const configModuleUrl = pathToFileURL(path.join(ROOT_DIR, "rsbuild.config.ts"))
+    .href;
+  const module = await import(configModuleUrl);
   const shellConfig = module.shellConfig ?? module.default ?? {};
   const snbConfig = module.snbConfig ?? {};
   return { shellConfig, snbConfig };

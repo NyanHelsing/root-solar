@@ -1,11 +1,19 @@
 import { access, readFile } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 import express from "express";
 import type { Application, NextFunction, Request, Response } from "express";
 
 import { createAppLogger } from "@root-solar/observability";
+import {
+  DEFAULT_SHELL_DIST_SUBDIR,
+  DEFAULT_SHELL_MOUNT,
+  DEFAULT_SNB_DIST_SUBDIR,
+  DEFAULT_SNB_MOUNT,
+  resolveDistSubdir,
+  resolveMountPath,
+} from "../../../../config/mfePaths.ts";
 import type { FrontendLifecycle } from "./types.ts";
 
 const prodFrontendLogger = createAppLogger("server:frontend:prod", {
@@ -21,10 +29,25 @@ const SSR_ENTRY_CANDIDATES = [
   "entry-server.js",
 ] as const;
 
-const HERE = fileURLToPath(new URL(".", import.meta.url));
-const ROOT_DIR = path.resolve(HERE, "../../../");
-const DIST_DIR = path.join(ROOT_DIR, "dist");
-const INDEX_HTML = path.join(DIST_DIR, "index.html");
+const ROOT_DIR = process.env.ROOT_SOLAR_ROOT
+  ? path.resolve(process.env.ROOT_SOLAR_ROOT)
+  : process.cwd();
+const DIST_ROOT = path.join(ROOT_DIR, "dist");
+const SHELL_DIST_DIR = path.join(DIST_ROOT, DEFAULT_SHELL_DIST_SUBDIR);
+const resolvePrimaryTemplate = (): string => {
+  const hint = process.env.SHELL_HTML?.trim();
+  if (!hint) {
+    return path.join(DIST_ROOT, "index.html");
+  }
+  return path.isAbsolute(hint) ? hint : path.join(DIST_ROOT, hint);
+};
+
+const PRIMARY_TEMPLATE = resolvePrimaryTemplate();
+const SHELL_TEMPLATE_FALLBACK = path.join(
+  DIST_ROOT,
+  DEFAULT_SHELL_DIST_SUBDIR,
+  "index.html",
+);
 
 const fileExists = async (filepath: string) => {
   try {
@@ -52,7 +75,7 @@ type SsrRenderer = (options: {
 
 const inferRenderer = async (): Promise<SsrRenderer | null> => {
   for (const candidate of SSR_ENTRY_CANDIDATES) {
-    const entryPath = path.join(DIST_DIR, candidate);
+    const entryPath = path.join(DIST_ROOT, candidate);
     if (!(await fileExists(entryPath))) {
       continue;
     }
@@ -92,6 +115,15 @@ const createRequestHandler = (
   renderer: SsrRenderer | null,
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      return next();
+    }
+
+    const acceptsHtml = req.headers.accept?.includes("text/html");
+    if (!acceptsHtml) {
+      return next();
+    }
+
     try {
       prodFrontendLogger.debug("Handling SSR request", {
         url: req.originalUrl,
@@ -130,34 +162,73 @@ const createRequestHandler = (
   };
 };
 
+const mountStaticIfPresent = async (
+  app: Application,
+  mountPath: string,
+  directory: string,
+) => {
+  if (!(await fileExists(directory))) {
+    prodFrontendLogger.debug("Static directory missing; skipping mount", {
+      mountPath,
+      directory,
+      tags: ["startup", "frontend"],
+    });
+    return;
+  }
+
+  prodFrontendLogger.debug("Attaching static middleware", {
+    mountPath,
+    directory,
+    tags: ["startup", "frontend"],
+  });
+  app.use(mountPath, express.static(directory, { index: false }));
+};
+
+const resolveTemplatePath = async (): Promise<string> => {
+  if (await fileExists(PRIMARY_TEMPLATE)) {
+    return PRIMARY_TEMPLATE;
+  }
+  if (await fileExists(SHELL_TEMPLATE_FALLBACK)) {
+    return SHELL_TEMPLATE_FALLBACK;
+  }
+  throw new Error(
+    `Unable to locate an HTML template under dist/. Expected ${PRIMARY_TEMPLATE} or ${SHELL_TEMPLATE_FALLBACK}. Run "pnpm run build" before starting in production mode.`,
+  );
+};
+
 export const setupProdFrontend = async (
   app: Application,
 ): Promise<FrontendLifecycle> => {
-  if (!(await fileExists(INDEX_HTML))) {
-    prodFrontendLogger.error("Production index.html missing", {
-      filepath: INDEX_HTML,
-      tags: ["startup", "frontend"],
-    });
-    throw new Error(
-      `Unable to locate ${INDEX_HTML}. Run \"pnpm rsbuild build\" before starting in production mode.`,
-    );
-  }
+  const templatePath = await resolveTemplatePath();
+
+  const shellDist = SHELL_DIST_DIR;
 
   prodFrontendLogger.info("Configuring production frontend", {
-    distDir: DIST_DIR,
+    distDir: shellDist,
+    templatePath,
     tags: ["startup", "frontend"],
   });
-  const template = await readFile(INDEX_HTML, "utf-8");
+  const template = await readFile(templatePath, "utf-8");
   prodFrontendLogger.debug("Production template loaded", {
     length: template.length,
     tags: ["startup", "frontend"],
   });
   const renderer = await inferRenderer();
 
-  app.use(express.static(DIST_DIR, { index: false }));
-  prodFrontendLogger.debug("Static middleware attached", {
-    tags: ["startup", "frontend"],
-  });
+  const shellStaticMount = resolveMountPath(
+    process.env.SHELL_STATIC_PATH,
+    DEFAULT_SHELL_MOUNT,
+  );
+  await mountStaticIfPresent(app, shellStaticMount, shellDist);
+
+  const snbMount = resolveMountPath(process.env.SNB_REMOTE_PATH, DEFAULT_SNB_MOUNT);
+  const snbDistSubdir = resolveDistSubdir(
+    process.env.SNB_DIST_SUBDIR,
+    DEFAULT_SNB_DIST_SUBDIR,
+  );
+  const snbDist = path.join(DIST_ROOT, snbDistSubdir);
+  await mountStaticIfPresent(app, snbMount, snbDist);
+
   app.use(createRequestHandler(template, renderer));
 
   return {

@@ -4,7 +4,7 @@ import {
   initializeObservability,
   parseLogLevel,
 } from "@root-solar/observability";
-import { startServer } from "./server/index.ts";
+import { startServer } from "@root-solar/server";
 
 const environment = process.env.NODE_ENV ?? "development";
 const desiredLevel =
