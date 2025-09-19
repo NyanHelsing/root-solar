@@ -3,6 +3,7 @@ import type { PeerId, Stream } from "@libp2p/interface";
 import { Uint8ArrayList } from "uint8arraylist";
 
 import type { SentimentModel } from "../api/persistence/entities/index.ts";
+import { createAppLogger, type AppLogger } from "../logging/index.ts";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -29,9 +30,11 @@ export type SentimentProvider = (
 
 type StreamHandler = Parameters<Libp2p["handle"]>[1];
 
-type Logger = Pick<Console, "debug" | "error">;
+type Logger = AppLogger;
 
-const defaultLogger: Logger = console;
+const defaultLogger = createAppLogger("network:sentiment", {
+  tags: ["network", "sentiment"],
+});
 
 const toUint8Array = (chunk: Uint8Array | Uint8ArrayList) => {
   return chunk instanceof Uint8ArrayList ? chunk.subarray() : chunk;
@@ -70,7 +73,9 @@ const writeJson = async (stream: Stream, value: unknown, logger: Logger) => {
     try {
       await stream.closeWrite();
     } catch (error) {
-      logger.debug("Failed closing write side", error);
+      logger.debug("Failed closing write side", error, {
+        tags: ["network", "stream"],
+      });
     }
   }
 };
@@ -80,7 +85,9 @@ const closeStream = async (stream: Stream, logger: Logger) => {
     try {
       await stream.close();
     } catch (error) {
-      logger.debug("Failed closing stream", error);
+      logger.debug("Failed closing stream", error, {
+        tags: ["network", "stream"],
+      });
     }
   }
 };
@@ -206,14 +213,26 @@ export const createSentimentNetwork = async ({
       }
 
       recordId = request.recordId;
+      logger.debug("Processing sentiment request", {
+        recordId,
+        tags: ["sentiment", "handler"],
+      });
       const fraction = await getSentiment(recordId);
       const response: SentimentResponse = fraction
         ? { status: "ok", recordId, fraction }
         : { status: "not_found", recordId };
 
       await writeJson(stream, response, logger);
+      logger.debug("Sentiment response written", {
+        recordId,
+        status: response.status,
+        tags: ["sentiment", "handler"],
+      });
     } catch (error) {
-      logger.error("sentiment handler error", error);
+      logger.error("Sentiment handler error", error, {
+        recordId,
+        tags: ["sentiment", "handler"],
+      });
       const response: SentimentResponse = {
         status: "error",
         message: error instanceof Error ? error.message : "Unknown sentiment error",
@@ -222,7 +241,10 @@ export const createSentimentNetwork = async ({
       try {
         await writeJson(stream, response, logger);
       } catch (innerError) {
-        logger.error("failed to reply with sentiment error", innerError);
+        logger.error("Failed to reply with sentiment error", innerError, {
+          recordId,
+          tags: ["sentiment", "handler"],
+        });
       }
     } finally {
       await closeStream(stream, logger);
@@ -239,9 +261,19 @@ export const createSentimentNetwork = async ({
       throw new Error("recordId must be provided");
     }
 
+    logger.debug("Dialing peer for sentiment", {
+      peerId: peerId.toString(),
+      recordId,
+      tags: ["sentiment", "client"],
+    });
     const { stream } = await libp2p.dialProtocol(peerId, protocol);
     try {
       await writeJson(stream, { recordId } satisfies SentimentRequest, logger);
+      logger.debug("Sentiment query sent", {
+        peerId: peerId.toString(),
+        recordId,
+        tags: ["sentiment", "client"],
+      });
       const payload = await readJson<unknown>(stream);
       if (!isSentimentResponse(payload)) {
         throw new Error("Invalid sentiment response payload");
@@ -251,10 +283,21 @@ export const createSentimentNetwork = async ({
         if (payload.fraction.denominator === 0) {
           throw new Error("Invalid fraction received: denominator is zero");
         }
+        logger.debug("Received sentiment fraction", {
+          peerId: peerId.toString(),
+          recordId,
+          fraction: payload.fraction,
+          tags: ["sentiment", "client"],
+        });
         return payload.fraction;
       }
 
       if (payload.status === "not_found") {
+        logger.debug("Sentiment record not found", {
+          peerId: peerId.toString(),
+          recordId,
+          tags: ["sentiment", "client"],
+        });
         return null;
       }
 
@@ -263,6 +306,11 @@ export const createSentimentNetwork = async ({
       if (typeof stream.abort === "function") {
         stream.abort(error instanceof Error ? error : new Error(String(error)));
       }
+      logger.error("Sentiment query failed", error, {
+        peerId: peerId.toString(),
+        recordId,
+        tags: ["sentiment", "client"],
+      });
       throw error;
     } finally {
       await closeStream(stream, logger);
@@ -270,10 +318,21 @@ export const createSentimentNetwork = async ({
   };
 
   const close = async () => {
+    logger.debug("Unregistering sentiment protocol handler", {
+      protocol,
+      tags: ["sentiment"],
+    });
     await libp2p.unhandle(protocol);
+    logger.info("Sentiment protocol handler unregistered", {
+      protocol,
+      tags: ["sentiment"],
+    });
   };
 
-  logger.debug(`Registered sentiment protocol handler for ${protocol}`);
+  logger.info("Sentiment protocol handler registered", {
+    protocol,
+    tags: ["sentiment"],
+  });
 
   return { protocol, querySentiment, close };
 };

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@catsle/caretta':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@chainsafe/libp2p-noise':
         specifier: ^16.1.4
         version: 16.1.4
@@ -107,6 +110,10 @@ packages:
 
   '@bufbuild/protobuf@2.6.3':
     resolution: {integrity: sha512-w/gJKME9mYN7ZoUAmSMAWXk4hkVpxRKvEJCb3dV5g9wwWdxTJJ0ayOJAVcNxtdqaxDyFuC0uz4RSGVacJ030PQ==}
+
+  '@catsle/caretta@1.0.3':
+    resolution: {integrity: sha512-Ppu0oI68H8uHi7k/lne/WNJS/9X0Q18iEPAdqVB71wY5xw/Sczz6ljYf84DYLLRy4KqceRO51TI93JscSfdgEg==}
+    engines: {node: '>=23'}
 
   '@chainsafe/as-chacha20poly1305@0.1.0':
     resolution: {integrity: sha512-BpNcL8/lji/GM3+vZ/bgRWqJ1q5kwvTFmGPk7pxm/QQZDbaMI98waOHjEymTjq2JmdD/INdNBFOVSyJofXg7ew==}
@@ -1448,6 +1455,8 @@ packages:
 snapshots:
 
   '@bufbuild/protobuf@2.6.3': {}
+
+  '@catsle/caretta@1.0.3': {}
 
   '@chainsafe/as-chacha20poly1305@0.1.0': {}
 

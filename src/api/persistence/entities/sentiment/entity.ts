@@ -1,6 +1,11 @@
 import { RecordId, StringRecordId } from "surrealdb";
 
+import { createAppLogger } from "../../../../logging/index.ts";
 import type { Context } from "../../../context.ts";
+
+const sentimentLogger = createAppLogger("persistence:sentiment", {
+  tags: ["persistence", "sentiment"],
+});
 
 const SENTIMENT_TABLE = "sentiment" as const;
 const BEING_TABLE = "being" as const;
@@ -55,6 +60,11 @@ const selectSentiments = async (
   ctx: Context,
   { beingId, type }: { beingId: string; type?: string },
 ) => {
+  sentimentLogger.debug("Selecting sentiments", {
+    beingId,
+    type,
+    tags: ["query"],
+  });
   const statement = type
     ? "SELECT * FROM type::table($table) WHERE beingId = $beingId AND type = $type"
     : "SELECT * FROM type::table($table) WHERE beingId = $beingId";
@@ -73,21 +83,42 @@ const selectSentiments = async (
   );
 
   if (!queryResult || queryResult.status !== "OK") {
+    sentimentLogger.warn("Sentiment selection query failed", {
+      beingId,
+      type,
+      status: queryResult?.status,
+      tags: ["query"],
+    });
     return [] as SentimentRecord[];
   }
 
   const records = queryResult.result;
   if (!Array.isArray(records)) {
+    sentimentLogger.warn("Unexpected sentiment query result shape", {
+      beingId,
+      type,
+      tags: ["query"],
+    });
     return [] as SentimentRecord[];
   }
-
-  return records.map(toSentimentRecord);
+  const mapped = records.map(toSentimentRecord);
+  sentimentLogger.debug("Sentiments selected", {
+    beingId,
+    type,
+    count: mapped.length,
+    tags: ["query"],
+  });
+  return mapped;
 };
 
 const ensureBeingExists = async (ctx: Context, beingId: string) => {
   const record = await ctx.db.select(new StringRecordId(beingId));
   const being = unwrapSingle(record);
   if (!being) {
+    sentimentLogger.warn("Being missing during sentiment operation; creating", {
+      beingId,
+      tags: ["mutation", "being"],
+    });
     return await ctx.beings.create({ name: "superuser" });
   }
 };
@@ -115,6 +146,15 @@ export const createSentimentModel = (ctx: Context) => {
       weight: number;
       maxWeight?: number;
     }) {
+      sentimentLogger.debug("Upserting sentiment", {
+        beingId,
+        axiomId,
+        type,
+        weight,
+        maxWeight,
+        tags: ["mutation", "upsert"],
+      });
+
       assertInteger(weight, "weight");
       if (weight < 0) {
         throw new Error("weight must be non-negative");
@@ -145,7 +185,19 @@ export const createSentimentModel = (ctx: Context) => {
       }
 
       if (weight === 0) {
+        sentimentLogger.debug("Weight is zero; deleting sentiment record", {
+          beingId,
+          axiomId,
+          type,
+          tags: ["mutation", "upsert"],
+        });
         await ctx.db.delete(new RecordId(SENTIMENT_TABLE, sentimentId));
+        sentimentLogger.info("Sentiment removed due to zero weight", {
+          beingId,
+          axiomId,
+          type,
+          tags: ["mutation", "upsert"],
+        });
         return null;
       }
 
@@ -161,19 +213,39 @@ export const createSentimentModel = (ctx: Context) => {
       );
       const stored = unwrapSingle(record);
       if (!stored) {
+        sentimentLogger.warn("Upsert returned empty record", {
+          beingId,
+          axiomId,
+          type,
+          tags: ["mutation", "upsert"],
+        });
         return null;
       }
 
       const ratio = newTotalWeight === 0 ? 0 : weight / newTotalWeight;
 
-      return {
+      const allocation = {
         ...toSentimentRecord(stored),
         totalWeightForType: newTotalWeight,
         ratio,
         maxWeight,
       } satisfies SentimentAllocation;
+      sentimentLogger.info("Sentiment upserted", {
+        beingId,
+        axiomId,
+        type,
+        weight,
+        totalWeightForType: newTotalWeight,
+        tags: ["mutation", "upsert"],
+      });
+      return allocation;
     },
     async listForBeing(beingId: string, options?: { type?: string }) {
+      sentimentLogger.debug("Listing sentiments for being", {
+        beingId,
+        type: options?.type,
+        tags: ["query"],
+      });
       //const sentiments = await selectSentiments(ctx, {
       //  beingId,
       //  type: options?.type,
@@ -182,8 +254,18 @@ export const createSentimentModel = (ctx: Context) => {
         `SELECT * FROM ${SENTIMENT_TABLE} WHERE beingId = $beingId`,
         { beingId },
       );
-      console.log({ sentiments });
+      if (!Array.isArray(sentiments)) {
+        sentimentLogger.warn("Unexpected sentiments result from listForBeing", {
+          beingId,
+          tags: ["query"],
+        });
+        return [] as SentimentAllocation[];
+      }
       if (sentiments.length === 0) {
+        sentimentLogger.debug("No sentiments found", {
+          beingId,
+          tags: ["query"],
+        });
         return [] as SentimentAllocation[];
       }
 
@@ -195,7 +277,7 @@ export const createSentimentModel = (ctx: Context) => {
         return acc;
       }, new Map<string, number>());
 
-      return sentiments.map((sentiment) => {
+      const allocations = sentiments.map((sentiment) => {
         const totalWeightForType = totals.get(sentiment.type) ?? 0;
         const ratio =
           totalWeightForType === 0 ? 0 : sentiment.weight / totalWeightForType;
@@ -205,6 +287,13 @@ export const createSentimentModel = (ctx: Context) => {
           ratio,
         } satisfies SentimentAllocation;
       });
+      sentimentLogger.debug("Sentiments listed", {
+        beingId,
+        count: allocations.length,
+        type: options?.type,
+        tags: ["query"],
+      });
+      return allocations;
     },
     async remove({
       beingId,
@@ -215,9 +304,21 @@ export const createSentimentModel = (ctx: Context) => {
       axiomId: string;
       type: string;
     }) {
+      sentimentLogger.debug("Removing sentiment", {
+        beingId,
+        axiomId,
+        type,
+        tags: ["mutation", "remove"],
+      });
       await ctx.db.delete(
         new RecordId(SENTIMENT_TABLE, `${beingId}:${type}:${axiomId}`),
       );
+      sentimentLogger.info("Sentiment removed", {
+        beingId,
+        axiomId,
+        type,
+        tags: ["mutation", "remove"],
+      });
     },
   } satisfies {
     upsert: (input: {
