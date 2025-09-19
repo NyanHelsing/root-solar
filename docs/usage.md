@@ -15,7 +15,7 @@ Once the application is running (either through Podman or local scripts), keep t
 ## Hot Reload Development Loop
 - UI + API together: `mise run dev`
 - API only: `mise run start`
-- Client only: `pnpm rsbuild dev`
+- Client only: run `pnpm run dev:snb` for the remote and `pnpm run dev:shell` for the shell host
 
 ## Observability Quick Wins
 - Tail server logs: `pnpm start -- --inspect` (local dev)

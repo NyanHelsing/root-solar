@@ -32,7 +32,7 @@ root.solar operates as a layered mesh that balances human-coordinated governance
 ## Package Placement Heuristics
 - If the package will live with HTTP lifecycle concerns, keep it under `src/server` or `src/features` depending on exposure.
 - Messaging or streaming adapters belong under `src/net` or a dedicated workspace package (`packages/*`) when reused across multiple surfaces.
-- Persistence models and repositories stay in `src/api/persistence`, with shared entity definitions exported via `entities/index.ts`.
+- Persistence models and repositories live in the `@root-solar/api` workspace package (`packages/api/src/persistence`), with shared entity definitions exported via `entities/index.ts`.
 
 ## Reference Topology
 ```

@@ -10,10 +10,11 @@ SURREAL_DATABASE = "root-solar"
 pnpm = "latest"
 
 [tasks.build]
-run = "pnpm rsbuild build"
+run = "pnpm run build"
 
 [tasks.dev]
-run = "pnpm rsbuild dev"
+env = { ENV = "development", NODE_ENV = "development" }
+run = "pnpm start"
 
 [tasks.start]
 run = "pnpm start"

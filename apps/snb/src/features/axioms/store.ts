@@ -1,8 +1,7 @@
 import { atom } from "jotai";
 
-import { client } from "../../api/client.ts";
-import type { AxiomRecord } from "../../api/persistence/entities/index.ts";
-import type { SentimentAllocation } from "../../api/persistence/entities/index.ts";
+import { client } from "@root-solar/api/client";
+import type { AxiomRecord, SentimentAllocation } from "@root-solar/api";
 import { createAppLogger } from "@root-solar/observability";
 import { beingAtom } from "../beings/store.ts";
 

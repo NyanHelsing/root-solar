@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-import { client } from "../../api/client.ts";
+import { client } from "@root-solar/api/client";
 
 export type NetworkStatus =
   | { state: "offline" }
