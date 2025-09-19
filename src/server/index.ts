@@ -1,5 +1,6 @@
 import type { Server } from "node:http";
 
+import { createAppLogger } from "../logging/index.ts";
 import { setNetworkStatus } from "../net/status.ts";
 
 import { createBaseApp } from "./app.ts";
@@ -8,6 +9,10 @@ import { PORT } from "./config.ts";
 import { setupFrontend, type FrontendLifecycle } from "./frontend/index.ts";
 import { createNetwork, shutdownNetwork, type NetworkResources } from "./network.ts";
 
+const serverLogger = createAppLogger("server:lifecycle", {
+  tags: ["server", "lifecycle"],
+});
+
 export interface ShutdownOptions {
   reason?: string;
   markOffline?: boolean;
@@ -15,6 +20,9 @@ export interface ShutdownOptions {
 
 export const startServer = async () => {
   setNetworkStatus({ state: "starting" });
+  serverLogger.info("Server startup initiated", {
+    tags: ["startup"],
+  });
 
   let shuttingDown = false;
   let frontend: FrontendLifecycle | null = null;
@@ -26,51 +34,102 @@ export const startServer = async () => {
     markOffline,
   }: ShutdownOptions = {}) => {
     if (shuttingDown) {
+      serverLogger.debug("Shutdown already in progress", {
+        reason,
+        tags: ["shutdown"],
+      });
       return;
     }
     shuttingDown = true;
 
-    const suffix = reason ? ` (${reason})` : "";
-    console.info(`Shutting down${suffix}`);
+    serverLogger.info("Shutdown initiated", {
+      reason,
+      markOffline: markOffline !== false,
+      tags: ["shutdown"],
+    });
 
     if (frontend) {
+      serverLogger.debug("Closing frontend", {
+        tags: ["shutdown", "frontend"],
+      });
       try {
         await frontend.close();
+        serverLogger.debug("Frontend closed", {
+          tags: ["shutdown", "frontend"],
+        });
       } catch (error) {
-        console.error("Failed to stop frontend", error);
+        serverLogger.error("Failed to stop frontend", error, {
+          tags: ["shutdown", "frontend"],
+        });
       }
       frontend = null;
     }
 
     if (network) {
+      serverLogger.debug("Closing network resources", {
+        tags: ["shutdown", "network"],
+      });
       try {
         await shutdownNetwork(network);
+        serverLogger.debug("Network resources closed", {
+          tags: ["shutdown", "network"],
+        });
       } catch (error) {
-        console.error("Failed to stop network", error);
+        serverLogger.error("Failed to stop network", error, {
+          tags: ["shutdown", "network"],
+        });
       }
       network = undefined;
     }
 
     if (server && server.listening) {
+      serverLogger.debug("Closing HTTP server", {
+        tags: ["shutdown", "http"],
+      });
       await new Promise<void>((resolve) => {
         server?.close(() => {
           resolve();
         });
+      });
+      serverLogger.debug("HTTP server closed", {
+        tags: ["shutdown", "http"],
       });
     }
     server = undefined;
 
     if (markOffline !== false) {
       setNetworkStatus({ state: "offline" });
+      serverLogger.info("Server marked offline", {
+        tags: ["shutdown"],
+      });
     }
+
+    serverLogger.info("Shutdown complete", {
+      reason,
+      tags: ["shutdown"],
+    });
   };
 
   try {
+    serverLogger.debug("Creating server context", {
+      tags: ["startup"],
+    });
     const context = await createServerContext();
+    serverLogger.debug("Server context ready", {
+      tags: ["startup"],
+    });
     network = await createNetwork(context);
+    serverLogger.info("Network resources initialized", {
+      tags: ["startup", "network"],
+      peerId: network.libp2p.peerId.toString(),
+      protocols: [network.sentimentNetwork.protocol],
+    });
 
     const app = createBaseApp();
     frontend = await setupFrontend(app);
+    serverLogger.debug("Frontend setup complete", {
+      tags: ["startup", "frontend"],
+    });
 
     server = app.listen(PORT, () => {
       if (!network) {
@@ -81,13 +140,19 @@ export const startServer = async () => {
         protocol: network.sentimentNetwork.protocol,
         peerId: network.libp2p.peerId.toString(),
       });
-      console.info(`Server listening on ${PORT}`);
+      serverLogger.info("Server listening", {
+        tags: ["startup", "http"],
+        port: PORT,
+        protocol: network.sentimentNetwork.protocol,
+      });
     });
 
     if (frontend?.afterServerStart) {
       server.on("listening", () => {
         Promise.resolve(frontend?.afterServerStart?.(server!)).catch((error) => {
-          console.error("Failed to complete frontend startup", error);
+          serverLogger.error("Failed to complete frontend startup", error, {
+            tags: ["startup", "frontend"],
+          });
         });
       });
     }
@@ -97,22 +162,37 @@ export const startServer = async () => {
         state: "error",
         message: error instanceof Error ? error.message : String(error),
       });
+      serverLogger.error("HTTP server error", error, {
+        tags: ["runtime", "http"],
+      });
       shutdown({ reason: "server error", markOffline: false }).catch(
         (shutdownError) => {
-          console.error("Error during shutdown", shutdownError);
+          serverLogger.error("Error during shutdown", shutdownError, {
+            tags: ["shutdown"],
+          });
         },
       );
     });
 
     process.once("SIGINT", () => {
+      serverLogger.warn("SIGINT received", {
+        tags: ["shutdown", "signal"],
+      });
       shutdown({ reason: "SIGINT" }).catch((error) => {
-        console.error("Error during shutdown", error);
+        serverLogger.error("Error during shutdown", error, {
+          tags: ["shutdown"],
+        });
       });
     });
 
     process.once("SIGTERM", () => {
+      serverLogger.warn("SIGTERM received", {
+        tags: ["shutdown", "signal"],
+      });
       shutdown({ reason: "SIGTERM" }).catch((error) => {
-        console.error("Error during shutdown", error);
+        serverLogger.error("Error during shutdown", error, {
+          tags: ["shutdown"],
+        });
       });
     });
   } catch (error) {
@@ -120,7 +200,9 @@ export const startServer = async () => {
       state: "error",
       message: error instanceof Error ? error.message : String(error),
     });
-    console.error("Failed to start server", error);
+    serverLogger.error("Failed to start server", error, {
+      tags: ["startup"],
+    });
     await shutdown({ markOffline: false });
     process.exitCode = 1;
   }

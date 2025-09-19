@@ -5,7 +5,12 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import express from "express";
 import type { Application, NextFunction, Request, Response } from "express";
 
+import { createAppLogger } from "../../logging/index.ts";
 import type { FrontendLifecycle } from "./types.ts";
+
+const prodFrontendLogger = createAppLogger("server:frontend:prod", {
+  tags: ["server", "frontend", "prod"],
+});
 
 const SSR_ENTRY_CANDIDATES = [
   "server/entry.mjs",
@@ -26,6 +31,10 @@ const fileExists = async (filepath: string) => {
     await access(filepath, fsConstants.F_OK);
     return true;
   } catch {
+    prodFrontendLogger.debug("File missing", {
+      filepath,
+      tags: ["fs"],
+    });
     return false;
   }
 };
@@ -51,13 +60,30 @@ const inferRenderer = async (): Promise<SsrRenderer | null> => {
     const moduleUrl = pathToFileURL(entryPath).href;
     const module = await import(moduleUrl);
     if (typeof module.render === "function") {
+      prodFrontendLogger.info("SSR renderer located", {
+        candidate,
+        exportName: "render",
+        tags: ["startup", "ssr"],
+      });
       return (options) => module.render(options);
     }
     if (typeof module.default === "function") {
+      prodFrontendLogger.info("SSR renderer located", {
+        candidate,
+        exportName: "default",
+        tags: ["startup", "ssr"],
+      });
       return (options) => module.default(options);
     }
+    prodFrontendLogger.debug("SSR candidate missing callable export", {
+      candidate,
+      tags: ["startup", "ssr"],
+    });
   }
 
+  prodFrontendLogger.warn("No SSR renderer discovered", {
+    tags: ["startup", "ssr"],
+  });
   return null;
 };
 
@@ -67,6 +93,11 @@ const createRequestHandler = (
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
+      prodFrontendLogger.debug("Handling SSR request", {
+        url: req.originalUrl,
+        hasRenderer: Boolean(renderer),
+        tags: ["request", "ssr"],
+      });
       if (renderer) {
         const result = await renderer({ request: req, url: req.originalUrl });
         if (result.headers) {
@@ -75,12 +106,25 @@ const createRequestHandler = (
           }
         }
         res.status(result.status ?? 200).send(result.html);
+        prodFrontendLogger.debug("SSR response rendered", {
+          url: req.originalUrl,
+          status: result.status ?? 200,
+          tags: ["request", "ssr"],
+        });
         return;
       }
 
       res.setHeader("Content-Type", "text/html");
       res.status(200).send(template);
+      prodFrontendLogger.debug("SSR fallback template served", {
+        url: req.originalUrl,
+        tags: ["request", "ssr"],
+      });
     } catch (error) {
+      prodFrontendLogger.error("SSR request handling failed", error, {
+        url: req.originalUrl,
+        tags: ["request", "ssr"],
+      });
       next(error);
     }
   };
@@ -90,20 +134,38 @@ export const setupProdFrontend = async (
   app: Application,
 ): Promise<FrontendLifecycle> => {
   if (!(await fileExists(INDEX_HTML))) {
+    prodFrontendLogger.error("Production index.html missing", {
+      filepath: INDEX_HTML,
+      tags: ["startup", "frontend"],
+    });
     throw new Error(
       `Unable to locate ${INDEX_HTML}. Run \"pnpm rsbuild build\" before starting in production mode.`,
     );
   }
 
+  prodFrontendLogger.info("Configuring production frontend", {
+    distDir: DIST_DIR,
+    tags: ["startup", "frontend"],
+  });
   const template = await readFile(INDEX_HTML, "utf-8");
+  prodFrontendLogger.debug("Production template loaded", {
+    length: template.length,
+    tags: ["startup", "frontend"],
+  });
   const renderer = await inferRenderer();
 
   app.use(express.static(DIST_DIR, { index: false }));
+  prodFrontendLogger.debug("Static middleware attached", {
+    tags: ["startup", "frontend"],
+  });
   app.use(createRequestHandler(template, renderer));
 
   return {
     close: async () => {
       // no resources to clean up for the static renderer
+      prodFrontendLogger.debug("Production frontend close invoked", {
+        tags: ["shutdown", "frontend"],
+      });
     },
   } satisfies FrontendLifecycle;
 };

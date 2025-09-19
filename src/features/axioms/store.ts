@@ -3,6 +3,7 @@ import { atom } from "jotai";
 import { client } from "../../api/client.ts";
 import type { AxiomRecord } from "../../api/persistence/entities/index.ts";
 import type { SentimentAllocation } from "../../api/persistence/entities/index.ts";
+import { createAppLogger } from "../../logging/index.ts";
 import { beingAtom } from "../beings/store.ts";
 
 export const SENTIMENT_TYPE = "priority" as const;
@@ -17,6 +18,10 @@ export type AxiomSentiment = {
 
 const baseAxiomsAtom = atom<AxiomSentiment[]>([]);
 const isLoadingAtom = atom(false);
+
+const axiomsLogger = createAppLogger("client:axioms-store", {
+  tags: ["client", "axioms"],
+});
 
 const computeRatios = (records: AxiomSentiment[]) => {
   const total = records.reduce((sum, record) => sum + record.weight, 0);
@@ -50,11 +55,18 @@ const mergeAxioms = (axioms: AxiomRecord[], sentiments: SentimentAllocation[]) =
 
 export const loadAxiomsAtom = atom(null, async (get, set) => {
   if (get(isLoadingAtom)) {
+    axiomsLogger.debug("Load skipped; already in progress", {
+      tags: ["load"],
+    });
     return;
   }
   set(isLoadingAtom, true);
   try {
     const being = get(beingAtom);
+    axiomsLogger.info("Loading axioms", {
+      beingId: being.id,
+      tags: ["load"],
+    });
     const [axioms, sentiments] = await Promise.all([
       client.listAxioms.query(),
       client.listSentimentsForBeing.query({
@@ -63,8 +75,16 @@ export const loadAxiomsAtom = atom(null, async (get, set) => {
       }),
     ]);
     set(baseAxiomsAtom, mergeAxioms(axioms, sentiments));
+    axiomsLogger.info("Axioms loaded", {
+      beingId: being.id,
+      axiomCount: axioms.length,
+      sentimentCount: sentiments.length,
+      tags: ["load"],
+    });
   } catch (error) {
-    console.error("Failed to load axioms", error);
+    axiomsLogger.error("Failed to load axioms", error, {
+      tags: ["load"],
+    });
   } finally {
     set(isLoadingAtom, false);
   }
@@ -81,6 +101,12 @@ export const setAxiomWeightAtom = atom(
   async (get, set, update: { axiomId: string; weight: number }) => {
     const safeWeight = Math.max(0, Math.min(MAX_SENTIMENT_WEIGHT, Math.round(update.weight)));
     const being = get(beingAtom);
+    axiomsLogger.debug("Persisting sentiment weight", {
+      beingId: being.id,
+      axiomId: update.axiomId,
+      weight: safeWeight,
+      tags: ["mutation"],
+    });
     try {
       await client.setSentiment.mutate({
         beingId: being.id,
@@ -90,7 +116,12 @@ export const setAxiomWeightAtom = atom(
         maxWeight: MAX_SENTIMENT_WEIGHT,
       });
     } catch (error) {
-      console.error("Failed to persist sentiment weight", error);
+      axiomsLogger.error("Failed to persist sentiment weight", error, {
+        beingId: being.id,
+        axiomId: update.axiomId,
+        weight: safeWeight,
+        tags: ["mutation"],
+      });
       return;
     }
 
@@ -98,5 +129,11 @@ export const setAxiomWeightAtom = atom(
       record.id === update.axiomId ? { ...record, weight: safeWeight } : record,
     );
     set(baseAxiomsAtom, computeRatios(next));
+    axiomsLogger.info("Sentiment weight updated locally", {
+      beingId: being.id,
+      axiomId: update.axiomId,
+      weight: safeWeight,
+      tags: ["mutation"],
+    });
   },
 );
