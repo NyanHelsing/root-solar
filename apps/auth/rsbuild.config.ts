@@ -1,5 +1,4 @@
 import path from "node:path";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "@rsbuild/core";
@@ -15,11 +14,6 @@ import {
   resolveMountPath,
 } from "../../config/mfePaths.ts";
 
-const require = createRequire(import.meta.url);
-const packageJson = require("../../package.json") as {
-  dependencies?: Record<string, string>;
-};
-const dependencyVersion = (name: string) => packageJson.dependencies?.[name] ?? "*";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const authDistSubdir = resolveDistSubdir(
@@ -41,30 +35,39 @@ export default defineConfig({
     pluginSass(),
     pluginModuleFederation({
       name: "auth",
-      filename: "remoteEntry.js",
       exposes: {
         "./App": "./apps/auth/src/App.tsx",
+      },
+      manifest: {
+        fileName: "mf-manifest.json",
       },
       shared: {
         react: {
           singleton: true,
-          requiredVersion: dependencyVersion("react"),
         },
         "react-dom": {
           singleton: true,
-          requiredVersion: dependencyVersion("react-dom"),
+        },
+        "react/jsx-runtime": {
+          singleton: true,
+        },
+        "react/jsx-dev-runtime": {
+          singleton: true,
+        },
+        "react-router": {
+          singleton: true,
         },
         "@root-solar/api": {
           singleton: true,
-          requiredVersion: dependencyVersion("@root-solar/api"),
         },
         "@root-solar/auth": {
           singleton: true,
-          requiredVersion: dependencyVersion("@root-solar/auth"),
+        },
+        "@root-solar/layout": {
+          singleton: true,
         },
         "@root-solar/observability": {
           singleton: true,
-          requiredVersion: dependencyVersion("@root-solar/observability"),
         },
       },
     }),
@@ -75,7 +78,7 @@ export default defineConfig({
   },
   source: {
     entry: {
-      auth: "./apps/auth/src/index.tsx",
+      index: "./apps/auth/src/index.ts",
     },
   },
   output: {
@@ -93,11 +96,5 @@ export default defineConfig({
       wasm: "wasm",
     },
     assetPrefix: authAssetPrefix,
-    htmlPath: "auth",
-  },
-  tools: {
-    rspack: {
-      plugins: [],
-    },
   },
 });

@@ -1,9 +1,15 @@
-import { randomBytes } from "node:crypto";
 import * as openpgp from "openpgp";
 
-import { fromBase64, toBase64, utf8ToBytes, concatBytes, bytesToUtf8 } from "./encoding.ts";
+import {
+  fromBase64,
+  toBase64,
+  utf8ToBytes,
+  concatBytes,
+  bytesToUtf8,
+} from "./encoding.ts";
 import type { BeingKeyMaterial, KeyPair } from "./identities.ts";
 import { generateSigningKeyPair } from "./identities.ts";
+import { getRandomBytes } from "./random.ts";
 
 export type AuthIntent = string | Uint8Array | undefined;
 
@@ -26,7 +32,9 @@ export type VerifiedAuthRequest = {
   message: Uint8Array;
 };
 
-export const AUTHENTICATION_CONTEXT = utf8ToBytes("root.solar/authentication/v1");
+export const AUTHENTICATION_CONTEXT = utf8ToBytes(
+  "root.solar/authentication/v1",
+);
 
 const normalizeIntent = (intent: AuthIntent): Uint8Array | undefined => {
   if (intent === undefined) {
@@ -100,7 +108,9 @@ export const verifyAuthRequest = async (
   );
 
   const message = await openpgp.createMessage({ binary: messageBytes });
-  const signature = await openpgp.readSignature({ armoredSignature: payload.signature });
+  const signature = await openpgp.readSignature({
+    armoredSignature: payload.signature,
+  });
   const verificationKey = await readPublicKey(payload.signingPublicKey);
 
   const verificationResult = await openpgp.verify({
@@ -113,7 +123,9 @@ export const verifyAuthRequest = async (
   try {
     await firstSignature.verified;
   } catch (error) {
-    throw new Error("Invalid authentication request signature", { cause: error });
+    throw new Error("Invalid authentication request signature", {
+      cause: error,
+    });
   }
 
   return {
@@ -141,19 +153,28 @@ export type IdpChallengeRecord = {
 const CHALLENGE_NONCE_LENGTH = 32;
 const CHALLENGE_ID_LENGTH = 16;
 
-const buildChallengeMessageText = (challengeId: string, nonceBase64: string): string =>
+const buildChallengeMessageText = (
+  challengeId: string,
+  nonceBase64: string,
+): string =>
   `${bytesToUtf8(AUTHENTICATION_CONTEXT)}::${challengeId}::${nonceBase64}`;
 
 export const createIdpChallenge = async (
   request: VerifiedAuthRequest,
-  options: { idpSigningKeyPair?: KeyPair; nonceLength?: number; challengeId?: string } = {},
+  options: {
+    idpSigningKeyPair?: KeyPair;
+    nonceLength?: number;
+    challengeId?: string;
+  } = {},
 ): Promise<{ challenge: IdpChallenge; record: IdpChallengeRecord }> => {
-  const idpSigningKeyPair = options.idpSigningKeyPair ?? (await generateSigningKeyPair());
+  const idpSigningKeyPair =
+    options.idpSigningKeyPair ?? (await generateSigningKeyPair());
 
   const nonceLength = options.nonceLength ?? CHALLENGE_NONCE_LENGTH;
-  const nonceBytes = randomBytes(nonceLength);
+  const nonceBytes = getRandomBytes(nonceLength);
   const nonceBase64 = toBase64(nonceBytes);
-  const challengeId = options.challengeId ?? toBase64(randomBytes(CHALLENGE_ID_LENGTH));
+  const challengeId =
+    options.challengeId ?? toBase64(getRandomBytes(CHALLENGE_ID_LENGTH));
 
   const encryptionKey = await readPublicKey(request.encryptionPublicKey);
   const signingKey = await readPrivateKey(idpSigningKeyPair.privateKey);
@@ -191,7 +212,9 @@ export const createChallengeResponse = async (
   challenge: IdpChallenge,
   keyMaterial: BeingKeyMaterial,
 ): Promise<ChallengeResponse> => {
-  const message = await openpgp.readMessage({ armoredMessage: challenge.encryptedNonce });
+  const message = await openpgp.readMessage({
+    armoredMessage: challenge.encryptedNonce,
+  });
   const decryptionKey = await readPrivateKey(keyMaterial.encryption.privateKey);
   const idpSigningKey = await readPublicKey(challenge.idpSigningPublicKey);
 
@@ -207,11 +230,16 @@ export const createChallengeResponse = async (
     try {
       await signature.verified;
     } catch (error) {
-      throw new Error("Unable to verify IDP challenge signature", { cause: error });
+      throw new Error("Unable to verify IDP challenge signature", {
+        cause: error,
+      });
     }
   }
 
-  const nonceBase64 = typeof decrypted.data === "string" ? decrypted.data : decrypted.data.toString();
+  const nonceBase64 =
+    typeof decrypted.data === "string"
+      ? decrypted.data
+      : decrypted.data.toString();
 
   const responseMessage = await openpgp.createMessage({
     text: buildChallengeMessageText(challenge.challengeId, nonceBase64),
@@ -243,7 +271,9 @@ export const verifyChallengeResponse = async (
     text: buildChallengeMessageText(record.challengeId, record.nonce),
   });
 
-  const signature = await openpgp.readSignature({ armoredSignature: response.signature });
+  const signature = await openpgp.readSignature({
+    armoredSignature: response.signature,
+  });
   const verificationKey = await readPublicKey(record.beingSigningPublicKey);
 
   try {

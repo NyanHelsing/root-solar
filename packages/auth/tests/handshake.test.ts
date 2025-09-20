@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import * as openpgp from "openpgp";
+import * as openpgp from "openpgp/lightweight";
 
 import {
   createAuthRequest,

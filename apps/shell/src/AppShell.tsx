@@ -1,33 +1,85 @@
 import type { ReactElement } from "react";
-import { Suspense, lazy } from "react";
-import { Route } from "wouter";
+import {
+  lazy,
+  Suspense,
+  Component,
+  type PropsWithChildren,
+  type ReactNode,
+} from "react";
+import { BrowserRouter, Route, Routes } from "react-router";
 
-const Header = lazy(() => import("snb/App").then((module) => ({ default: module.Header })));
-const Hero = lazy(() => import("snb/App").then((module) => ({ default: module.Hero })));
-const Main = lazy(() => import("snb/App").then((module) => ({ default: module.Main })));
-const Footer = lazy(() => import("snb/App").then((module) => ({ default: module.Footer })));
-const ComponentHarness = lazy(() =>
-  import("snb/App").then((module) => ({ default: module.ComponentHarness })),
-);
+import { ShellHero, ShellLayout } from "@root-solar/layout";
 
 const loadingFallback = (
   <div role="status" aria-live="polite">
-    Loading search and browse experience…
+    Loading experience…
   </div>
 );
 
+const AuthApp = lazy(() => import("auth/App"));
+const SearchAndBrowseApp = lazy(() => import("snb/App"));
+
+const HomeRoute = () => <ShellLayout activePath="/" hero={<ShellHero />} />;
+
+class RouteErrorBoundary extends Component<
+  PropsWithChildren<{ fallback?: ReactNode }>,
+  { error: Error | null }
+> {
+  constructor(props: PropsWithChildren<{ fallback?: ReactNode }>) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error("Route rendering failed", error);
+  }
+
+  render(): ReactNode {
+    const { error } = this.state;
+    if (error) {
+      return (
+        this.props.fallback ?? (
+          <ShellLayout>
+            <section>
+              <h1>Something went wrong</h1>
+              <p>{error.message}</p>
+            </section>
+          </ShellLayout>
+        )
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function AppShell(): ReactElement {
   return (
-    <Suspense fallback={loadingFallback}>
-      <Header />
-      <Route path="/">
-        <Hero />
-      </Route>
-      <Route path="/__component__/:componentName">
-        {(params) => <ComponentHarness componentName={params?.componentName} />}
-      </Route>
-      <Main />
-      <Footer />
-    </Suspense>
+    <BrowserRouter>
+      <Routes>
+        <Route index element={<HomeRoute />} />
+        <Route
+          path="/auth"
+          element={
+            <RouteErrorBoundary>
+              <AuthApp />
+            </RouteErrorBoundary>
+          }
+          hydrateFallbackElement={loadingFallback}
+        />
+        <Route
+          path="/axioms"
+          element={
+            <RouteErrorBoundary>
+              <SearchAndBrowseApp />
+            </RouteErrorBoundary>
+          }
+          hydrateFallbackElement={loadingFallback}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }

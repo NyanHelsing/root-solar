@@ -30,7 +30,8 @@ export const generateSigningKeyPair = async (): Promise<KeyPair> =>
 export const generateEncryptionKeyPair = async (): Promise<KeyPair> =>
   generateKeyPair("curve25519", "root.solar-being-encryption");
 
-export const generateBeingKeyMaterial = async (): Promise<BeingKeyMaterial> => ({
-  signing: await generateSigningKeyPair(),
-  encryption: await generateEncryptionKeyPair(),
-});
+export const generateBeingKeyMaterial =
+  async (): Promise<BeingKeyMaterial> => ({
+    signing: await generateSigningKeyPair(),
+    encryption: await generateEncryptionKeyPair(),
+  });

@@ -1,5 +1,4 @@
 import path from "node:path";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "@rsbuild/core";
@@ -16,12 +15,6 @@ import {
   resolveMountPath,
 } from "../../config/mfePaths.ts";
 
-const require = createRequire(import.meta.url);
-const packageJson = require("../../package.json") as {
-  dependencies?: Record<string, string>;
-};
-const dependencyVersion = (name: string) =>
-  packageJson.dependencies?.[name] ?? "*";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const shellMountPath = resolveMountPath(
@@ -55,44 +48,43 @@ export default defineConfig({
     pluginModuleFederation({
       name: "shell",
       remotes: {
-        snb: `snb@${remoteBase}/remoteEntry.js`,
-        auth: `auth@${authRemoteBase}/remoteEntry.js`,
+        snb: `snb@${remoteBase}/mf-manifest.json`,
+        auth: `auth@${authRemoteBase}/mf-manifest.json`,
       },
       shared: {
         react: {
           singleton: true,
-          requiredVersion: dependencyVersion("react"),
         },
         "react-dom": {
           singleton: true,
-          requiredVersion: dependencyVersion("react-dom"),
         },
-        wouter: {
+        "react/jsx-runtime": {
           singleton: true,
-          requiredVersion: dependencyVersion("wouter"),
+        },
+        "react/jsx-dev-runtime": {
+          singleton: true,
+        },
+        "react-router": {
+          singleton: true,
         },
         jotai: {
           singleton: true,
-          requiredVersion: dependencyVersion("jotai"),
         },
         "jotai-optics": {
           singleton: true,
-          requiredVersion: dependencyVersion("jotai-optics"),
         },
         "@root-solar/observability": {
           singleton: true,
-          requiredVersion: dependencyVersion("@root-solar/observability"),
         },
         "react-icons": {
           singleton: true,
-          requiredVersion: dependencyVersion("react-icons"),
         },
       },
     }),
   ],
   source: {
     entry: {
-      shell: "./apps/shell/src/index.tsx",
+      shell: "./apps/shell/src/index.ts",
     },
   },
   output: {

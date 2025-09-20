@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import { TiMinus, TiPlus } from "react-icons/ti";
 import { useSetAtom } from "jotai";
 
