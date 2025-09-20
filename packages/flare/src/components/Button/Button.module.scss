@@ -1,0 +1,68 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.button {
+  --flare-button-border: transparent;
+  --flare-button-bg: var(--flare-surface-emphasis, rgb(17, 24, 39));
+  --flare-button-text: rgb(255, 255, 255);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--flare-gap-sm, 0.75rem);
+  padding-inline: 1.25rem;
+  padding-block: 0.65rem;
+  border-radius: var(--flare-radius-md, 14px);
+  border: 1px solid var(--flare-button-border);
+  font-weight: 600;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  background: var(--flare-button-bg);
+  color: var(--flare-button-text);
+  cursor: pointer;
+  text-decoration: none;
+  @include mixins.soft-transition(background, 160ms);
+
+  &:focus-visible {
+    @include mixins.focus-ring(rgb(59, 130, 246), 3px, var(--flare-radius-md, 14px));
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    opacity: 0.56;
+    cursor: not-allowed;
+  }
+}
+
+.button--primary {
+  --flare-button-bg: linear-gradient(135deg, rgb(99, 102, 241), rgb(79, 70, 229));
+  --flare-button-border: rgba(255, 255, 255, 0.12);
+}
+
+.button--secondary {
+  --flare-button-bg: var(--flare-surface, rgb(255, 255, 255));
+  --flare-button-text: var(--flare-text, rgb(17, 24, 39));
+  --flare-button-border: var(--flare-border, rgba(17, 24, 39, 0.08));
+}
+
+.button--ghost {
+  --flare-button-bg: transparent;
+  --flare-button-text: var(--flare-text, rgb(17, 24, 39));
+  --flare-button-border: transparent;
+  color: var(--flare-text-soft, rgba(17, 24, 39, 0.72));
+}
+
+.button--sm {
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.button--lg {
+  padding-inline: 1.5rem;
+  padding-block: 0.85rem;
+  font-size: 1.05rem;
+}
+
+.button--full {
+  width: 100%;
+}

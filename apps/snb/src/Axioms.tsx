@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
+import { FlareStack } from "@root-solar/flare";
 import Axiom from "./Axiom.tsx";
 
 import {
@@ -9,8 +10,6 @@ import {
   axiomsTotalWeightAtom,
   loadAxiomsAtom,
 } from "./features/axioms/store.ts";
-
-import styles from "./Axioms.module.scss";
 
 export default function Axioms() {
   const axioms = useAtomValue(axiomsAtom);
@@ -23,27 +22,25 @@ export default function Axioms() {
   }, [loadAxioms]);
 
   return (
-    <section className={styles.axioms}>
-      <h1>Aggregate Prioritization</h1>
-      <p>
-        Calculated by summing the weights of individual participant's priorities
-      </p>
-      <p className={styles.summary}>
-        Total personal allocation: <strong>{totalWeight}</strong>
-      </p>
-      {isLoading && <p className={styles.loading}>Refreshing priorities…</p>}
-      {!isLoading && axioms.length === 0 && (
-        <p className={styles.empty}>No axioms found yet.</p>
-      )}
-      <ul>
-        {axioms.map((axiom) => {
-          return (
-            <li key={axiom.id}>
-              <Axiom {...axiom} />
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+    <FlareStack gap="lg">
+      <FlareStack as="header" gap="sm">
+        <h1 className="rs-heading-xl">Aggregate Prioritization</h1>
+        <p className="rs-text-body-lg rs-text-soft">
+          Calculated by summing the weights of individual participant's priorities
+        </p>
+        <p className="rs-text-soft">
+          Total personal allocation: <strong>{totalWeight}</strong>
+        </p>
+      </FlareStack>
+      {isLoading ? <p className="rs-text-soft">Refreshing priorities…</p> : null}
+      {!isLoading && axioms.length === 0 ? (
+        <p className="rs-text-soft">No axioms found yet.</p>
+      ) : null}
+      <FlareStack gap="md">
+        {axioms.map((axiom) => (
+          <Axiom key={axiom.id} {...axiom} />
+        ))}
+      </FlareStack>
+    </FlareStack>
   );
 }

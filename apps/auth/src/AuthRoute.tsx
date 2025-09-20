@@ -2,19 +2,17 @@ import type { ReactElement } from "react";
 
 import { ShellLayout } from "@root-solar/layout";
 import { client } from "@root-solar/api/client";
-
-import styles from "./App.module.scss";
+import { FlareCard, FlareHero, FlarePageSection } from "@root-solar/flare";
 
 import BeingRegistration from "@root-solar/auth/ui/BeingRegistration";
 
-const AuthHero = () => (
-  <div className={styles.hero}>
-    <h1>Register a new being</h1>
-    <p>
-      Generate key material and complete the root.solar authentication
-      challenge.
-    </p>
-  </div>
+const AuthHero = (
+  <FlareHero
+    tone="dark"
+    alignment="center"
+    title="Register a new being"
+    description="Generate key material and complete the root.solar authentication challenge."
+  />
 );
 
 const AuthRoute = (): ReactElement => {
@@ -26,13 +24,15 @@ const AuthRoute = (): ReactElement => {
   ) => client.completeBeingRegistration.mutate(input);
 
   return (
-    <ShellLayout hero={<AuthHero />} activePath="/auth">
-      <section className={styles.panel}>
-        <BeingRegistration
-          startRegistration={startRegistration}
-          completeRegistration={completeRegistration}
-        />
-      </section>
+    <ShellLayout hero={AuthHero} activePath="/auth">
+      <FlarePageSection maxWidth="48rem" paddingBlock="2.5rem">
+        <FlareCard tone="contrast" padding="lg">
+          <BeingRegistration
+            startRegistration={startRegistration}
+            completeRegistration={completeRegistration}
+          />
+        </FlareCard>
+      </FlarePageSection>
     </ShellLayout>
   );
 };

@@ -8,7 +8,8 @@ import {
 } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 
-import { ShellHero, ShellLayout } from "@root-solar/layout";
+import { ShellLayout } from "@root-solar/layout";
+import { RootSolarHomepage } from "@root-solar/homepage";
 
 const loadingFallback = (
   <div role="status" aria-live="polite">
@@ -19,7 +20,7 @@ const loadingFallback = (
 const AuthApp = lazy(() => import("auth/App"));
 const SearchAndBrowseApp = lazy(() => import("snb/App"));
 
-const HomeRoute = () => <ShellLayout activePath="/" hero={<ShellHero />} />;
+const HomeRoute = () => <RootSolarHomepage />;
 
 class RouteErrorBoundary extends Component<
   PropsWithChildren<{ fallback?: ReactNode }>,

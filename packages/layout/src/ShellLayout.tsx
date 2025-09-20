@@ -1,55 +1,76 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 
-import styles from "./ShellLayout.module.scss";
+import { FlarePageSection, FlareStack } from "@root-solar/flare";
 
-const NAV_ITEMS = [
-  { href: "/", label: "Home" },
+import RootSolarFooter, {
+  type RootSolarFooterProps,
+} from "./RootSolarFooter.tsx";
+import RootSolarHeader, {
+  type RootSolarHeaderProps,
+  type RootSolarNavLink,
+  type RootSolarSession,
+} from "./RootSolarHeader.tsx";
+
+const DEFAULT_NAV_LINKS: RootSolarNavLink[] = [
   { href: "/axioms", label: "Axioms" },
-  { href: "/auth", label: "Auth" },
-] as const;
+];
 
-export type ShellLayoutProps = {
+export interface ShellLayoutProps {
   hero?: ReactNode;
   children?: ReactNode;
   activePath?: string;
-};
+  navLinks?: RootSolarNavLink[];
+  headerActions?: RootSolarHeaderProps["actions"];
+  footerLinks?: RootSolarFooterProps["links"];
+  footerMeta?: RootSolarFooterProps["meta"];
+  mainMaxWidth?: string;
+  mainPaddingBlock?: string;
+  session?: RootSolarSession | null;
+  loginHref?: string;
+}
 
-const isActive = (candidate: string, activePath?: string) => {
-  if (!activePath) {
-    return false;
-  }
-  if (candidate === "/") {
-    return activePath === "/";
-  }
-  return activePath.startsWith(candidate);
-};
-
-export const ShellLayout = ({ hero, children, activePath }: ShellLayoutProps) => {
+export const ShellLayout = ({
+  hero,
+  children,
+  activePath,
+  navLinks,
+  headerActions,
+  footerLinks,
+  footerMeta,
+  mainMaxWidth = "72rem",
+  mainPaddingBlock = "3rem",
+  session,
+  loginHref,
+}: ShellLayoutProps) => {
   return (
-    <div className={styles.layout}>
-      <header className={styles.header}>
-        <a className={styles.logo} href="/">
-          root.solar
-        </a>
-        <nav className={styles.nav} aria-label="Primary">
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={styles.link}
-              data-active={isActive(item.href, activePath) ? "true" : undefined}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </header>
-      {hero ? <div className={styles.heroRegion}>{hero}</div> : null}
-      {children ? <main className={styles.main}>{children}</main> : null}
-      <footer className={styles.footer}>
-        <small>© {new Date().getFullYear()} root.solar</small>
-      </footer>
-    </div>
+    <FlareStack
+      gap="none"
+      fullWidth
+      style={{
+        minHeight: "100vh",
+        background: "var(--flare-body-background)",
+      }}
+    >
+      <RootSolarHeader
+        navLinks={navLinks ?? DEFAULT_NAV_LINKS}
+        activePath={activePath}
+        actions={headerActions}
+        session={session}
+        loginHref={loginHref}
+      />
+      {hero}
+      {children ? (
+        <FlarePageSection
+          as="main"
+          maxWidth={mainMaxWidth}
+          paddingBlock={mainPaddingBlock}
+          style={{ flex: "1 0 auto" }}
+        >
+          {children}
+        </FlarePageSection>
+      ) : null}
+      <RootSolarFooter links={footerLinks} meta={footerMeta} />
+    </FlareStack>
   );
 };
 

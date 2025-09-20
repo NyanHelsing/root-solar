@@ -1,0 +1,40 @@
+@use "sass:math";
+
+@mixin center-page($min-width, $min-inline-padding) {
+  $half-width: math.div($min-width, 2);
+
+  padding-inline: max($min-inline-padding, calc(50% - #{$half-width}));
+}
+
+@mixin surface($background, $foreground, $radius, $shadow: none, $border: 1px solid transparent) {
+  background: $background;
+  color: $foreground;
+  border: $border;
+  border-radius: $radius;
+  box-shadow: $shadow;
+}
+
+@mixin focus-ring($color, $offset: 2px, $radius: 6px) {
+  outline: none;
+  box-shadow: 0 0 0 $offset rgba($color, 0.2), 0 0 0 calc($offset + 1px) rgba($color, 0.4);
+  border-radius: $radius;
+}
+
+@mixin text-label($weight: 600, $transform: uppercase, $spacing: 0.08em) {
+  font-weight: $weight;
+  text-transform: $transform;
+  letter-spacing: $spacing;
+}
+
+@mixin icon-button($size: 2.25rem) {
+  width: $size;
+  height: $size;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin soft-transition($props: all, $duration: 140ms, $timing: ease-in-out) {
+  transition: $props $duration $timing;
+}

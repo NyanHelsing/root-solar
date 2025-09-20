@@ -1,0 +1,82 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.header {
+  @include mixins.center-page(72rem, 1.5rem);
+  padding-block: 1.25rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.25rem;
+  align-items: center;
+  background: transparent;
+}
+
+.header--surface {
+  background: var(--flare-surface, rgb(255, 255, 255));
+  border-radius: var(--flare-radius-lg, 22px);
+  box-shadow: var(--flare-shadow-soft, 0 10px 30px rgba(17, 24, 39, 0.08));
+}
+
+.header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--flare-text, rgb(17, 24, 39));
+  font-weight: 700;
+}
+
+.header__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--flare-text, rgb(17, 24, 39));
+}
+
+.header__subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--flare-text-soft, rgba(17, 24, 39, 0.72));
+}
+
+.header__center {
+  display: grid;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.header__children {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .header {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand actions"
+      "center center"
+      "children children";
+    gap: 1rem;
+  }
+
+  .header__brand {
+    grid-area: brand;
+  }
+
+  .header__center {
+    grid-area: center;
+  }
+
+  .header__actions {
+    grid-area: actions;
+  }
+
+  .header__children {
+    grid-area: children;
+  }
+}

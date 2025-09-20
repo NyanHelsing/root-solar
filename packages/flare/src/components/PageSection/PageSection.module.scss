@@ -1,0 +1,7 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.section {
+  @include mixins.center-page(var(--flare-page-section-max-width, 70rem), var(--flare-page-section-inline-padding, 1.5rem));
+  padding-block: var(--flare-page-section-padding-block, 3rem);
+  width: 100%;
+}

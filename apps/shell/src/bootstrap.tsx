@@ -10,7 +10,8 @@ import {
 
 import AppShell from "./AppShell.tsx";
 
-import "../../shared/styles/global.css";
+import "@root-solar/flare/styles/base";
+import "@root-solar/flare/styles/utilities";
 
 console.error("RUNNING APPSHELL BOOTSTRAP");
 

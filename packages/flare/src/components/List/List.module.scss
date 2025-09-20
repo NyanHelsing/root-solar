@@ -1,0 +1,71 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.list {
+  display: grid;
+  gap: var(--flare-gap-sm, 0.75rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list--ordered {
+  counter-reset: flare-list-counter;
+}
+
+.list--bordered {
+  padding: 1rem;
+  border-radius: var(--flare-radius-md, 14px);
+  border: 1px solid var(--flare-border, rgba(17, 24, 39, 0.08));
+  gap: var(--flare-gap-sm, 0.75rem);
+}
+
+.list--surface {
+  @include mixins.surface(
+    var(--flare-surface-muted, rgb(249, 250, 251)),
+    var(--flare-text, rgb(17, 24, 39)),
+    var(--flare-radius-md, 14px),
+    none,
+    1px solid rgba(17, 24, 39, 0.04)
+  );
+  padding: 1.25rem;
+}
+
+.list--tight {
+  gap: 0.5rem;
+}
+
+.list--loose {
+  gap: var(--flare-gap-lg, 2rem);
+}
+
+.list__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--flare-gap-sm, 0.75rem);
+  align-items: flex-start;
+  line-height: 1.55;
+  color: var(--flare-text-soft, rgba(17, 24, 39, 0.72));
+}
+
+.list__item-marker {
+  font-weight: 600;
+  color: var(--flare-text, rgb(17, 24, 39));
+}
+
+.list--ordered .list__item {
+  counter-increment: flare-list-counter;
+}
+
+.list--ordered .list__item-marker::before {
+  content: counter(flare-list-counter) ".";
+}
+
+.list__title {
+  @include mixins.text-label();
+  color: var(--flare-text, rgb(17, 24, 39));
+  margin-bottom: 0.25rem;
+}
+
+.list__content {
+  display: block;
+}

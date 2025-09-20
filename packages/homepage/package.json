@@ -1,5 +1,5 @@
 {
-  "name": "@root-solar/layout",
+  "name": "@root-solar/homepage",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -12,7 +12,8 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "dependencies": {
-    "@root-solar/flare": "workspace:*"
+    "@root-solar/flare": "workspace:*",
+    "@root-solar/layout": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.1.1",
