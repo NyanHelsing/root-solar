@@ -35,6 +35,12 @@ importers:
       '@root-solar/auth':
         specifier: workspace:*
         version: link:packages/auth
+      '@root-solar/flare':
+        specifier: workspace:*
+        version: link:packages/flare
+      '@root-solar/homepage':
+        specifier: workspace:*
+        version: link:packages/homepage
       '@root-solar/layout':
         specifier: workspace:*
         version: link:packages/layout
@@ -169,7 +175,7 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
 
-  packages/layout:
+  packages/flare:
     dependencies:
       react:
         specifier: ^19.1.1
@@ -177,6 +183,36 @@ importers:
       react-dom:
         specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
+
+  packages/homepage:
+    dependencies:
+      '@root-solar/flare':
+        specifier: workspace:*
+        version: link:../flare
+      '@root-solar/layout':
+        specifier: workspace:*
+        version: link:../layout
+      react:
+        specifier: ^19.1.1
+        version: 19.1.1
+      react-dom:
+        specifier: ^19.1.1
+        version: 19.1.1(react@19.1.1)
+
+  packages/layout:
+    dependencies:
+      '@root-solar/flare':
+        specifier: workspace:*
+        version: link:../flare
+      react:
+        specifier: ^19.1.1
+        version: 19.1.1
+      react-dom:
+        specifier: ^19.1.1
+        version: 19.1.1(react@19.1.1)
+      react-router:
+        specifier: ^7.9.1
+        version: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
 
   packages/net:
     dependencies:

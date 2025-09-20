@@ -1,0 +1,36 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.icon-button {
+  @include mixins.icon-button();
+  border-radius: var(--flare-radius-sm, 8px);
+  border: 1px solid transparent;
+  background: rgba(17, 24, 39, 0.06);
+  color: var(--flare-text, rgb(17, 24, 39));
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  @include mixins.soft-transition(background, 140ms);
+
+  &:focus-visible {
+    @include mixins.focus-ring(rgb(59, 130, 246), 3px, var(--flare-radius-sm, 8px));
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.icon-button--ghost {
+  background: transparent;
+}
+
+.icon-button--solid {
+  background: linear-gradient(135deg, rgb(99, 102, 241), rgb(79, 70, 229));
+  color: rgb(255, 255, 255);
+}
+
+.icon-button--danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: rgb(220, 38, 38);
+}

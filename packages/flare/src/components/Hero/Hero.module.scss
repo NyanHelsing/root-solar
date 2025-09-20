@@ -1,0 +1,123 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.hero {
+  --flare-hero-background: linear-gradient(135deg, rgb(30, 64, 175), rgb(99, 102, 241));
+  --flare-hero-foreground: rgb(255, 255, 255);
+  --flare-hero-overlay: rgba(17, 24, 39, 0.55);
+  --flare-hero-image-opacity: 0.35;
+
+  position: relative;
+  overflow: hidden;
+  color: var(--flare-hero-foreground);
+  background: var(--flare-hero-background);
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--flare-hero-background-image);
+  background-size: cover;
+  background-position: center;
+  opacity: var(--flare-hero-image-opacity);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--flare-hero-overlay);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.hero__inner {
+  position: relative;
+  @include mixins.center-page(70rem, 1.5rem);
+  padding-block: clamp(4rem, 6vw, 7rem);
+  display: grid;
+  gap: 1.5rem;
+}
+
+.hero__inner--center {
+  text-align: center;
+  justify-items: center;
+}
+
+.hero__inner--start {
+  text-align: left;
+  justify-items: flex-start;
+}
+
+.hero__eyebrow {
+  @include mixins.text-label(600, uppercase, 0.14em);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hero__title {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.hero__description {
+  margin: 0;
+  font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+  max-width: 60ch;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.hero__actions {
+  display: inline-flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero--surface {
+  --flare-hero-background: var(--flare-surface, rgb(255, 255, 255));
+  --flare-hero-foreground: var(--flare-text, rgb(17, 24, 39));
+  --flare-hero-overlay: rgba(255, 255, 255, 0.82);
+  --flare-hero-image-opacity: 0.18;
+}
+
+.hero--minimal {
+  --flare-hero-background: transparent;
+  --flare-hero-overlay: transparent;
+  --flare-hero-image-opacity: 0.12;
+  color: var(--flare-text, rgb(17, 24, 39));
+}
+
+.hero--minimal::after {
+  display: none;
+}
+
+.hero--minimal::before {
+  opacity: var(--flare-hero-image-opacity);
+}
+
+.hero--minimal .hero__inner {
+  padding-block: clamp(3rem, 5vw, 5rem);
+}
+
+.hero--dark {
+  --flare-hero-background: linear-gradient(145deg, rgb(15, 23, 42), rgb(30, 41, 59));
+  --flare-hero-foreground: rgb(226, 232, 240);
+  --flare-hero-overlay: rgba(15, 23, 42, 0.5);
+  --flare-hero-image-opacity: 0.28;
+}
+
+.hero--no-gap .hero__inner {
+  gap: 1rem;
+}
+
+.hero--align-start .hero__actions {
+  justify-content: flex-start;
+}
+
+.hero--align-center .hero__actions {
+  justify-content: center;
+}

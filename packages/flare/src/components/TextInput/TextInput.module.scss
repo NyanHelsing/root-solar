@@ -1,0 +1,43 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.input {
+  width: 100%;
+  border-radius: var(--flare-radius-md, 14px);
+  border: 1px solid var(--flare-border, rgba(17, 24, 39, 0.12));
+  background: var(--flare-surface, rgb(255, 255, 255));
+  color: var(--flare-text, rgb(17, 24, 39));
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.75rem 1rem;
+  @include mixins.soft-transition(box-shadow, 120ms);
+
+  &::placeholder {
+    color: var(--flare-text-soft, rgba(17, 24, 39, 0.55));
+  }
+
+  &:focus-visible {
+    @include mixins.focus-ring(rgb(59, 130, 246), 3px, var(--flare-radius-md, 14px));
+  }
+
+  &:disabled {
+    background: rgba(17, 24, 39, 0.04);
+    color: rgba(17, 24, 39, 0.45);
+    cursor: not-allowed;
+  }
+
+  &[data-invalid="true"] {
+    border-color: rgb(239, 68, 68);
+  }
+}
+
+.input--compact {
+  width: auto;
+  min-width: 10rem;
+}
+
+.input--numeric {
+  width: 4rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding-inline: 0.5rem;
+}

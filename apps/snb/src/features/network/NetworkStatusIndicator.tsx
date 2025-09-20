@@ -1,7 +1,10 @@
 import { useEffect, useMemo } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
-import styles from "./NetworkStatusIndicator.module.scss";
+import {
+  FlareStatusIndicator,
+  type StatusIndicatorTone,
+} from "@root-solar/flare";
 import {
   networkStatusAtom,
   refreshNetworkStatusAtom,
@@ -32,11 +35,11 @@ const getTitle = (status: NetworkStatus) => {
   return undefined;
 };
 
-const stateClasses: Record<NetworkStatus["state"], string> = {
-  ready: styles.ready,
-  starting: styles.starting,
-  error: styles.error,
-  offline: styles.offline,
+const toneByState: Record<NetworkStatus["state"], StatusIndicatorTone> = {
+  ready: "success",
+  starting: "info",
+  error: "danger",
+  offline: "muted",
 };
 
 export default function NetworkStatusIndicator() {
@@ -55,12 +58,14 @@ export default function NetworkStatusIndicator() {
 
   const label = useMemo(() => getLabel(status), [status]);
   const title = useMemo(() => getTitle(status), [status]);
-  const dotClass = useMemo(() => stateClasses[status.state] ?? styles.offline, [status]);
+  const tone = useMemo(() => toneByState[status.state] ?? "muted", [status]);
 
   return (
-    <div className={styles.indicator} aria-live="polite" title={title}>
-      <span aria-hidden="true" className={`${styles.dot} ${dotClass}`} />
-      <span className={styles.text}>{label}</span>
-    </div>
+    <FlareStatusIndicator
+      aria-live="polite"
+      label={label}
+      tone={tone}
+      title={title}
+    />
   );
 }

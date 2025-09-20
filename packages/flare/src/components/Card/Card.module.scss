@@ -1,0 +1,82 @@
+@use "../../styles/mixins.scss" as mixins;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--flare-gap-sm, 0.75rem);
+  @include mixins.surface(
+    var(--flare-surface, rgb(255, 255, 255)),
+    var(--flare-text, rgb(17, 24, 39)),
+    var(--flare-radius-lg, 22px),
+    var(--flare-shadow-soft, 0 10px 30px rgba(17, 24, 39, 0.08)),
+    1px solid var(--flare-border, rgba(17, 24, 39, 0.08))
+  );
+  padding: 1.5rem;
+}
+
+.card--muted {
+  @include mixins.surface(
+    var(--flare-surface-muted, rgb(249, 250, 251)),
+    var(--flare-text, rgb(17, 24, 39)),
+    var(--flare-radius-lg, 22px),
+    var(--flare-shadow-soft, 0 10px 30px rgba(17, 24, 39, 0.05)),
+    1px solid rgba(17, 24, 39, 0.04)
+  );
+}
+
+.card--contrast {
+  @include mixins.surface(
+    var(--flare-surface-emphasis, rgb(17, 24, 39)),
+    rgb(255, 255, 255),
+    var(--flare-radius-lg, 22px),
+    var(--flare-shadow-hard, 0 18px 40px rgba(17, 24, 39, 0.12)),
+    1px solid rgba(255, 255, 255, 0.08)
+  );
+}
+
+.card--borderless {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+.card--pad-none {
+  padding: 0;
+}
+
+.card--pad-sm {
+  padding: 1rem;
+}
+
+.card--pad-lg {
+  padding: 2rem;
+}
+
+.card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--flare-gap-sm, 0.75rem);
+}
+
+.card__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.card__subtitle {
+  color: var(--flare-text-soft, rgba(17, 24, 39, 0.72));
+  font-size: 0.95rem;
+}
+
+.card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--flare-gap-sm, 0.75rem);
+}
+
+.card__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--flare-gap-sm, 0.75rem);
+}

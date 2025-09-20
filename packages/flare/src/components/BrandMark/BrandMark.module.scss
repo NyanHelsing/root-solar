@@ -1,0 +1,38 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--flare-brand-mark-size, 2.25rem);
+  height: var(--flare-brand-mark-size, 2.25rem);
+  border-radius: 999px;
+  background: var(--flare-brand-mark-background, var(--flare-brand-gradient));
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+  color: var(--flare-brand-mark-color, #cfff04);
+}
+
+.brand svg {
+  width: var(--flare-brand-mark-icon-size, 55%);
+  height: var(--flare-brand-mark-icon-size, 55%);
+}
+
+.brand--with-label {
+  gap: 0.75rem;
+  padding-inline: 0.6rem;
+  padding-block: 0.35rem;
+  border-radius: 999px;
+  background: var(--flare-brand-mark-background, var(--flare-brand-gradient));
+  color: var(--flare-brand-mark-text-color, rgb(17, 24, 39));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.brand--with-label > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--flare-brand-mark-size, 2.25rem);
+  height: var(--flare-brand-mark-size, 2.25rem);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.12);
+  color: inherit;
+}

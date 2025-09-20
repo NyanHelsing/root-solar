@@ -1,0 +1,39 @@
+.indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--flare-text-soft, rgba(17, 24, 39, 0.72));
+}
+
+.dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px rgba(17, 24, 39, 0.18);
+}
+
+.label {
+  line-height: 1.2;
+}
+
+.indicator--success {
+  color: rgb(16, 185, 129);
+}
+
+.indicator--warning {
+  color: rgb(234, 179, 8);
+}
+
+.indicator--danger {
+  color: rgb(239, 68, 68);
+}
+
+.indicator--info {
+  color: rgb(59, 130, 246);
+}
+
+.indicator--muted {
+  color: rgba(17, 24, 39, 0.55);
+}

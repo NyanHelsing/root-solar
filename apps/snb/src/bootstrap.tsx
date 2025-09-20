@@ -3,7 +3,8 @@ import { createRoot } from "react-dom/client";
 
 import { SearchAndBrowseApp } from "./App.tsx";
 
-import "../../shared/styles/global.css";
+import "@root-solar/flare/styles/base";
+import "@root-solar/flare/styles/utilities";
 
 console.error("RUNNING SNB BOOTSTRAP");
 

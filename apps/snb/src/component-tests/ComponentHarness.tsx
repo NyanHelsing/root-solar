@@ -1,12 +1,15 @@
 import type { ComponentType, ReactElement } from "react";
 import { useMemo } from "react";
+import { MemoryRouter } from "react-router";
 
 import Axiom from "../Axiom.tsx";
 import Axioms from "../Axioms.tsx";
-import Footer from "../Footer.tsx";
-import Header from "../Header.tsx";
-import Hero from "../Hero.tsx";
 import Main from "../Main.tsx";
+import {
+  RootSolarFooter as Footer,
+  RootSolarHeader as Header,
+  ShellHero as Hero,
+} from "@root-solar/layout";
 import NetworkStatusIndicator from "../features/network/NetworkStatusIndicator.tsx";
 
 const registry: Record<string, ComponentType<Record<string, unknown>>> = {
@@ -65,10 +68,23 @@ const ComponentHarness = ({
     );
   }
 
+  type HarnessProps = Record<string, unknown> & { initialPath?: unknown };
+  const resolvedProps: HarnessProps | undefined = componentProps
+    ? ({ ...componentProps } as HarnessProps)
+    : undefined;
+
+  let initialPath = "/";
+  if (resolvedProps && typeof resolvedProps.initialPath === "string") {
+    initialPath = resolvedProps.initialPath;
+    delete resolvedProps.initialPath;
+  }
+
   return (
-    <div data-component-root>
-      <Component {...(componentProps ?? {})} />
-    </div>
+    <MemoryRouter initialEntries={[initialPath]}>
+      <div data-component-root>
+        <Component {...(resolvedProps ?? {})} />
+      </div>
+    </MemoryRouter>
   );
 };
 

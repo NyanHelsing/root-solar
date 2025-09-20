@@ -1,0 +1,12 @@
+.stack {
+  display: flex;
+  flex-direction: var(--flare-stack-direction, column);
+  gap: var(--flare-stack-gap, var(--flare-gap-md, 1.25rem));
+  justify-content: var(--flare-stack-justify, flex-start);
+  align-items: var(--flare-stack-align, stretch);
+  flex-wrap: var(--flare-stack-wrap, nowrap);
+}
+
+.stack--full {
+  width: 100%;
+}

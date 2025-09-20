@@ -17,9 +17,12 @@ export const ShellRoutes = () => (
 );
 
 export { default as ComponentHarness } from "./component-tests/ComponentHarness.tsx";
-export { default as Header } from "./Header.tsx";
-export { default as Hero } from "./Hero.tsx";
+export {
+  RootSolarHeader as Header,
+  ShellHero as Hero,
+  RootSolarFooter as Footer,
+  ShellLayout,
+} from "@root-solar/layout";
 export { default as Main } from "./Main.tsx";
-export { default as Footer } from "./Footer.tsx";
 
 export default SearchAndBrowseApp;

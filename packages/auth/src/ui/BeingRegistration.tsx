@@ -1,5 +1,10 @@
 import { type FormEvent, useCallback, useMemo, useState } from "react";
 
+import {
+  FlareButton,
+  FlareStack,
+  FlareTextInput,
+} from "@root-solar/flare";
 import type {
   BeingRegistrationCompleteInput,
   BeingRegistrationCompleteOutput,
@@ -133,13 +138,15 @@ export const BeingRegistration = <
 
   if (status === "completed" && snapshot) {
     return (
-      <div className="being-registration">
-        <h2>Being Registered</h2>
+      <FlareStack gap="lg">
+        <h2 className="rs-heading-lg">Being Registered</h2>
         <p>
           Being <strong>{snapshot.being.name}</strong> registered with id {snapshot.being.id}.
         </p>
-        <section>
-          <h3>Public Keys</h3>
+        <FlareStack as="section" gap="md">
+          <h3 className="rs-heading-md">
+            Public Keys
+          </h3>
           <details>
             <summary>Signing Public Key</summary>
             <pre>{snapshot.being.signingPublicKey}</pre>
@@ -148,9 +155,11 @@ export const BeingRegistration = <
             <summary>Encryption Public Key</summary>
             <pre>{snapshot.being.encryptionPublicKey}</pre>
           </details>
-        </section>
-        <section>
-          <h3>Private Key Material</h3>
+        </FlareStack>
+        <FlareStack as="section" gap="md">
+          <h3 className="rs-heading-md">
+            Private Key Material
+          </h3>
           <details>
             <summary>Signing Private Key</summary>
             <pre>{snapshot.keyMaterial.signing.privateKey}</pre>
@@ -159,20 +168,22 @@ export const BeingRegistration = <
             <summary>Encryption Private Key</summary>
             <pre>{snapshot.keyMaterial.encryption.privateKey}</pre>
           </details>
-        </section>
-        <button type="button" onClick={reset}>
+        </FlareStack>
+        <FlareButton type="button" variant="secondary" onClick={reset}>
           Register Another Being
-        </button>
-      </div>
+        </FlareButton>
+      </FlareStack>
     );
   }
 
   return (
-    <div className="being-registration">
-      <h2>Create a new being</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="being-name">Being name</label>
-        <input
+    <FlareStack gap="lg">
+      <h2 className="rs-heading-lg">Create a new being</h2>
+      <FlareStack as="form" gap="md" onSubmit={handleSubmit}>
+        <label className="rs-label" htmlFor="being-name">
+          Being name
+        </label>
+        <FlareTextInput
           id="being-name"
           type="text"
           value={name}
@@ -182,15 +193,15 @@ export const BeingRegistration = <
           required
           minLength={3}
         />
-        <button type="submit" disabled={isBusy}>
+        <FlareButton type="submit" disabled={isBusy}>
           {isBusy ? "Registering..." : "Generate credentials"}
-        </button>
-      </form>
-      {status !== "idle" && status !== "completed" && (
-        <p className="status">Status: {status}</p>
-      )}
-      {error && <p className="error">{error}</p>}
-    </div>
+        </FlareButton>
+      </FlareStack>
+      {status !== "idle" && status !== "completed" ? (
+        <p className="rs-text-soft-inverse">Status: {status}</p>
+      ) : null}
+      {error ? <p className="rs-text-danger">{error}</p> : null}
+    </FlareStack>
   );
 };
 

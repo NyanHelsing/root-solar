@@ -1,14 +1,19 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { TiMinus, TiPlus } from "react-icons/ti";
 import { useSetAtom } from "jotai";
 
 import {
+  FlareCard,
+  FlareIconButton,
+  FlareStack,
+  FlareTextInput,
+} from "@root-solar/flare";
+import {
   MAX_SENTIMENT_WEIGHT,
   setAxiomWeightAtom,
   type AxiomSentiment,
 } from "./features/axioms/store.ts";
-import styles from "./Axiom.module.scss";
 
 const formatRatio = (ratio: number) => `${Math.round(ratio * 100)}%`;
 
@@ -41,49 +46,72 @@ export default function Axiom({ id, title, weight, ratio }: AxiomSentiment) {
     commitWeight(next);
   };
 
+  const ratioLabel = useMemo(() => formatRatio(ratio), [ratio]);
+
   return (
-    <div className={styles["axiom"]}>
-      <h2 className={styles["title"]}>{title}</h2>
-      <div className={styles["metrics"]}>
-        <span className={styles["ratio"]}>{formatRatio(ratio)}</span>
-        <span className={styles["weight"]}>{weight}</span>
-      </div>
-      <fieldset className={styles["prioritization"]}>
-        <button
-          type="button"
-          onClick={() => adjust(1)}
-          aria-label="Increase priority"
-          disabled={weight >= MAX_SENTIMENT_WEIGHT}
+    <FlareCard padding="lg">
+      <FlareStack gap="lg">
+        <FlareStack
+          direction="row"
+          wrap
+          align="baseline"
+          justify="space-between"
+          gap="md"
         >
-          <TiPlus />
-        </button>
-        <input
-          name="weight"
-          inputMode="numeric"
-          type="number"
-          min={0}
-          max={MAX_SENTIMENT_WEIGHT}
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onBlur={handleBlur}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.currentTarget.blur();
-            }
-          }}
-        />
-        <button
-          type="button"
-          onClick={() => adjust(-1)}
-          aria-label="Decrease priority"
-          disabled={weight <= 0}
+          <h2 className="rs-heading-md">{title}</h2>
+          <FlareStack direction="row" align="baseline" gap="sm" className="rs-text-soft">
+            <strong>{ratioLabel}</strong>
+            <span className="rs-text-caption">{weight}</span>
+          </FlareStack>
+        </FlareStack>
+        <FlareStack
+          direction="row"
+          justify="flex-end"
+          align="center"
+          gap="sm"
+          wrap
         >
-          <TiMinus />
-        </button>
-      </fieldset>
-      <div className={styles["cta-group"]}>
-        <Link to={`/axioms/${id}`}>More Info</Link>
-      </div>
-    </div>
+          <FlareIconButton
+            type="button"
+            variant="solid"
+            onClick={() => adjust(1)}
+            aria-label="Increase priority"
+            disabled={weight >= MAX_SENTIMENT_WEIGHT}
+          >
+            <TiPlus />
+          </FlareIconButton>
+          <FlareTextInput
+            name="weight"
+            inputMode="numeric"
+            type="number"
+            min={0}
+            max={MAX_SENTIMENT_WEIGHT}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.currentTarget.blur();
+              }
+            }}
+            size="numeric"
+          />
+          <FlareIconButton
+            type="button"
+            variant="ghost"
+            onClick={() => adjust(-1)}
+            aria-label="Decrease priority"
+            disabled={weight <= 0}
+          >
+            <TiMinus />
+          </FlareIconButton>
+        </FlareStack>
+        <FlareStack direction="row" justify="flex-end" gap="sm" fullWidth>
+          <Link to={`/axioms/${id}`} className="rs-link">
+            More Info
+          </Link>
+        </FlareStack>
+      </FlareStack>
+    </FlareCard>
   );
 }
