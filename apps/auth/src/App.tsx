@@ -1,27 +1,19 @@
-import { BeingRegistration } from "@root-solar/auth/ui";
-import { client } from "@root-solar/api/client";
+import type { ComponentType } from "react";
+import { Route } from "react-router";
 
-import styles from "./App.module.scss";
+import AuthRoute from "./AuthRoute.tsx";
 
-export const AuthApp = () => {
-  const startRegistration = (input: Parameters<typeof client.startBeingRegistration.mutate>[0]) =>
-    client.startBeingRegistration.mutate(input);
-  const completeRegistration = (
-    input: Parameters<typeof client.completeBeingRegistration.mutate>[0],
-  ) => client.completeBeingRegistration.mutate(input);
+export type ShellRouteComponent = ComponentType;
 
-  return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Register a new being</h1>
-        <p>Generate key material and enroll a being through the root.solar authentication flow.</p>
-      </header>
-      <BeingRegistration
-        startRegistration={startRegistration}
-        completeRegistration={completeRegistration}
-      />
-    </div>
-  );
-};
+export const shellRouteConfig = {
+  path: "/auth",
+  Component: AuthRoute as ShellRouteComponent,
+} as const;
+
+export const AuthApp = () => <AuthRoute />;
+
+export const ShellRoutes = () => (
+  <Route path={shellRouteConfig.path} element={<AuthRoute />} />
+);
 
 export default AuthApp;

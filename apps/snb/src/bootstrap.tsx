@@ -1,17 +1,14 @@
-import { StrictMode } from "react";
+import { BrowserRouter } from "react-router";
 import { createRoot } from "react-dom/client";
 
 import { SearchAndBrowseApp } from "./App.tsx";
 
 import "../../shared/styles/global.css";
 
-const rootElement = document.getElementById("root");
-if (!rootElement) {
-  throw new Error("Unable to locate #root element for the SNB micro frontend");
-}
+console.error("RUNNING SNB BOOTSTRAP");
 
-createRoot(rootElement).render(
-  <StrictMode>
+createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
     <SearchAndBrowseApp />
-  </StrictMode>,
+  </BrowserRouter>,
 );

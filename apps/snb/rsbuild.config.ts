@@ -1,5 +1,4 @@
 import path from "node:path";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "@rsbuild/core";
@@ -15,12 +14,6 @@ import {
   resolveMountPath,
 } from "../../config/mfePaths.ts";
 
-const require = createRequire(import.meta.url);
-const packageJson = require("../../package.json") as {
-  dependencies?: Record<string, string>;
-};
-const dependencyVersion = (name: string) =>
-  packageJson.dependencies?.[name] ?? "*";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const snbDistSubdir = resolveDistSubdir(
@@ -42,38 +35,45 @@ export default defineConfig({
     pluginSass(),
     pluginModuleFederation({
       name: "snb",
-      filename: "remoteEntry.js",
       exposes: {
         "./App": "./apps/snb/src/App.tsx",
+      },
+      manifest: {
+        fileName: "mf-manifest.json",
       },
       shared: {
         react: {
           singleton: true,
-          //requiredVersion: dependencyVersion("react"),
         },
         "react-dom": {
           singleton: true,
-          //requiredVersion: dependencyVersion("react-dom"),
+        },
+        "react/jsx-runtime": {
+          singleton: true,
+        },
+        "react/jsx-dev-runtime": {
+          singleton: true,
         },
         jotai: {
           singleton: true,
-          //requiredVersion: dependencyVersion("jotai"),
         },
         "jotai-optics": {
           singleton: true,
-          //requiredVersion: dependencyVersion("jotai-optics"),
         },
-        wouter: {
+        "react-router": {
           singleton: true,
-          //requiredVersion: dependencyVersion("wouter"),
+        },
+        "@root-solar/api": {
+          singleton: true,
+        },
+        "@root-solar/layout": {
+          singleton: true,
         },
         "@root-solar/observability": {
           singleton: true,
-          //requiredVersion: dependencyVersion("@root-solar/observability"),
         },
         "react-icons": {
           singleton: true,
-          //requiredVersion: dependencyVersion("react-icons"),
         },
       },
     }),
@@ -84,7 +84,7 @@ export default defineConfig({
   },
   source: {
     entry: {
-      snb: "./apps/snb/src/index.tsx",
+      index: "./apps/snb/src/index.ts",
     },
   },
   output: {
@@ -102,11 +102,5 @@ export default defineConfig({
       wasm: "wasm",
     },
     assetPrefix: snbAssetPrefix,
-    htmlPath: "snb",
-  },
-  tools: {
-    rspack: {
-      plugins: [],
-    },
   },
 });

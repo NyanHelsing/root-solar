@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -13,10 +12,12 @@ import AppShell from "./AppShell.tsx";
 
 import "../../shared/styles/global.css";
 
+console.error("RUNNING APPSHELL BOOTSTRAP");
+
 const environment = process.env.NODE_ENV ?? "development";
 const desiredLevel =
-  parseLogLevel(process.env.PUBLIC_LOG_LEVEL)
-  ?? (environment === "development" ? LogLevel.DEBUG : LogLevel.INFO);
+  parseLogLevel(process.env.PUBLIC_LOG_LEVEL) ??
+  (environment === "development" ? LogLevel.DEBUG : LogLevel.INFO);
 
 const resolvedLevel = initializeObservability({
   level: desiredLevel,
@@ -42,17 +43,15 @@ if (!rootElement) {
 }
 
 createRoot(rootElement).render(
-  <StrictMode>
-    <Suspense
-      fallback={
-        <div role="status" aria-live="polite">
-          Loading application shell…
-        </div>
-      }
-    >
-      <AppShell />
-    </Suspense>
-  </StrictMode>,
+  <Suspense
+    fallback={
+      <div role="status" aria-live="polite">
+        Loading application shell…
+      </div>
+    }
+  >
+    <AppShell />
+  </Suspense>,
 );
 
 clientBootstrapLogger.info("Shell micro frontend rendered", {

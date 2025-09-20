@@ -11,6 +11,8 @@ import {
   DEFAULT_SHELL_MOUNT,
   DEFAULT_SNB_DIST_SUBDIR,
   DEFAULT_SNB_MOUNT,
+  DEFAULT_AUTH_DIST_SUBDIR,
+  DEFAULT_AUTH_MOUNT,
   resolveDistSubdir,
   resolveMountPath,
 } from "../../../../config/mfePaths.ts";
@@ -228,6 +230,17 @@ export const setupProdFrontend = async (
   );
   const snbDist = path.join(DIST_ROOT, snbDistSubdir);
   await mountStaticIfPresent(app, snbMount, snbDist);
+
+  const authMount = resolveMountPath(
+    process.env.AUTH_REMOTE_PATH,
+    DEFAULT_AUTH_MOUNT,
+  );
+  const authDistSubdir = resolveDistSubdir(
+    process.env.AUTH_DIST_SUBDIR,
+    DEFAULT_AUTH_DIST_SUBDIR,
+  );
+  const authDist = path.join(DIST_ROOT, authDistSubdir);
+  await mountStaticIfPresent(app, authMount, authDist);
 
   app.use(createRequestHandler(template, renderer));
 

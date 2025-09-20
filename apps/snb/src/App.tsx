@@ -1,21 +1,25 @@
-import type { ReactElement } from "react";
+import type { ComponentType } from "react";
+import { Route } from "react-router";
 
-import Header from "./Header.tsx";
-import Hero from "./Hero.tsx";
-import Main from "./Main.tsx";
-import Footer from "./Footer.tsx";
-import ComponentHarness from "./component-tests/ComponentHarness.tsx";
+import SearchAndBrowseRoute from "./SearchAndBrowseRoute.tsx";
 
-export function SearchAndBrowseApp(): ReactElement {
-  return (
-    <>
-      <Header />
-      <Hero />
-      <Main />
-      <Footer />
-    </>
-  );
-}
+export type ShellRouteComponent = ComponentType;
 
-export { ComponentHarness };
-export { Header, Hero, Main, Footer };
+export const shellRouteConfig = {
+  path: "/axioms",
+  Component: SearchAndBrowseRoute as ShellRouteComponent,
+} as const;
+
+export const SearchAndBrowseApp = () => <SearchAndBrowseRoute />;
+
+export const ShellRoutes = () => (
+  <Route path={shellRouteConfig.path} element={<SearchAndBrowseRoute />} />
+);
+
+export { default as ComponentHarness } from "./component-tests/ComponentHarness.tsx";
+export { default as Header } from "./Header.tsx";
+export { default as Hero } from "./Hero.tsx";
+export { default as Main } from "./Main.tsx";
+export { default as Footer } from "./Footer.tsx";
+
+export default SearchAndBrowseApp;
