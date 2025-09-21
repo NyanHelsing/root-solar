@@ -9,19 +9,33 @@ import {
   FlareStack,
   FlareTextInput,
 } from "@root-solar/flare";
+import type { CommentTreeNode } from "@root-solar/api";
+
+import { MAX_SENTIMENT_WEIGHT, SENTIMENT_TYPE } from "../axioms/atoms.ts";
 import {
-  MAX_SENTIMENT_WEIGHT,
-  SENTIMENT_TYPE,
-  useBeing,
   useAddAxiomComment,
   useAxiomDetailState,
   useLoadAxiomDetail,
   useLoadAxioms,
   useUpdateAxiomSentiment,
-} from "@root-solar/declarations";
-import type { CommentTreeNode, SentimentAllocation } from "@root-solar/api";
+} from "../axioms/hooks.ts";
+import { useBeing } from "../beings.ts";
 
-const BOOLEAN_SENTIMENT_TYPES = new Set(["vision", "initiative", "epic", "story", "axiomatic"]);
+const pluralize = (value: string) => (value.endsWith("s") ? value : `${value}s`);
+
+const resolveBasePath = (basePath: string | undefined, kind: string | undefined) => {
+  if (basePath) {
+    return basePath;
+  }
+  if (!kind) {
+    return "/missives";
+  }
+  return `/${pluralize(kind)}`;
+};
+
+const capitalize = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+
+const indefiniteArticle = (value: string) => (/[aeiou]/i.test(value[0] ?? "u") ? "an" : "a");
 
 const formatTimestamp = (value: string) => {
   const date = new Date(value);
@@ -196,14 +210,43 @@ const CommentThread = ({ comments, onReply, level = 0 }: CommentThreadProps) => 
   );
 };
 
-const AxiomDetail = () => {
-  const { axiomId } = useParams();
+type MissiveDetailProps = {
+  kind?: string;
+  basePath?: string;
+  paramKey?: string;
+  missiveId?: string;
+};
+
+const resolveLabels = (kind?: string) => {
+  if (kind === "axiom") {
+    return {
+      singular: "axiom",
+      plural: "axioms",
+      capitalized: "Axiom",
+    };
+  }
+  const singular = kind ?? "missive";
+  return {
+    singular,
+    plural: pluralize(singular),
+    capitalized: capitalize(singular),
+  };
+};
+
+const MissiveDetail = ({ kind, basePath, paramKey = "missiveId", missiveId }: MissiveDetailProps) => {
+  const params = useParams<Record<string, string | undefined>>();
+  const tentativeId = missiveId ?? params[paramKey] ?? params.missiveId ?? params.axiomId;
+  const activeMissiveId = tentativeId;
+
   const being = useBeing();
   const loadDetail = useLoadAxiomDetail();
   const loadAxioms = useLoadAxioms();
-  const detail = useAxiomDetailState(axiomId);
+  const detail = useAxiomDetailState(activeMissiveId);
   const updateSentiment = useUpdateAxiomSentiment();
   const addComment = useAddAxiomComment();
+
+  const labels = useMemo(() => resolveLabels(kind), [kind]);
+  const resolvedBasePath = useMemo(() => resolveBasePath(basePath, kind), [basePath, kind]);
 
   const [busySentimentType, setBusySentimentType] = useState<string | null>(null);
   const [sentimentError, setSentimentError] = useState<string | null>(null);
@@ -215,18 +258,18 @@ const AxiomDetail = () => {
   const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
-    if (!axiomId) {
+    if (!activeMissiveId) {
       return;
     }
     void loadAxioms();
-  }, [axiomId, being.id, loadAxioms]);
+  }, [activeMissiveId, being.id, loadAxioms]);
 
   useEffect(() => {
-    if (!axiomId) {
+    if (!activeMissiveId) {
       return;
     }
-    void loadDetail(axiomId);
-  }, [axiomId, being.id, loadDetail]);
+    void loadDetail(activeMissiveId);
+  }, [activeMissiveId, being.id, loadDetail]);
 
   useEffect(() => {
     if (detail.sentiments.length === 0) {
@@ -247,37 +290,22 @@ const AxiomDetail = () => {
     });
   }, [detail.sentiments]);
 
-  const computeMaxWeight = useCallback((type: string, current?: SentimentAllocation) => {
-    const normalizedType = type.toLowerCase();
-    if (BOOLEAN_SENTIMENT_TYPES.has(normalizedType)) {
-      return 1;
-    }
-    if (current?.maxWeight !== undefined) {
-      return current.maxWeight;
-    }
+  const clampWeightForType = useCallback((type: string, weight: number) => {
+    const normalized = Math.max(0, Math.round(weight));
     if (type === SENTIMENT_TYPE) {
-      return MAX_SENTIMENT_WEIGHT;
+      return Math.min(MAX_SENTIMENT_WEIGHT, normalized);
     }
-    return MAX_SENTIMENT_WEIGHT;
+    return normalized;
   }, []);
-
-  const clampWeightForType = useCallback(
-    (type: string, weight: number, current?: SentimentAllocation) => {
-      const normalized = Math.max(0, Math.round(weight));
-      const max = computeMaxWeight(type, current);
-      return Math.min(normalized, max);
-    },
-    [computeMaxWeight],
-  );
 
   const commitSentimentWeight = useCallback(
     async (type: string, weight: number) => {
-      if (!axiomId) {
-        setSentimentError("Select an axiom before adjusting sentiments.");
+      if (!activeMissiveId) {
+        setSentimentError(`Select ${indefiniteArticle(labels.singular)} ${labels.singular} before adjusting sentiments.`);
         return;
       }
+      const nextWeight = clampWeightForType(type, weight);
       const previous = detail.sentiments.find((sentiment) => sentiment.type === type);
-      const nextWeight = clampWeightForType(type, weight, previous);
       const previousWeight = previous?.weight ?? 0;
       if (nextWeight === previousWeight) {
         setSentimentDrafts((current) => ({
@@ -289,7 +317,7 @@ const AxiomDetail = () => {
       setBusySentimentType(type);
       setSentimentError(null);
       try {
-        await updateSentiment({ missiveId: axiomId, type, weight: nextWeight, maxWeight: computeMaxWeight(type, previous) });
+        await updateSentiment({ axiomId: activeMissiveId, type, weight: nextWeight });
         setSentimentDrafts((current) => ({
           ...current,
           [type]: nextWeight.toString(),
@@ -305,14 +333,14 @@ const AxiomDetail = () => {
         setBusySentimentType(null);
       }
     },
-    [axiomId, clampWeightForType, computeMaxWeight, detail.sentiments, updateSentiment],
+    [activeMissiveId, clampWeightForType, detail.sentiments, labels.singular, updateSentiment],
   );
 
   const handleCreateSentiment = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (!axiomId) {
-        setSentimentError("Select an axiom before creating sentiments.");
+      if (!activeMissiveId) {
+        setSentimentError(`Select ${indefiniteArticle(labels.singular)} ${labels.singular} before creating sentiments.`);
         return;
       }
       const type = newSentimentType.trim();
@@ -330,12 +358,12 @@ const AxiomDetail = () => {
         (sentiment) => sentiment.type.toLowerCase() === type.toLowerCase(),
       );
       const resolvedType = existing?.type ?? type;
-      const nextWeight = clampWeightForType(resolvedType, parsedWeight, existing);
+      const nextWeight = clampWeightForType(resolvedType, parsedWeight);
 
       setSentimentError(null);
       setIsCreatingSentiment(true);
       try {
-        await updateSentiment({ missiveId: axiomId, type: resolvedType, weight: nextWeight, maxWeight: computeMaxWeight(resolvedType, existing) });
+        await updateSentiment({ axiomId: activeMissiveId, type: resolvedType, weight: nextWeight });
         setNewSentimentType("");
         setNewSentimentWeight("1");
       } catch (error) {
@@ -346,10 +374,10 @@ const AxiomDetail = () => {
       }
     },
     [
-      axiomId,
+      activeMissiveId,
       clampWeightForType,
-      computeMaxWeight,
       detail.sentiments,
+      labels.singular,
       newSentimentType,
       newSentimentWeight,
       updateSentiment,
@@ -358,35 +386,37 @@ const AxiomDetail = () => {
 
   const handleRootComment = useCallback(
     async (body: string) => {
-      if (!axiomId) {
-        throw new Error("Axiom details are not loaded");
+      if (!activeMissiveId) {
+        throw new Error("Missive details are not loaded");
       }
       setIsPosting(true);
       try {
-        await addComment({ axiomId, body });
+        await addComment({ axiomId: activeMissiveId, body });
       } finally {
         setIsPosting(false);
       }
     },
-    [addComment, axiomId],
+    [addComment, activeMissiveId],
   );
 
   const handleReply = useCallback(
     async (parentId: string, body: string) => {
-      if (!axiomId) {
-        throw new Error("Axiom details are not loaded");
+      if (!activeMissiveId) {
+        throw new Error("Missive details are not loaded");
       }
-      await addComment({ axiomId, parentCommentId: parentId, body });
+      await addComment({ axiomId: activeMissiveId, parentCommentId: parentId, body });
     },
-    [addComment, axiomId],
+    [addComment, activeMissiveId],
   );
 
   const commentCount = useMemo(() => countComments(detail.comments), [detail.comments]);
 
-  if (!axiomId) {
+  if (!activeMissiveId) {
     return (
       <FlareStack gap="md">
-        <p>Select an axiom to view its details.</p>
+        <p>
+          Select {indefiniteArticle(labels.singular)} {labels.singular} to view its details.
+        </p>
       </FlareStack>
     );
   }
@@ -396,21 +426,21 @@ const AxiomDetail = () => {
   return (
     <FlareStack gap="lg">
       <FlareStack gap="sm" as="header">
-        <Link to="/axioms" className="rs-link">
-          Back to priorities
+        <Link to={resolvedBasePath} className="rs-link">
+          {kind === "axiom" ? "Back to priorities" : `Back to ${labels.plural}`}
         </Link>
         {detail.record ? (
           <>
             <h1 className="rs-heading-xl">{detail.record.title}</h1>
-            {detail.record.summary || detail.record.body ? (
-              <p className="rs-text-body-lg">{detail.record.summary ?? detail.record.body}</p>
+            {detail.record.details ? (
+              <p className="rs-text-body-lg">{detail.record.details}</p>
             ) : (
               <p className="rs-text-soft">No additional details recorded yet.</p>
             )}
           </>
         ) : null}
       </FlareStack>
-      {isInitialLoading ? <p className="rs-text-soft">Loading axiom…</p> : null}
+      {isInitialLoading ? <p className="rs-text-soft">Loading {labels.singular}…</p> : null}
       {detail.error ? (
         <p role="alert" className="rs-text-soft">
           {detail.error}
@@ -422,7 +452,7 @@ const AxiomDetail = () => {
             <FlareStack direction="row" justify="space-between" align="baseline" wrap>
               <h2 className="rs-heading-lg">Sentiments</h2>
               <span className="rs-text-soft">
-                Tune how strongly this axiom registers across each sentiment type.
+                Tune how strongly this {labels.singular} registers across each sentiment type.
               </span>
             </FlareStack>
             {sentimentError ? (
@@ -544,7 +574,7 @@ const AxiomDetail = () => {
               </FlareStack>
             ) : (
               <p className="rs-text-soft">
-                No sentiments recorded yet. Use the form below to capture how this axiom resonates.
+                No sentiments recorded yet. Use the form below to capture how this {labels.singular} resonates.
               </p>
             )}
             <form onSubmit={handleCreateSentiment}>
@@ -572,7 +602,7 @@ const AxiomDetail = () => {
                   </FlareButton>
                 </FlareStack>
                 <span className="rs-text-caption rs-text-soft">
-                  Create a new sentiment type to adjust its weight for this axiom.
+                  Create a new sentiment type to adjust its weight for this {labels.singular}.
                 </span>
               </FlareStack>
             </form>
@@ -593,13 +623,13 @@ const AxiomDetail = () => {
               <>
                 <p className="rs-text-soft">
                   {commentCount === 0
-                    ? "Start the discussion by adding the first comment."
+                    ? `Start the discussion by adding the first comment about this ${labels.singular}.`
                     : `${commentCount} comment${commentCount === 1 ? "" : "s"} so far.`}
                 </p>
                 <CommentForm
                   onSubmit={handleRootComment}
                   submitLabel="Post comment"
-                  placeholder="Add a comment about this axiom…"
+                  placeholder={`Add a comment about this ${labels.singular}…`}
                   busy={isPosting}
                 />
                 {detail.comments.length > 0 ? (
@@ -618,4 +648,4 @@ const AxiomDetail = () => {
   );
 };
 
-export default AxiomDetail;
+export default MissiveDetail;

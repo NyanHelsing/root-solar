@@ -11,12 +11,15 @@
   },
   "peerDependencies": {
     "react": "^19.1.1",
-    "jotai": "^2.14.0"
+    "jotai": "^2.14.0",
+    "react-router": "^7.9.1",
+    "react-icons": "^5.5.0"
   },
   "dependencies": {
     "@root-solar/api": "workspace:*",
     "@root-solar/auth": "workspace:*",
     "@root-solar/observability": "workspace:*",
+    "@root-solar/flare": "workspace:*",
     "jotai-optics": "^0.4.0",
     "optics-ts": "^2.4.1"
   }

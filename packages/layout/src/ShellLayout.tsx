@@ -12,6 +12,7 @@ import RootSolarHeader, {
 } from "./RootSolarHeader.tsx";
 
 const DEFAULT_NAV_LINKS: RootSolarNavLink[] = [
+  { href: "/missives", label: "Missives" },
   { href: "/axioms", label: "Axioms" },
 ];
 
