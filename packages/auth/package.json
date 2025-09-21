@@ -12,6 +12,10 @@
       "types": "./src/procedures/index.ts",
       "default": "./src/procedures/index.ts"
     },
+    "./session": {
+      "types": "./src/session.ts",
+      "default": "./src/session.ts"
+    },
     "./ui": {
       "types": "./src/ui/index.ts",
       "default": "./src/ui/index.ts"
@@ -19,11 +23,16 @@
     "./ui/BeingRegistration": {
       "types": "./src/ui/BeingRegistration.tsx",
       "default": "./src/ui/BeingRegistration.tsx"
+    },
+    "./ui/BeingLogin": {
+      "types": "./src/ui/BeingLogin.tsx",
+      "default": "./src/ui/BeingLogin.tsx"
     }
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "dependencies": {
+    "jotai": "^2.14.0",
     "openpgp": "^5.11.1",
     "zod": "^4.1.5"
   },
