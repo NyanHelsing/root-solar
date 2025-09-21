@@ -34,3 +34,20 @@ export {
   utf8ToBytes,
   bytesToUtf8,
 } from "./encoding.ts";
+
+export {
+  createBeingSession,
+  loadBeingSessionRecord,
+  persistBeingSessionRecord,
+  clearBeingSessionRecord,
+  unlockBeingSessionRecord,
+  generateSessionPin,
+  getSessionStorageKey,
+  type BeingSessionRecord,
+} from "./session.ts";
+
+export {
+  beingSessionAtom,
+  beingSessionSummaryAtom,
+  type BeingSessionAction,
+} from "./session-atoms.ts";
