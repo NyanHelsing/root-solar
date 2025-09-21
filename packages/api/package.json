@@ -40,15 +40,14 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "dependencies": {
+    "@root-solar/auth": "workspace:*",
+    "@root-solar/net": "workspace:*",
+    "@root-solar/observability": "workspace:*",
     "@surrealdb/node": "1.0.0-beta.3",
     "@trpc/client": "^11.5.1",
     "@trpc/server": "^11.5.1",
     "nanoid": "^5.1.5",
     "surrealdb": "^1.3.2",
-    "zod": "^4.1.5",
-    "@root-solar/auth": "workspace:*",
-    "@root-solar/net": "workspace:*",
-    "@root-solar/planning": "workspace:*",
-    "@root-solar/observability": "workspace:*"
+    "zod": "^4.1.5"
   }
 }

@@ -2,8 +2,6 @@ import type { ComponentType, ReactElement } from "react";
 import { useMemo } from "react";
 import { MemoryRouter } from "react-router";
 
-import Axiom from "../Axiom.tsx";
-import Axioms from "../Axioms.tsx";
 import Main from "../Main.tsx";
 import {
   RootSolarFooter as Footer,
@@ -11,10 +9,60 @@ import {
   ShellHero as Hero,
 } from "@root-solar/layout";
 import NetworkStatusIndicator from "../features/network/NetworkStatusIndicator.tsx";
+import { MissiveDetail, MissiveList } from "@root-solar/declarations";
+
+const pluralize = (value: string) => (value.endsWith("s") ? value : `${value}s`);
+
+const MissiveListHarness: ComponentType<Record<string, unknown>> = (props) => {
+  const { kind, basePath } = props;
+  const resolvedKind = typeof kind === "string" ? kind : undefined;
+  const resolvedBasePath = (() => {
+    if (typeof basePath === "string") {
+      return basePath;
+    }
+    if (resolvedKind === "axiom") {
+      return "/axioms";
+    }
+    if (resolvedKind) {
+      return `/${pluralize(resolvedKind)}`;
+    }
+    return "/missives";
+  })();
+  return <MissiveList kind={resolvedKind} basePath={resolvedBasePath} />;
+};
+
+const MissiveDetailHarness: ComponentType<Record<string, unknown>> = (props) => {
+  const { kind, basePath, paramKey, missiveId } = props;
+  const resolvedKind = typeof kind === "string" ? kind : undefined;
+  const resolvedBasePath = (() => {
+    if (typeof basePath === "string") {
+      return basePath;
+    }
+    if (resolvedKind === "axiom") {
+      return "/axioms";
+    }
+    if (resolvedKind) {
+      return `/${pluralize(resolvedKind)}`;
+    }
+    return "/missives";
+  })();
+  const resolvedParamKey = typeof paramKey === "string" ? paramKey : "missiveId";
+  const resolvedMissiveId = typeof missiveId === "string" ? missiveId : undefined;
+  return (
+    <MissiveDetail
+      kind={resolvedKind}
+      basePath={resolvedBasePath}
+      paramKey={resolvedParamKey}
+      missiveId={resolvedMissiveId}
+    />
+  );
+};
 
 const registry: Record<string, ComponentType<Record<string, unknown>>> = {
-  axiom: Axiom,
-  axioms: Axioms,
+  axiom: MissiveDetailHarness,
+  axioms: MissiveListHarness,
+  "missive-detail": MissiveDetailHarness,
+  "missive-list": MissiveListHarness,
   footer: Footer,
   header: Header,
   hero: Hero,

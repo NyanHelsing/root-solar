@@ -10,21 +10,9 @@ const sentimentLogger = createAppLogger("persistence:sentiment", {
 const SENTIMENT_TABLE = "sentiment" as const;
 const BEING_TABLE = "being" as const;
 
-const BOOLEAN_SENTIMENT_TYPES = new Set<string>([
-  "vision",
-  "initiative",
-  "epic",
-  "story",
-  "axiomatic",
-]);
-
 export type SentimentRecord = {
   id: string;
   beingId: string;
-  missiveId: string;
-  /**
-   * @deprecated legacy alias retained for compatibility
-   */
   axiomId: string;
   type: string;
   weight: number;
@@ -36,63 +24,27 @@ export type SentimentAllocation = SentimentRecord & {
   maxWeight?: number;
 };
 
-type RawSentimentRecord = {
+type RawSentimentRecord = Omit<
+  SentimentRecord,
+  "id" | "beingId" | "axiomId"
+> & {
   id: string | RecordId;
   beingId: string | number;
-  missiveId?: string | number;
-  axiomId?: string | number;
-  type: string;
-  weight: number;
+  axiomId: string | number;
 };
 
-const normalizeId = (value: string | number | RecordId | undefined | null) => {
-  if (value === undefined || value === null) {
-    return undefined;
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  if (typeof value === "number") {
-    return value.toString();
-  }
-  return value.toString();
-};
-
-const extractMissiveId = (record: RawSentimentRecord): string => {
-  const direct = normalizeId(record.missiveId ?? record.axiomId);
-  if (direct && direct.length > 0) {
-    return direct;
-  }
-  const rawId = normalizeId(record.id);
-  if (rawId) {
-    const parts = rawId.split(":");
-    if (parts.length >= 4) {
-      // sentiment id shape: beingId:type:missiveId...
-      const candidate = parts.slice(3).join(":");
-      if (candidate.length > 0) {
-        return candidate.startsWith("missive:") ? candidate : `missive:${candidate}`;
-      }
-    }
-  }
-  throw new Error("Unable to determine missiveId from sentiment record");
-};
-
-const toSentimentRecord = (record: RawSentimentRecord): SentimentRecord => {
-  const missiveId = extractMissiveId(record);
-  const id = normalizeId(record.id);
-  const beingId = normalizeId(record.beingId);
-  if (!id || !beingId) {
-    throw new Error("Sentiment record missing identifier");
-  }
-  return {
-    id,
-    beingId,
-    missiveId,
-    axiomId: missiveId,
-    type: record.type,
-    weight: record.weight,
-  } satisfies SentimentRecord;
-};
+const toSentimentRecord = (record: RawSentimentRecord): SentimentRecord => ({
+  ...record,
+  id: typeof record.id === "string" ? record.id : record.id.toString(),
+  beingId:
+    typeof record.beingId === "string"
+      ? record.beingId
+      : record.beingId.toString(),
+  axiomId:
+    typeof record.axiomId === "string"
+      ? record.axiomId
+      : record.axiomId.toString(),
+});
 
 const unwrapSingle = <T>(value: T | T[] | null): T | null => {
   if (value === null) {
@@ -204,36 +156,26 @@ const assertInteger = (value: number, field: string) => {
   }
 };
 
-const normalizeMissiveId = (missiveId: string) => {
-  if (missiveId.includes(":")) {
-    return missiveId;
-  }
-  return `missive:${missiveId}`;
-};
-
 export type SentimentModel = ReturnType<typeof createSentimentModel>;
 
 export const createSentimentModel = (ctx: Context) => {
   return {
     async upsert({
       beingId,
-      missiveId,
+      axiomId,
       type,
       weight,
       maxWeight,
     }: {
       beingId: string;
-      missiveId: string;
+      axiomId: string;
       type: string;
       weight: number;
       maxWeight?: number;
     }) {
-      const normalizedMissiveId = normalizeMissiveId(missiveId);
-      const isBooleanSentiment = BOOLEAN_SENTIMENT_TYPES.has(type);
-
       sentimentLogger.debug("Upserting sentiment", {
         beingId,
-        missiveId: normalizedMissiveId,
+        axiomId,
         type,
         weight,
         maxWeight,
@@ -244,9 +186,6 @@ export const createSentimentModel = (ctx: Context) => {
       if (weight < 0) {
         throw new Error("weight must be non-negative");
       }
-      if (isBooleanSentiment && weight > 1) {
-        throw new Error(`Boolean sentiment ${type} must be 0 or 1`);
-      }
       if (maxWeight !== undefined) {
         assertInteger(maxWeight, "maxWeight");
         if (maxWeight < 0) {
@@ -256,8 +195,7 @@ export const createSentimentModel = (ctx: Context) => {
 
       await ensureBeingExists(ctx, beingId);
 
-      const sentimentId = `${beingId}:${type}:${normalizedMissiveId}`;
-      const effectiveMaxWeight = isBooleanSentiment ? 1 : maxWeight;
+      const sentimentId = `${beingId}:${type}:${axiomId}`;
       const existingForType = await selectSentiments(ctx, { beingId, type });
       const otherWeightTotal = existingForType.reduce((total, record) => {
         if (record.id === sentimentId) {
@@ -267,23 +205,23 @@ export const createSentimentModel = (ctx: Context) => {
       }, 0);
       const newTotalWeight = otherWeightTotal + weight;
 
-      if (effectiveMaxWeight !== undefined && newTotalWeight > effectiveMaxWeight) {
+      if (maxWeight !== undefined && newTotalWeight > maxWeight) {
         throw new Error(
-          `Sentiment type ${type} for being ${beingId} exceeds allocation of ${effectiveMaxWeight} (attempted ${newTotalWeight})`,
+          `Sentiment type ${type} for being ${beingId} exceeds allocation of ${maxWeight} (attempted ${newTotalWeight})`,
         );
       }
 
       if (weight === 0) {
         sentimentLogger.debug("Weight is zero; deleting sentiment record", {
           beingId,
-          missiveId: normalizedMissiveId,
+          axiomId,
           type,
           tags: ["mutation", "upsert"],
         });
         await ctx.db.delete(new RecordId(SENTIMENT_TABLE, sentimentId));
         sentimentLogger.info("Sentiment removed due to zero weight", {
           beingId,
-          missiveId: normalizedMissiveId,
+          axiomId,
           type,
           tags: ["mutation", "upsert"],
         });
@@ -295,8 +233,7 @@ export const createSentimentModel = (ctx: Context) => {
         {
           id: sentimentId,
           beingId,
-          missiveId: normalizedMissiveId,
-          axiomId: normalizedMissiveId,
+          axiomId,
           type,
           weight,
         },
@@ -305,7 +242,7 @@ export const createSentimentModel = (ctx: Context) => {
       if (!stored) {
         sentimentLogger.warn("Upsert returned empty record", {
           beingId,
-          missiveId: normalizedMissiveId,
+          axiomId,
           type,
           tags: ["mutation", "upsert"],
         });
@@ -318,11 +255,11 @@ export const createSentimentModel = (ctx: Context) => {
         ...toSentimentRecord(stored),
         totalWeightForType: newTotalWeight,
         ratio,
-        maxWeight: effectiveMaxWeight,
+        maxWeight,
       } satisfies SentimentAllocation;
       sentimentLogger.info("Sentiment upserted", {
         beingId,
-        missiveId: normalizedMissiveId,
+        axiomId,
         type,
         weight,
         totalWeightForType: newTotalWeight,
@@ -367,7 +304,6 @@ export const createSentimentModel = (ctx: Context) => {
           ...sentiment,
           totalWeightForType,
           ratio,
-          maxWeight: BOOLEAN_SENTIMENT_TYPES.has(sentiment.type) ? 1 : undefined,
         } satisfies SentimentAllocation;
       });
 
@@ -381,26 +317,25 @@ export const createSentimentModel = (ctx: Context) => {
     },
     async remove({
       beingId,
-      missiveId,
+      axiomId,
       type,
     }: {
       beingId: string;
-      missiveId: string;
+      axiomId: string;
       type: string;
     }) {
-      const normalizedMissiveId = normalizeMissiveId(missiveId);
       sentimentLogger.debug("Removing sentiment", {
         beingId,
-        missiveId: normalizedMissiveId,
+        axiomId,
         type,
         tags: ["mutation", "remove"],
       });
       await ctx.db.delete(
-        new RecordId(SENTIMENT_TABLE, `${beingId}:${type}:${normalizedMissiveId}`),
+        new RecordId(SENTIMENT_TABLE, `${beingId}:${type}:${axiomId}`),
       );
       sentimentLogger.info("Sentiment removed", {
         beingId,
-        missiveId: normalizedMissiveId,
+        axiomId,
         type,
         tags: ["mutation", "remove"],
       });
@@ -408,7 +343,7 @@ export const createSentimentModel = (ctx: Context) => {
   } satisfies {
     upsert: (input: {
       beingId: string;
-      missiveId: string;
+      axiomId: string;
       type: string;
       weight: number;
       maxWeight?: number;
@@ -419,7 +354,7 @@ export const createSentimentModel = (ctx: Context) => {
     ) => Promise<SentimentAllocation[]>;
     remove: (input: {
       beingId: string;
-      missiveId: string;
+      axiomId: string;
       type: string;
     }) => Promise<void>;
   };

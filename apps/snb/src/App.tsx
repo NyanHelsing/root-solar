@@ -6,14 +6,17 @@ import SearchAndBrowseRoute from "./SearchAndBrowseRoute.tsx";
 export type ShellRouteComponent = ComponentType;
 
 export const shellRouteConfig = {
-  path: "/axioms/*",
+  path: "/missives/*",
   Component: SearchAndBrowseRoute as ShellRouteComponent,
 } as const;
 
 export const SearchAndBrowseApp = () => <SearchAndBrowseRoute />;
 
 export const ShellRoutes = () => (
-  <Route path={shellRouteConfig.path} element={<SearchAndBrowseRoute />} />
+  <>
+    <Route path="/missives/*" element={<SearchAndBrowseRoute />} />
+    <Route path="/axioms/*" element={<SearchAndBrowseRoute />} />
+  </>
 );
 
 export { default as ComponentHarness } from "./component-tests/ComponentHarness.tsx";

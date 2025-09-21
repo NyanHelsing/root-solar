@@ -80,6 +80,15 @@ export default function AppShell(): ReactElement {
           }
           hydrateFallbackElement={loadingFallback}
         />
+        <Route
+          path="/missives/*"
+          element={
+            <RouteErrorBoundary>
+              <SearchAndBrowseApp />
+            </RouteErrorBoundary>
+          }
+          hydrateFallbackElement={loadingFallback}
+        />
       </Routes>
     </BrowserRouter>
   );
