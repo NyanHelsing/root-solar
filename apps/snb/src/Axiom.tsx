@@ -27,7 +27,7 @@ export default function Axiom({ id, title, weight, ratio }: AxiomOverview) {
 
   const commitWeight = useCallback(
     (next: number) => {
-      void updateSentiment({ axiomId: id, type: SENTIMENT_TYPE, weight: next });
+      void updateSentiment({ missiveId: id, type: SENTIMENT_TYPE, weight: next });
     },
     [id, updateSentiment],
   );
