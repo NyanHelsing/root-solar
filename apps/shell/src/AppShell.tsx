@@ -72,7 +72,7 @@ export default function AppShell(): ReactElement {
           hydrateFallbackElement={loadingFallback}
         />
         <Route
-          path="/axioms"
+          path="/axioms/*"
           element={
             <RouteErrorBoundary>
               <SearchAndBrowseApp />

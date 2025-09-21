@@ -9,6 +9,8 @@ import {
   createSentimentModel,
   type SentimentModel,
   createBeingRegistrationStore,
+  createCommentModel,
+  type CommentModel,
 } from "./persistence/entities/index.ts";
 import { getDb } from "./persistence/db.ts";
 import type { BeingRegistrationStore } from "@root-solar/auth/procedures";
@@ -22,6 +24,7 @@ export class Context {
   axioms: AxiomModel;
   beings: BeingModel;
   sentiments: SentimentModel;
+  comments: CommentModel;
   authRegistrations: BeingRegistrationStore;
 
   constructor({ db }: { db: Awaited<ReturnType<typeof getDb>> }) {
@@ -29,6 +32,7 @@ export class Context {
     this.axioms = createAxiomModel(this);
     this.beings = createBeingModel(this);
     this.sentiments = createSentimentModel(this);
+    this.comments = createCommentModel(this);
     this.authRegistrations = createBeingRegistrationStore(this);
     apiContextLogger.debug("API context constructed", {
       tags: ["startup"],

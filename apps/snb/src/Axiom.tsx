@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { TiMinus, TiPlus } from "react-icons/ti";
-import { useSetAtom } from "jotai";
 
 import {
   FlareCard,
@@ -11,14 +10,15 @@ import {
 } from "@root-solar/flare";
 import {
   MAX_SENTIMENT_WEIGHT,
-  setAxiomWeightAtom,
-  type AxiomSentiment,
-} from "./features/axioms/store.ts";
+  SENTIMENT_TYPE,
+  type AxiomOverview,
+  useUpdateAxiomSentiment,
+} from "@root-solar/declarations";
 
 const formatRatio = (ratio: number) => `${Math.round(ratio * 100)}%`;
 
-export default function Axiom({ id, title, weight, ratio }: AxiomSentiment) {
-  const setWeight = useSetAtom(setAxiomWeightAtom);
+export default function Axiom({ id, title, weight, ratio }: AxiomOverview) {
+  const updateSentiment = useUpdateAxiomSentiment();
   const [draft, setDraft] = useState(() => weight.toString());
 
   useEffect(() => {
@@ -27,9 +27,9 @@ export default function Axiom({ id, title, weight, ratio }: AxiomSentiment) {
 
   const commitWeight = useCallback(
     (next: number) => {
-      setWeight({ axiomId: id, weight: next });
+      void updateSentiment({ axiomId: id, type: SENTIMENT_TYPE, weight: next });
     },
-    [id, setWeight],
+    [id, updateSentiment],
   );
 
   const adjust = (delta: number) => {

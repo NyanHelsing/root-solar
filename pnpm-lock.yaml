@@ -35,6 +35,9 @@ importers:
       '@root-solar/auth':
         specifier: workspace:*
         version: link:packages/auth
+      '@root-solar/declarations':
+        specifier: workspace:*
+        version: link:packages/declarations
       '@root-solar/flare':
         specifier: workspace:*
         version: link:packages/flare
@@ -162,6 +165,9 @@ importers:
 
   packages/auth:
     dependencies:
+      jotai:
+        specifier: ^2.14.0
+        version: 2.14.0(@types/react@19.1.11)(react@19.1.1)
       openpgp:
         specifier: ^5.11.1
         version: 5.11.3
@@ -174,6 +180,30 @@ importers:
       zod:
         specifier: ^4.1.5
         version: 4.1.5
+
+  packages/declarations:
+    dependencies:
+      '@root-solar/api':
+        specifier: workspace:*
+        version: link:../api
+      '@root-solar/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@root-solar/observability':
+        specifier: workspace:*
+        version: link:../observability
+      jotai:
+        specifier: ^2.14.0
+        version: 2.14.0(@types/react@19.1.11)(react@19.1.1)
+      jotai-optics:
+        specifier: ^0.4.0
+        version: 0.4.0(jotai@2.14.0(@types/react@19.1.11)(react@19.1.1))(optics-ts@2.4.1)
+      optics-ts:
+        specifier: ^2.4.1
+        version: 2.4.1
+      react:
+        specifier: ^19.1.1
+        version: 19.1.1
 
   packages/flare:
     dependencies:
@@ -198,6 +228,9 @@ importers:
       react-dom:
         specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
+      react-router:
+        specifier: ^7.9.1
+        version: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
 
   packages/layout:
     dependencies:

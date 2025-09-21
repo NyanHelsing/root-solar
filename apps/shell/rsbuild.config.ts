@@ -73,6 +73,12 @@ export default defineConfig({
         "jotai-optics": {
           singleton: true,
         },
+        "@root-solar/auth": {
+          singleton: true,
+        },
+        "@root-solar/declarations": {
+          singleton: true,
+        },
         "@root-solar/observability": {
           singleton: true,
         },
