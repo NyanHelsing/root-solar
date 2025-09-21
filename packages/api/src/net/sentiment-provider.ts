@@ -6,12 +6,11 @@ import type {
 } from "../persistence/entities/index.ts";
 
 const parseSentimentRecordId = (recordId: string) => {
-  const [beingRaw, type, axiomRaw] = recordId.split(":");
-  if (!beingRaw || !type || !axiomRaw) {
+  const [beingId, type, ...rest] = recordId.split(':');
+  if (!beingId || !type || rest.length === 0) {
     throw new Error(`Invalid sentiment record identifier: ${recordId}`);
   }
-
-  return { beingId: beingRaw, type, axiomId: axiomRaw };
+  return { beingId, type, missiveId: rest.join(':') };
 };
 
 const gcd = (a: number, b: number): number => {
@@ -52,16 +51,16 @@ const normaliseFraction = (
 
 const findSentimentAllocation = (
   allocations: SentimentAllocation[],
-  axiomId: string,
-) => allocations.find((allocation) => allocation.axiomId === axiomId);
+  missiveId: string,
+) => allocations.find((allocation) => allocation.missiveId === missiveId || allocation.axiomId === missiveId);
 
 export const createModelBackedSentimentProvider = (
   sentiments: Pick<SentimentModel, "listForBeing">,
 ): SentimentProvider => {
   return async (recordId) => {
-    const { beingId, type, axiomId } = parseSentimentRecordId(recordId);
+    const { beingId, type, missiveId } = parseSentimentRecordId(recordId);
     const allocations = await sentiments.listForBeing(beingId, { type });
-    const match = findSentimentAllocation(allocations, axiomId);
+    const match = findSentimentAllocation(allocations, missiveId);
     if (!match) {
       return null;
     }

@@ -1,5 +1,8 @@
 export { beingAtom, useBeing } from "./beings.ts";
-export { MAX_SENTIMENT_WEIGHT, SENTIMENT_TYPE } from "./axioms/atoms.ts";
+export {
+  SENTIMENT_TYPE,
+  MAX_SENTIMENT_WEIGHT,
+} from "./axioms/constants.ts";
 export type { AxiomOverview, AxiomDetailState } from "./axioms/hooks.ts";
 export {
   useAddAxiomComment,
@@ -12,3 +15,19 @@ export {
   useLoadAxioms,
   useUpdateAxiomSentiment,
 } from "./axioms/hooks.ts";
+export type {
+  MissiveOverview,
+  MissiveDetailState,
+  MissiveHookOptions,
+} from "./missives/hooks.ts";
+export {
+  useAddMissiveComment,
+  useMissiveDetailState,
+  useMissivesListError,
+  useMissivesListLoading,
+  useMissivesOverview,
+  useMissivesTotalWeight,
+  useLoadMissiveDetail,
+  useLoadMissives,
+  useUpdateMissiveSentiment,
+} from "./missives/hooks.ts";

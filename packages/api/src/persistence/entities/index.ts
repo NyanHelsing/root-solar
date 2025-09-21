@@ -1,5 +1,10 @@
-export { createAxiomModel } from "./axiom/entity.ts";
-export type { AxiomModel, AxiomRecord } from "./axiom/entity.ts";
+export {
+  createMissiveModel,
+  type MissiveModel,
+  type MissiveRecord,
+  type MissiveCreateInput,
+  type MissiveUpsertInput,
+} from "./missive/entity.ts";
 export { createBeingModel } from "./being/entity.ts";
 export type { BeingModel, BeingRecord } from "./being/entity.ts";
 export { createSentimentModel } from "./sentiment/entity.ts";

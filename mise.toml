@@ -18,3 +18,9 @@ run = "pnpm start"
 
 [tasks.start]
 run = "pnpm start"
+
+[tasks."planning:docs-to-db"]
+run = "node --experimental-strip-types packages/planning/src/cli.ts docs-to-db"
+
+[tasks."planning:db-to-docs"]
+run = "node --experimental-strip-types packages/planning/src/cli.ts db-to-docs"

@@ -19,7 +19,9 @@ import {
   useLoadAxioms,
   useUpdateAxiomSentiment,
 } from "@root-solar/declarations";
-import type { CommentTreeNode } from "@root-solar/api";
+import type { CommentTreeNode, SentimentAllocation } from "@root-solar/api";
+
+const BOOLEAN_SENTIMENT_TYPES = new Set(["vision", "initiative", "epic", "story", "axiomatic"]);
 
 const formatTimestamp = (value: string) => {
   const date = new Date(value);
@@ -245,13 +247,28 @@ const AxiomDetail = () => {
     });
   }, [detail.sentiments]);
 
-  const clampWeightForType = useCallback((type: string, weight: number) => {
-    const normalized = Math.max(0, Math.round(weight));
-    if (type === SENTIMENT_TYPE) {
-      return Math.min(MAX_SENTIMENT_WEIGHT, normalized);
+  const computeMaxWeight = useCallback((type: string, current?: SentimentAllocation) => {
+    const normalizedType = type.toLowerCase();
+    if (BOOLEAN_SENTIMENT_TYPES.has(normalizedType)) {
+      return 1;
     }
-    return normalized;
+    if (current?.maxWeight !== undefined) {
+      return current.maxWeight;
+    }
+    if (type === SENTIMENT_TYPE) {
+      return MAX_SENTIMENT_WEIGHT;
+    }
+    return MAX_SENTIMENT_WEIGHT;
   }, []);
+
+  const clampWeightForType = useCallback(
+    (type: string, weight: number, current?: SentimentAllocation) => {
+      const normalized = Math.max(0, Math.round(weight));
+      const max = computeMaxWeight(type, current);
+      return Math.min(normalized, max);
+    },
+    [computeMaxWeight],
+  );
 
   const commitSentimentWeight = useCallback(
     async (type: string, weight: number) => {
@@ -259,8 +276,8 @@ const AxiomDetail = () => {
         setSentimentError("Select an axiom before adjusting sentiments.");
         return;
       }
-      const nextWeight = clampWeightForType(type, weight);
       const previous = detail.sentiments.find((sentiment) => sentiment.type === type);
+      const nextWeight = clampWeightForType(type, weight, previous);
       const previousWeight = previous?.weight ?? 0;
       if (nextWeight === previousWeight) {
         setSentimentDrafts((current) => ({
@@ -272,7 +289,7 @@ const AxiomDetail = () => {
       setBusySentimentType(type);
       setSentimentError(null);
       try {
-        await updateSentiment({ axiomId, type, weight: nextWeight });
+        await updateSentiment({ missiveId: axiomId, type, weight: nextWeight, maxWeight: computeMaxWeight(type, previous) });
         setSentimentDrafts((current) => ({
           ...current,
           [type]: nextWeight.toString(),
@@ -288,7 +305,7 @@ const AxiomDetail = () => {
         setBusySentimentType(null);
       }
     },
-    [axiomId, clampWeightForType, detail.sentiments, updateSentiment],
+    [axiomId, clampWeightForType, computeMaxWeight, detail.sentiments, updateSentiment],
   );
 
   const handleCreateSentiment = useCallback(
@@ -313,12 +330,12 @@ const AxiomDetail = () => {
         (sentiment) => sentiment.type.toLowerCase() === type.toLowerCase(),
       );
       const resolvedType = existing?.type ?? type;
-      const nextWeight = clampWeightForType(resolvedType, parsedWeight);
+      const nextWeight = clampWeightForType(resolvedType, parsedWeight, existing);
 
       setSentimentError(null);
       setIsCreatingSentiment(true);
       try {
-        await updateSentiment({ axiomId, type: resolvedType, weight: nextWeight });
+        await updateSentiment({ missiveId: axiomId, type: resolvedType, weight: nextWeight, maxWeight: computeMaxWeight(resolvedType, existing) });
         setNewSentimentType("");
         setNewSentimentWeight("1");
       } catch (error) {
@@ -331,6 +348,7 @@ const AxiomDetail = () => {
     [
       axiomId,
       clampWeightForType,
+      computeMaxWeight,
       detail.sentiments,
       newSentimentType,
       newSentimentWeight,
@@ -384,8 +402,8 @@ const AxiomDetail = () => {
         {detail.record ? (
           <>
             <h1 className="rs-heading-xl">{detail.record.title}</h1>
-            {detail.record.details ? (
-              <p className="rs-text-body-lg">{detail.record.details}</p>
+            {detail.record.summary || detail.record.body ? (
+              <p className="rs-text-body-lg">{detail.record.summary ?? detail.record.body}</p>
             ) : (
               <p className="rs-text-soft">No additional details recorded yet.</p>
             )}
