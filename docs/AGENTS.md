@@ -17,3 +17,5 @@ This file governs all content beneath `docs/`.
 - Update diagrams or embedded assets together with the text that references them.
 - Note the last validated tool versions when instructions depend on specific releases.
 - Archive stale strategy docs under `docs/archive/` instead of deleting them so the context remains searchable.
+- When code changes alter behavior or APIs, update the corresponding docs in the same change.
+- When reviewing documentation, spot-check it against the current code to confirm accuracy before accepting.
