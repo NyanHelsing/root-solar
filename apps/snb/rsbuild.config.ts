@@ -66,6 +66,12 @@ export default defineConfig({
         "@root-solar/api": {
           singleton: true,
         },
+        "@root-solar/auth": {
+          singleton: true,
+        },
+        "@root-solar/declarations": {
+          singleton: true,
+        },
         "@root-solar/layout": {
           singleton: true,
         },

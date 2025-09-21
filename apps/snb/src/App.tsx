@@ -6,7 +6,7 @@ import SearchAndBrowseRoute from "./SearchAndBrowseRoute.tsx";
 export type ShellRouteComponent = ComponentType;
 
 export const shellRouteConfig = {
-  path: "/axioms",
+  path: "/axioms/*",
   Component: SearchAndBrowseRoute as ShellRouteComponent,
 } as const;
 

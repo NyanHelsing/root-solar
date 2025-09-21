@@ -77,30 +77,57 @@ const selectSentiments = async (
     params.type = type;
   }
 
-  const [queryResult] = await ctx.db.query<[(RawSentimentRecord[] | null)?]>(
-    statement,
-    params,
-  );
+  const [rawResult] = await ctx.db.query(statement, params);
 
-  if (!queryResult || queryResult.status !== "OK") {
+  if (!rawResult) {
     sentimentLogger.warn("Sentiment selection query failed", {
       beingId,
       type,
-      status: queryResult?.status,
+      status: "EMPTY_RESULT",
       tags: ["query"],
     });
     return [] as SentimentRecord[];
   }
 
-  const records = queryResult.result;
-  if (!Array.isArray(records)) {
-    sentimentLogger.warn("Unexpected sentiment query result shape", {
+  const extractRecords = (): RawSentimentRecord[] | null => {
+    if (Array.isArray(rawResult)) {
+      return rawResult as RawSentimentRecord[];
+    }
+    if (typeof rawResult === "object" && rawResult !== null) {
+      const status = (rawResult as { status?: string }).status;
+      if (status && status !== "OK") {
+        sentimentLogger.warn("Sentiment selection query failed", {
+          beingId,
+          type,
+          status,
+          tags: ["query"],
+        });
+        return null;
+      }
+      const result = (rawResult as { result?: unknown }).result;
+      if (Array.isArray(result)) {
+        return result as RawSentimentRecord[];
+      }
+      sentimentLogger.warn("Unexpected sentiment query result shape", {
+        beingId,
+        type,
+        tags: ["query"],
+      });
+      return null;
+    }
+    sentimentLogger.warn("Unhandled sentiment query result shape", {
       beingId,
       type,
       tags: ["query"],
     });
+    return null;
+  };
+
+  const records = extractRecords();
+  if (!records) {
     return [] as SentimentRecord[];
   }
+
   const mapped = records.map(toSentimentRecord);
   sentimentLogger.debug("Sentiments selected", {
     beingId,
@@ -246,24 +273,16 @@ export const createSentimentModel = (ctx: Context) => {
         type: options?.type,
         tags: ["query"],
       });
-      //const sentiments = await selectSentiments(ctx, {
-      //  beingId,
-      //  type: options?.type,
-      //});
-      const [sentiments] = await ctx.db.query<[SentimentAllocation[]]>(
-        `SELECT * FROM ${SENTIMENT_TABLE} WHERE beingId = $beingId`,
-        { beingId },
-      );
-      if (!Array.isArray(sentiments)) {
-        sentimentLogger.warn("Unexpected sentiments result from listForBeing", {
-          beingId,
-          tags: ["query"],
-        });
-        return [] as SentimentAllocation[];
-      }
+
+      const sentiments = await selectSentiments(ctx, {
+        beingId,
+        type: options?.type,
+      });
+
       if (sentiments.length === 0) {
         sentimentLogger.debug("No sentiments found", {
           beingId,
+          type: options?.type,
           tags: ["query"],
         });
         return [] as SentimentAllocation[];
@@ -287,6 +306,7 @@ export const createSentimentModel = (ctx: Context) => {
           ratio,
         } satisfies SentimentAllocation;
       });
+
       sentimentLogger.debug("Sentiments listed", {
         beingId,
         count: allocations.length,

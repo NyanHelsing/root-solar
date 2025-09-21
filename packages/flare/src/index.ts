@@ -74,3 +74,9 @@ export {
   type FooterProps,
   type FooterLink
 } from "./components/Footer/Footer.tsx";
+
+export {
+  default as FlareLoader,
+  type LoaderProps,
+  type LoaderSize,
+} from "./components/Loader/Loader.tsx";

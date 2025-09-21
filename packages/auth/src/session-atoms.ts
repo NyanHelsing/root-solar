@@ -6,18 +6,16 @@ import {
   type BeingSessionRecord,
 } from "./session.ts";
 
-const baseSessionAtom = atom<BeingSessionRecord | null>(null);
-
-baseSessionAtom.onMount = (setValue) => {
+const resolveInitialSession = (): BeingSessionRecord | null => {
   try {
-    const existing = loadBeingSessionRecord();
-    if (existing) {
-      setValue(existing);
-    }
+    return loadBeingSessionRecord();
   } catch (error) {
-    console.warn("Unable to load session during atom mount", error);
+    console.warn("Unable to load session during initialization", error);
+    return null;
   }
 };
+
+const baseSessionAtom = atom<BeingSessionRecord | null>(resolveInitialSession());
 
 export type BeingSessionAction =
   | { type: "set"; record: BeingSessionRecord }

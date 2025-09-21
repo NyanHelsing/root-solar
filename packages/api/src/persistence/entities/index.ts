@@ -9,3 +9,9 @@ export type {
   SentimentRecord,
 } from "./sentiment/entity.ts";
 export { createBeingRegistrationStore } from "./auth/being-registration.ts";
+export { createCommentModel } from "./comment/entity.ts";
+export type {
+  CommentModel,
+  CommentRecord,
+  CommentTreeNode,
+} from "./comment/entity.ts";

@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { RecordId } from "surrealdb";
+import { RecordId, StringRecordId } from "surrealdb";
 
 import { createAppLogger } from "@root-solar/observability";
 import type { Context } from "../../../context.ts";
@@ -51,6 +51,33 @@ export const createAxiomModel = (ctx: Context) => {
       });
       return sorted;
     },
+    async get(id: string) {
+      axiomLogger.debug("Fetching axiom", {
+        id,
+        tags: ["query"],
+      });
+      const recordId = id.includes(":")
+        ? new StringRecordId(id)
+        : new RecordId(TABLE, id);
+      const record = await ctx.db.select<AxiomRecord | null>(recordId);
+      const stored = unwrapSingle(record);
+      if (!stored) {
+        axiomLogger.debug("Axiom not found", {
+          id,
+          tags: ["query"],
+        });
+        return null;
+      }
+      const normalized: AxiomRecord = {
+        ...stored,
+        id: typeof stored.id === "string" ? stored.id : stored.id.toString(),
+      };
+      axiomLogger.debug("Axiom fetched", {
+        id: normalized.id,
+        tags: ["query"],
+      });
+      return normalized;
+    },
     async create(input: Omit<AxiomRecord, "id">) {
       for (let attempt = 0; attempt < MAX_CREATE_ATTEMPTS; attempt += 1) {
         const id = nanoid();
@@ -95,6 +122,7 @@ export const createAxiomModel = (ctx: Context) => {
     },
   } satisfies {
     list: () => Promise<AxiomRecord[]>;
+    get: (id: string) => Promise<AxiomRecord | null>;
     create: (input: Omit<AxiomRecord, "id">) => Promise<AxiomRecord>;
   };
 };

@@ -1,0 +1,45 @@
+.loader {
+  --flare-loader-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--rs-text-soft, #4b5563);
+}
+
+.loader--sm {
+  --flare-loader-size: 1.125rem;
+}
+
+.loader--lg {
+  --flare-loader-size: 2rem;
+}
+
+.spinner {
+  width: var(--flare-loader-size);
+  height: var(--flare-loader-size);
+  border-radius: 9999px;
+  border: 0.2rem solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--rs-accent, #3b82f6);
+  animation: flare-loader-spin 0.8s linear infinite;
+}
+
+.label {
+  font-size: 0.875rem;
+}
+
+.visuallyHidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+@keyframes flare-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

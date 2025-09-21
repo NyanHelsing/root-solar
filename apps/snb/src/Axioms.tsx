@@ -1,25 +1,27 @@
 import { useEffect } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
 
 import { FlareStack } from "@root-solar/flare";
+import {
+  useAxiomsOverview,
+  useAxiomsTotalWeight,
+  useAxiomsListLoading,
+  useAxiomsListError,
+  useLoadAxioms,
+  useBeing,
+} from "@root-solar/declarations";
 import Axiom from "./Axiom.tsx";
 
-import {
-  axiomsAtom,
-  axiomsLoadingAtom,
-  axiomsTotalWeightAtom,
-  loadAxiomsAtom,
-} from "./features/axioms/store.ts";
-
 export default function Axioms() {
-  const axioms = useAtomValue(axiomsAtom);
-  const totalWeight = useAtomValue(axiomsTotalWeightAtom);
-  const isLoading = useAtomValue(axiomsLoadingAtom);
-  const loadAxioms = useSetAtom(loadAxiomsAtom);
+  const being = useBeing();
+  const axioms = useAxiomsOverview();
+  const totalWeight = useAxiomsTotalWeight();
+  const isLoading = useAxiomsListLoading();
+  const error = useAxiomsListError();
+  const loadAxioms = useLoadAxioms();
 
   useEffect(() => {
-    loadAxioms();
-  }, [loadAxioms]);
+    void loadAxioms();
+  }, [loadAxioms, being.id]);
 
   return (
     <FlareStack gap="lg">
@@ -33,6 +35,11 @@ export default function Axioms() {
         </p>
       </FlareStack>
       {isLoading ? <p className="rs-text-soft">Refreshing priorities…</p> : null}
+      {error ? (
+        <p role="alert" className="rs-text-soft">
+          {error}
+        </p>
+      ) : null}
       {!isLoading && axioms.length === 0 ? (
         <p className="rs-text-soft">No axioms found yet.</p>
       ) : null}

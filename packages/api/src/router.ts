@@ -1,4 +1,4 @@
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createAppLogger } from "@root-solar/observability";
@@ -85,6 +85,11 @@ const createAxiomInput = z.object({
   details: z.string().min(5).optional(),
 });
 
+const getAxiomInput = z.object({
+  axiomId: z.string().min(1),
+  beingId: z.string().min(1).optional(),
+});
+
 const sentimentInput = z.object({
   beingId: z.string().min(1),
   axiomId: z.string().min(1),
@@ -104,8 +109,39 @@ const removeSentimentInput = z.object({
   type: z.string().min(1),
 });
 
+const createCommentInput = z.object({
+  axiomId: z.string().min(1),
+  parentCommentId: z.string().min(1).optional(),
+  authorBeingId: z.string().min(1),
+  authorDisplayName: z.string().min(1),
+  body: z.string().min(1),
+});
+
 export const router = t.router({
   listAxioms: procedure.query(({ ctx }) => ctx.axioms.list()),
+  getAxiom: procedure
+    .input(getAxiomInput)
+    .query(async ({ input, ctx }) => {
+      const axiom = await ctx.axioms.get(input.axiomId);
+      if (!axiom) {
+        routerLogger.debug("Axiom not found for detail", {
+          id: input.axiomId,
+          tags: ["query"],
+        });
+        return null;
+      }
+      const comments = await ctx.comments.listForAxiom(axiom.id);
+      const sentiments = input.beingId
+        ? (await ctx.sentiments.listForBeing(input.beingId)).filter(
+            (sentiment) => sentiment.axiomId === axiom.id,
+          )
+        : [];
+      return {
+        ...axiom,
+        comments,
+        sentiments,
+      };
+    }),
   createAxiom: procedure
     .input(createAxiomInput)
     .mutation(({ input, ctx }) => ctx.axioms.create(input)),
@@ -114,12 +150,36 @@ export const router = t.router({
     .mutation(({ input, ctx }) => ctx.sentiments.upsert(input)),
   listSentimentsForBeing: procedure
     .input(listSentimentsInput)
-    .query(({ input, ctx }) =>
-      ctx.sentiments.listForBeing(input.beingId, { type: input.type }),
-    ),
+    .query(async ({ input, ctx }) => {
+      const sentiments = await ctx.sentiments.listForBeing(input.beingId, {
+        type: input.type,
+      });
+      if (!input.type) {
+        return sentiments;
+      }
+      return sentiments.filter((sentiment) => sentiment.type === input.type);
+    }),
   removeSentiment: procedure
     .input(removeSentimentInput)
     .mutation(({ input, ctx }) => ctx.sentiments.remove(input)),
+  addAxiomComment: procedure
+    .input(createCommentInput)
+    .mutation(async ({ input, ctx }) => {
+      const axiom = await ctx.axioms.get(input.axiomId);
+      if (!axiom) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Axiom ${input.axiomId} not found`,
+        });
+      }
+      return await ctx.comments.create({
+        axiomId: axiom.id,
+        parentCommentId: input.parentCommentId,
+        authorBeingId: input.authorBeingId,
+        authorDisplayName: input.authorDisplayName,
+        body: input.body,
+      });
+    }),
   startBeingRegistration: procedure
     .input(beingRegistrationStartInputSchema)
     .mutation(({ ctx, input }) =>

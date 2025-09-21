@@ -24,6 +24,7 @@
     "@nats-io/transport-node": "^3.1.0",
     "@root-solar/api": "workspace:*",
     "@root-solar/auth": "workspace:*",
+    "@root-solar/declarations": "workspace:*",
     "@root-solar/flare": "workspace:*",
     "@root-solar/homepage": "workspace:*",
     "@root-solar/layout": "workspace:*",
