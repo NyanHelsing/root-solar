@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from "react";
 
 import { FlareButton, FlareStack } from "@root-solar/flare";
 
@@ -29,8 +35,10 @@ export const CommentForm = ({
     }
   }, [autoFocus]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitDraft = async () => {
+    if (busy) {
+      return;
+    }
     const body = draft.trim();
     if (!body) {
       setLocalError("Please add a comment before submitting.");
@@ -47,6 +55,19 @@ export const CommentForm = ({
     }
   };
 
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    await submitDraft();
+  };
+
+  const handleTextareaKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      void submitDraft();
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <FlareStack gap="sm">
@@ -54,6 +75,7 @@ export const CommentForm = ({
           ref={textareaRef}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={handleTextareaKeyDown}
           rows={4}
           placeholder={placeholder}
           disabled={busy}
@@ -82,7 +104,7 @@ export const CommentForm = ({
               Cancel
             </FlareButton>
           ) : null}
-          <FlareButton type="submit" disabled={busy}>
+          <FlareButton type="button" onClick={submitDraft} disabled={busy}>
             {submitLabel}
           </FlareButton>
         </FlareStack>
