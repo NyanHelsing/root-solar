@@ -13,9 +13,16 @@ type MissiveListProps = {
   onSentimentChanged?: (next: string | null) => void;
   basePath: string;
   showViewAllLink: boolean;
+  onCreateMissive?: () => void;
 };
 
-const MissiveList = ({ sentiment, onSentimentChanged, basePath, showViewAllLink }: MissiveListProps) => {
+const MissiveList = ({
+  sentiment,
+  onSentimentChanged,
+  basePath,
+  showViewAllLink,
+  onCreateMissive,
+}: MissiveListProps) => {
   const {
     copy,
     isLoading,
@@ -56,6 +63,7 @@ const MissiveList = ({ sentiment, onSentimentChanged, basePath, showViewAllLink 
         tagOptions={tagOptions}
         onFilterChange={onFilterChange}
         showViewAllLink={showViewAllLink}
+        onCreate={basePath === "/missives" ? onCreateMissive : undefined}
       />
       {isLoading ? <p className="rs-text-soft">{copy.loadingLabel}</p> : null}
       {error ? (

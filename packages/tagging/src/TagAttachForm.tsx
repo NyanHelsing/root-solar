@@ -43,6 +43,7 @@ const TagAttachForm = ({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    event.stopPropagation();
     if (disabled || isSubmitting) {
       return;
     }
