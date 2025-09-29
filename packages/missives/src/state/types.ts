@@ -17,3 +17,15 @@ export type SentimentMutationContext = {
   payload: SentimentMutationVariables;
   resolvedWeight: number;
 };
+
+export type MissiveCreationInput = {
+  title: string;
+  details?: string;
+  tagSlugs?: string[];
+};
+
+export type MissiveUpdateInput = {
+  missiveId: string;
+  title: string;
+  details?: string;
+};

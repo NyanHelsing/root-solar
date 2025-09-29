@@ -21,6 +21,8 @@ export {
   useLoadMissiveDetail,
   useUpdateMissiveSentiment,
   useAddMissiveComment,
+  useCreateMissive,
+  useUpdateMissive,
 } from "./hooks/useMissiveActions.ts";
 export {
   useActiveSentimentTag,

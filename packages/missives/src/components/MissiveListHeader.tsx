@@ -1,7 +1,7 @@
 import type { ChangeEvent, CSSProperties } from "react";
 import { Link } from "react-router";
 
-import { FlareStack } from "@root-solar/flare";
+import { FlareButton, FlareStack } from "@root-solar/flare";
 
 import type { TagOption } from "../utils/tagFilterUtils.ts";
 import type { MissiveListCopy } from "../utils/listUtils.ts";
@@ -14,6 +14,7 @@ type MissiveListHeaderProps = {
   tagOptions: TagOption[];
   onFilterChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   showViewAllLink: boolean;
+  onCreate?: () => void;
 };
 
 const controlStyles: CSSProperties = {
@@ -32,6 +33,7 @@ const MissiveListHeader = ({
   tagOptions,
   onFilterChange,
   showViewAllLink,
+  onCreate,
 }: MissiveListHeaderProps) => (
   <FlareStack as="header" gap="sm">
     <h1 className="rs-heading-xl">{copy.title}</h1>
@@ -60,6 +62,11 @@ const MissiveListHeader = ({
         <Link to="/missives" className="rs-link">
           View all missives
         </Link>
+      ) : null}
+      {onCreate ? (
+        <FlareButton type="button" size="sm" onClick={onCreate}>
+          Create missive
+        </FlareButton>
       ) : null}
     </FlareStack>
   </FlareStack>

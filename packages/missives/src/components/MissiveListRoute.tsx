@@ -41,12 +41,17 @@ const MissiveListRoute = ({ defaultSentiment = null }: MissiveListRouteProps) =>
     }
   };
 
+  const handleCreateMissive = () => {
+    navigate({ pathname: "/missives/new" });
+  };
+
   return (
     <MissiveList
       sentiment={sentiment}
       onSentimentChanged={handleSentimentChange}
       basePath={basePath}
       showViewAllLink={basePath === "/axioms"}
+      onCreateMissive={basePath === "/missives" ? handleCreateMissive : undefined}
     />
   );
 };

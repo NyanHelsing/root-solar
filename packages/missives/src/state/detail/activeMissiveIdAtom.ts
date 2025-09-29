@@ -2,6 +2,8 @@ import { atom, useAtomValue } from "jotai";
 
 import { routeParamsAtom, routePathAtom } from "@root-solar/routing";
 
+const CREATION_SEGMENT = "new" as const;
+
 const extractMissiveIdFromPath = (path: string): string | null => {
   const match = path.match(/^(?:\/missives|\/axioms)\/([^/?#]+)/i);
   if (!match) {
@@ -17,7 +19,9 @@ const extractMissiveIdFromPath = (path: string): string | null => {
 export const activeMissiveIdAtom = atom<string | null>((get) => {
   const params = get(routeParamsAtom);
   const path = get(routePathAtom);
-  const resolved = params.missiveId ?? extractMissiveIdFromPath(path);
+  const rawId = params.missiveId ?? extractMissiveIdFromPath(path);
+  const resolved =
+    rawId && rawId.toLowerCase() === CREATION_SEGMENT ? null : rawId;
   console.debug("[missives] activeMissiveIdAtom", {
     params,
     path,

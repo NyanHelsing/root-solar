@@ -97,10 +97,16 @@ const listTagsOutput = z.array(
   }),
 );
 
-const createAxiomInput = z.object({
+const createMissiveInput = z.object({
   title: z.string().min(5),
   details: z.string().min(5).optional(),
   tagSlugs: z.array(z.string().min(1)).optional(),
+});
+
+const updateMissiveInput = z.object({
+  missiveId: z.string().min(1),
+  title: z.string().min(5),
+  details: z.string().min(5).optional(),
 });
 
 const addMissiveTagInput = z.object({
@@ -207,9 +213,15 @@ export const router = t.router({
         sentiments,
       };
     }),
-  createAxiom: procedure
-    .input(createAxiomInput)
+  createMissive: procedure
+    .input(createMissiveInput)
     .mutation(({ input, ctx }) => ctx.missives.create(input)),
+  createAxiom: procedure
+    .input(createMissiveInput)
+    .mutation(({ input, ctx }) => ctx.missives.create(input)),
+  updateMissive: procedure
+    .input(updateMissiveInput)
+    .mutation(({ input, ctx }) => ctx.missives.update(input)),
   addMissiveTag: procedure
     .input(addMissiveTagInput)
     .mutation(async ({ input, ctx }) => {

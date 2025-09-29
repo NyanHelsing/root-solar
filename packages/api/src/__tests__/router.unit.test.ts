@@ -60,6 +60,7 @@ describe("api/router", () => {
     ];
 
     const createdMissives = [];
+    const updatedMissives = [];
     const taggedMissives = [];
     const ensuredTagDefinitions = [];
     const tagParentMutations = [];
@@ -85,6 +86,10 @@ describe("api/router", () => {
         async create(input) {
           createdMissives.push(input);
           return { id: "missive:new", ...input };
+        },
+        async update(input) {
+          updatedMissives.push(input);
+          return { id: input.missiveId, title: input.title, details: input.details };
         },
         async addTag(input) {
           taggedMissives.push(input);
@@ -180,12 +185,31 @@ describe("api/router", () => {
     const missing = await caller.getAxiom({ axiomId: "missive:missing" });
     assert.equal(missing, null);
 
+    await caller.createMissive({
+      title: "Missive title",
+      details: "Details",
+      tagSlugs: ["axiom"],
+    });
+
     await caller.createAxiom({
       title: "Axiom title",
       details: "Details",
       tagSlugs: ["axiom"],
     });
-    assert.equal(createdMissives.length, 1);
+
+    assert.equal(createdMissives.length, 2);
+
+    await caller.updateMissive({
+      missiveId: "missive:1",
+      title: "Updated title",
+      details: "Updated details",
+    });
+
+    assert.deepEqual(updatedMissives.at(-1), {
+      missiveId: "missive:1",
+      title: "Updated title",
+      details: "Updated details",
+    });
 
     await caller.addMissiveTag({ missiveId: "missive:1", tagSlug: "focus" });
     assert.deepEqual(taggedMissives[0], { missiveId: "missive:1", tagSlug: "focus" });

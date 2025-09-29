@@ -309,6 +309,50 @@ export const createMissiveModel = (ctx: Context) => {
       });
       throw new Error("Unable to allocate unique id for new missive");
     },
+    async update(input: { missiveId: string; title: string; details?: string }) {
+      const { missiveId, title, details } = input;
+      missiveLogger.debug("Updating missive", {
+        missiveId,
+        tags: ["mutation", "update"],
+      });
+
+      const recordId = toMissiveRecordId(missiveId);
+      const existingRecord = await ctx.db.select<StoredMissiveRecord>(recordId);
+      const stored = unwrapSingle(existingRecord);
+      if (!stored) {
+        missiveLogger.debug("Missive not found when updating", {
+          missiveId,
+          tags: ["mutation", "update"],
+        });
+        return null;
+      }
+
+      const updatePayload: Partial<StoredMissiveRecord> = {
+        title,
+      };
+      if (typeof details !== "undefined") {
+        updatePayload.details = details;
+      }
+
+      await ctx.db.merge(recordId, updatePayload);
+
+      const refreshedRecord = await ctx.db.select<StoredMissiveRecord>(recordId);
+      const reloaded = unwrapSingle(refreshedRecord) ?? {
+        ...stored,
+        title,
+        details,
+      };
+
+      const hydrated = await hydrateRecords([normaliseRecord(reloaded)]);
+      const result = hydrated[0] ?? null;
+      if (result) {
+        missiveLogger.info("Missive updated", {
+          missiveId: result.id,
+          tags: ["mutation", "update"],
+        });
+      }
+      return result;
+    },
     async addTag({ missiveId, tagSlug }: { missiveId: string; tagSlug: string }) {
       const resolvedSlug = resolveTagSlug(tagSlug);
       if (!resolvedSlug) {
