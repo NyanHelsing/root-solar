@@ -17,7 +17,7 @@ export type {
   IdpChallenge,
   IdpChallengeRecord,
   ChallengeResponse,
-} from "./handshake.ts";
+} from "./handshake/index.ts";
 
 export {
   createAuthRequest,
@@ -26,7 +26,7 @@ export {
   createChallengeResponse,
   verifyChallengeResponse,
   AUTHENTICATION_CONTEXT,
-} from "./handshake.ts";
+} from "./handshake/index.ts";
 
 export {
   toBase64,
@@ -51,3 +51,9 @@ export {
   beingSessionSummaryAtom,
   type BeingSessionAction,
 } from "./session-atoms.ts";
+
+export {
+  beingAtom,
+  useBeing,
+  type Being,
+} from "./beings.ts";

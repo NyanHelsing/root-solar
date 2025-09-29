@@ -8,8 +8,8 @@ import {
 import {
   networkStatusAtom,
   refreshNetworkStatusAtom,
-  type NetworkStatus,
 } from "./store.ts";
+import type { NetworkStatus } from "@root-solar/net/status";
 
 const getLabel = (status: NetworkStatus) => {
   switch (status.state) {
@@ -19,7 +19,6 @@ const getLabel = (status: NetworkStatus) => {
       return "P2P starting";
     case "error":
       return "P2P error";
-    case "offline":
     default:
       return "P2P offline";
   }

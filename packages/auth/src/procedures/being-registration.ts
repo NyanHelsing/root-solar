@@ -10,7 +10,7 @@ import {
   createIdpChallenge,
   verifyAuthRequest,
   verifyChallengeResponse,
-} from "../handshake.ts";
+} from "../handshake/index.ts";
 import { toBase64 } from "../encoding.ts";
 
 export const authRequestPayloadSchema = z.object({

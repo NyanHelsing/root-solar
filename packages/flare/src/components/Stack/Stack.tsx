@@ -56,7 +56,7 @@ const Stack = <T extends ElementType = "div">({
   ...rest
 }: StackProps<T>) => {
   const resolvedGap = gapMap[gap as keyof typeof gapMap] ?? gap;
-  const styleOverrides: CSSProperties = {
+  const styleOverrides: Record<string, string> = {
     "--flare-stack-direction": direction,
     "--flare-stack-gap": resolvedGap,
   };

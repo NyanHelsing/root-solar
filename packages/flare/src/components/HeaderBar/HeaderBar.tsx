@@ -1,9 +1,9 @@
-import { type HTMLAttributes, type ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import styles from "./HeaderBar.module.scss";
 
 export type HeaderBarTone = "transparent" | "surface";
 
-export interface HeaderBarProps extends HTMLAttributes<HTMLElement> {
+export interface HeaderBarProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   brand?: ReactNode;
   title?: ReactNode;
   subtitle?: ReactNode;

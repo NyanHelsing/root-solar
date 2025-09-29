@@ -2,10 +2,13 @@ import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 
 import { createAppLogger } from "@root-solar/observability";
 import {
-  createAxiomModel,
+  createMissiveModel,
+  type MissiveModel,
   type AxiomModel,
   createBeingModel,
   type BeingModel,
+  createTagModel,
+  type TagModel,
   createSentimentModel,
   type SentimentModel,
   createBeingRegistrationStore,
@@ -21,15 +24,19 @@ const apiContextLogger = createAppLogger("api:context", {
 
 export class Context {
   db: Awaited<ReturnType<typeof getDb>>;
+  missives: MissiveModel;
   axioms: AxiomModel;
   beings: BeingModel;
+  tags: TagModel;
   sentiments: SentimentModel;
   comments: CommentModel;
   authRegistrations: BeingRegistrationStore;
 
   constructor({ db }: { db: Awaited<ReturnType<typeof getDb>> }) {
     this.db = db;
-    this.axioms = createAxiomModel(this);
+    this.tags = createTagModel(this);
+    this.missives = createMissiveModel(this);
+    this.axioms = this.missives;
     this.beings = createBeingModel(this);
     this.sentiments = createSentimentModel(this);
     this.comments = createCommentModel(this);

@@ -3,10 +3,10 @@ import { useLocation } from "react-router";
 
 import { FlareLoader, FlareStack } from "@root-solar/flare";
 import { ShellHero, ShellLayout } from "@root-solar/layout";
-import { useBeing } from "@root-solar/declarations";
+import { useBeing } from "@root-solar/auth";
 
-import Main from "./Main.tsx";
 import NetworkStatusIndicator from "./features/network/NetworkStatusIndicator.tsx";
+import { Outlet } from "react-router";
 
 const resolveActivePath = (pathname: string): string => {
   if (pathname.startsWith("/missives")) {
@@ -14,6 +14,9 @@ const resolveActivePath = (pathname: string): string => {
   }
   if (pathname.startsWith("/axioms")) {
     return "/axioms";
+  }
+  if (pathname.startsWith("/tags")) {
+    return "/tags";
   }
   return "/missives";
 };
@@ -31,7 +34,7 @@ const SearchAndBrowseContent = (): ReactElement => {
       session={{ name: being.name, profileHref: "/auth" }}
       loginHref="/auth"
     >
-      <Main />
+      <Outlet />
     </ShellLayout>
   );
 };

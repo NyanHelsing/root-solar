@@ -22,4 +22,10 @@ Once the application is running (either through Podman or local scripts), keep t
 - Tail server logs: `pnpm start -- --inspect` (local dev)
 - Watch sentiment ingest: check dashboards referenced in the [Observability Canon](docs/coe/best-practices/observability.md)
 
+## Validation & Testing
+- Static analysis: `pnpm run typecheck` for TypeScript, `pnpm run lint` for Biome linting, and `pnpm run format:check` before submitting patches
+- Unit tests: `pnpm run test:unit` (Node test runner with native TS stripping)
+- Component + integration smoke tests: `pnpm run test:component` and `pnpm run test:integration`
+- Full pre-flight: `pnpm run check` to run typechecking, linting, and the entire test matrix in one command
+
 Refer back here before demos or production rollouts to ensure core flows are healthy.

@@ -2,35 +2,37 @@ import { RecordId, StringRecordId } from "surrealdb";
 
 import { createAppLogger } from "@root-solar/observability";
 import type { Context } from "../../../context.ts";
+import type { TagRecord } from "../index.ts";
 
 const sentimentLogger = createAppLogger("persistence:sentiment", {
   tags: ["persistence", "sentiment"],
 });
 
 const SENTIMENT_TABLE = "sentiment" as const;
-const BEING_TABLE = "being" as const;
 
 export type SentimentRecord = {
   id: string;
   beingId: string;
-  axiomId: string;
-  type: string;
+  subjectTable: string;
+  subjectId: string;
+  tagId: string;
   weight: number;
 };
 
 export type SentimentAllocation = SentimentRecord & {
-  totalWeightForType: number;
+  totalWeightForTag: number;
   ratio: number;
   maxWeight?: number;
+  tag?: TagRecord;
 };
 
 type RawSentimentRecord = Omit<
   SentimentRecord,
-  "id" | "beingId" | "axiomId"
+  "id" | "beingId" | "subjectId"
 > & {
   id: string | RecordId;
   beingId: string | number;
-  axiomId: string | number;
+  subjectId: string | number;
 };
 
 const toSentimentRecord = (record: RawSentimentRecord): SentimentRecord => ({
@@ -40,10 +42,10 @@ const toSentimentRecord = (record: RawSentimentRecord): SentimentRecord => ({
     typeof record.beingId === "string"
       ? record.beingId
       : record.beingId.toString(),
-  axiomId:
-    typeof record.axiomId === "string"
-      ? record.axiomId
-      : record.axiomId.toString(),
+  subjectId:
+    typeof record.subjectId === "string"
+      ? record.subjectId
+      : record.subjectId.toString(),
 });
 
 const unwrapSingle = <T>(value: T | T[] | null): T | null => {
@@ -58,23 +60,29 @@ const unwrapSingle = <T>(value: T | T[] | null): T | null => {
 
 const selectSentiments = async (
   ctx: Context,
-  { beingId, type }: { beingId: string; type?: string },
+  {
+    beingId,
+    tagId,
+    subjectTable = "missive",
+  }: { beingId: string; tagId?: string; subjectTable?: string },
 ) => {
   sentimentLogger.debug("Selecting sentiments", {
     beingId,
-    type,
+    tagId,
+    subjectTable,
     tags: ["query"],
   });
-  const statement = type
-    ? "SELECT * FROM type::table($table) WHERE beingId = $beingId AND type = $type"
-    : "SELECT * FROM type::table($table) WHERE beingId = $beingId";
+  const statement = tagId
+    ? "SELECT * FROM type::table($table) WHERE beingId = $beingId AND tagId = $tagId AND subjectTable = $subjectTable"
+    : "SELECT * FROM type::table($table) WHERE beingId = $beingId AND subjectTable = $subjectTable";
 
   const params: Record<string, unknown> = {
     table: SENTIMENT_TABLE,
     beingId,
-  };
-  if (type !== undefined) {
-    params.type = type;
+    subjectTable,
+  } satisfies Record<string, unknown>;
+  if (tagId) {
+    params.tagId = tagId;
   }
 
   const [rawResult] = await ctx.db.query(statement, params);
@@ -82,7 +90,8 @@ const selectSentiments = async (
   if (!rawResult) {
     sentimentLogger.warn("Sentiment selection query failed", {
       beingId,
-      type,
+      tagId,
+      subjectTable,
       status: "EMPTY_RESULT",
       tags: ["query"],
     });
@@ -98,7 +107,8 @@ const selectSentiments = async (
       if (status && status !== "OK") {
         sentimentLogger.warn("Sentiment selection query failed", {
           beingId,
-          type,
+          tagId,
+          subjectTable,
           status,
           tags: ["query"],
         });
@@ -110,14 +120,16 @@ const selectSentiments = async (
       }
       sentimentLogger.warn("Unexpected sentiment query result shape", {
         beingId,
-        type,
+        tagId,
+        subjectTable,
         tags: ["query"],
       });
       return null;
     }
     sentimentLogger.warn("Unhandled sentiment query result shape", {
       beingId,
-      type,
+      tagId,
+      subjectTable,
       tags: ["query"],
     });
     return null;
@@ -131,7 +143,8 @@ const selectSentiments = async (
   const mapped = records.map(toSentimentRecord);
   sentimentLogger.debug("Sentiments selected", {
     beingId,
-    type,
+    tagId,
+    subjectTable,
     count: mapped.length,
     tags: ["query"],
   });
@@ -150,10 +163,48 @@ const ensureBeingExists = async (ctx: Context, beingId: string) => {
   }
 };
 
+const ensureTagExists = async (ctx: Context, tagId: string) => {
+  const existing = await ctx.tags.get(tagId);
+  if (existing) {
+    return existing;
+  }
+  const slug = tagId.includes(":") ? tagId.split(":").slice(1).join(":") : tagId;
+  const label = slug
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+  const created = await ctx.tags.upsert({
+    slug,
+    label,
+    tags: ["tag:sentimental"],
+  });
+  if (!created) {
+    throw new Error(`Failed to ensure tag ${tagId} exists`);
+  }
+  return created;
+};
+
 const assertInteger = (value: number, field: string) => {
   if (!Number.isInteger(value)) {
     throw new Error(`${field} must be an integer`);
   }
+};
+
+const hydrateSentiments = async (
+  ctx: Context,
+  records: SentimentRecord[],
+): Promise<SentimentAllocation[]> => {
+  if (records.length === 0) {
+    return [];
+  }
+  const tagIds = Array.from(new Set(records.map((record) => record.tagId)));
+  const tags = await ctx.tags.getMany(tagIds);
+  const lookup = new Map(tags.map((tag) => [tag.id, tag]));
+  return records.map((record) => ({
+    ...record,
+    tag: lookup.get(record.tagId),
+    totalWeightForTag: 0,
+    ratio: 0,
+  } satisfies SentimentAllocation));
 };
 
 export type SentimentModel = ReturnType<typeof createSentimentModel>;
@@ -162,21 +213,24 @@ export const createSentimentModel = (ctx: Context) => {
   return {
     async upsert({
       beingId,
-      axiomId,
-      type,
+      subjectId,
+      subjectTable = "missive",
+      tagId,
       weight,
       maxWeight,
     }: {
       beingId: string;
-      axiomId: string;
-      type: string;
+      subjectId: string;
+      subjectTable?: string;
+      tagId: string;
       weight: number;
       maxWeight?: number;
     }) {
       sentimentLogger.debug("Upserting sentiment", {
         beingId,
-        axiomId,
-        type,
+        subjectId,
+        subjectTable,
+        tagId,
         weight,
         maxWeight,
         tags: ["mutation", "upsert"],
@@ -194,10 +248,15 @@ export const createSentimentModel = (ctx: Context) => {
       }
 
       await ensureBeingExists(ctx, beingId);
+      await ensureTagExists(ctx, tagId);
 
-      const sentimentId = `${beingId}:${type}:${axiomId}`;
-      const existingForType = await selectSentiments(ctx, { beingId, type });
-      const otherWeightTotal = existingForType.reduce((total, record) => {
+      const sentimentId = `${beingId}:${tagId}:${subjectTable}:${subjectId}`;
+      const existingForTag = await selectSentiments(ctx, {
+        beingId,
+        tagId,
+        subjectTable,
+      });
+      const otherWeightTotal = existingForTag.reduce((total, record) => {
         if (record.id === sentimentId) {
           return total;
         }
@@ -207,22 +266,24 @@ export const createSentimentModel = (ctx: Context) => {
 
       if (maxWeight !== undefined && newTotalWeight > maxWeight) {
         throw new Error(
-          `Sentiment type ${type} for being ${beingId} exceeds allocation of ${maxWeight} (attempted ${newTotalWeight})`,
+          `Sentiment tag ${tagId} for being ${beingId} exceeds allocation of ${maxWeight} (attempted ${newTotalWeight})`,
         );
       }
 
       if (weight === 0) {
         sentimentLogger.debug("Weight is zero; deleting sentiment record", {
           beingId,
-          axiomId,
-          type,
+          subjectId,
+          subjectTable,
+          tagId,
           tags: ["mutation", "upsert"],
         });
         await ctx.db.delete(new RecordId(SENTIMENT_TABLE, sentimentId));
         sentimentLogger.info("Sentiment removed due to zero weight", {
           beingId,
-          axiomId,
-          type,
+          subjectId,
+          subjectTable,
+          tagId,
           tags: ["mutation", "upsert"],
         });
         return null;
@@ -233,8 +294,9 @@ export const createSentimentModel = (ctx: Context) => {
         {
           id: sentimentId,
           beingId,
-          axiomId,
-          type,
+          subjectId,
+          subjectTable,
+          tagId,
           weight,
         },
       );
@@ -242,8 +304,9 @@ export const createSentimentModel = (ctx: Context) => {
       if (!stored) {
         sentimentLogger.warn("Upsert returned empty record", {
           beingId,
-          axiomId,
-          type,
+          subjectId,
+          subjectTable,
+          tagId,
           tags: ["mutation", "upsert"],
         });
         return null;
@@ -251,58 +314,70 @@ export const createSentimentModel = (ctx: Context) => {
 
       const ratio = newTotalWeight === 0 ? 0 : weight / newTotalWeight;
 
-      const allocation = {
-        ...toSentimentRecord(stored),
-        totalWeightForType: newTotalWeight,
-        ratio,
-        maxWeight,
-      } satisfies SentimentAllocation;
+      const allocations = await hydrateSentiments(ctx, [toSentimentRecord(stored)]);
+      const allocation = allocations[0];
+      if (!allocation) {
+        return null;
+      }
+      allocation.totalWeightForTag = newTotalWeight;
+      allocation.ratio = ratio;
+      allocation.maxWeight = maxWeight;
+
       sentimentLogger.info("Sentiment upserted", {
         beingId,
-        axiomId,
-        type,
+        subjectId,
+        subjectTable,
+        tagId,
         weight,
-        totalWeightForType: newTotalWeight,
+        totalWeightForTag: newTotalWeight,
         tags: ["mutation", "upsert"],
       });
       return allocation;
     },
-    async listForBeing(beingId: string, options?: { type?: string }) {
+    async listForBeing(
+      beingId: string,
+      options?: { tagId?: string; subjectTable?: string },
+    ) {
+      const subjectTable = options?.subjectTable ?? "missive";
       sentimentLogger.debug("Listing sentiments for being", {
         beingId,
-        type: options?.type,
+        tagId: options?.tagId,
+        subjectTable,
         tags: ["query"],
       });
 
       const sentiments = await selectSentiments(ctx, {
         beingId,
-        type: options?.type,
+        tagId: options?.tagId,
+        subjectTable,
       });
 
       if (sentiments.length === 0) {
         sentimentLogger.debug("No sentiments found", {
           beingId,
-          type: options?.type,
+          tagId: options?.tagId,
+          subjectTable,
           tags: ["query"],
         });
         return [] as SentimentAllocation[];
       }
 
-      const totals = sentiments.reduce((acc, sentiment) => {
-        acc.set(
-          sentiment.type,
-          (acc.get(sentiment.type) ?? 0) + sentiment.weight,
-        );
+      const hydrated = await hydrateSentiments(ctx, sentiments);
+
+      const totals = hydrated.reduce((acc, sentiment) => {
+        const key = `${sentiment.tagId}:${sentiment.subjectTable}`;
+        acc.set(key, (acc.get(key) ?? 0) + sentiment.weight);
         return acc;
       }, new Map<string, number>());
 
-      const allocations = sentiments.map((sentiment) => {
-        const totalWeightForType = totals.get(sentiment.type) ?? 0;
+      const allocations = hydrated.map((sentiment) => {
+        const key = `${sentiment.tagId}:${sentiment.subjectTable}`;
+        const totalWeightForTag = totals.get(key) ?? 0;
         const ratio =
-          totalWeightForType === 0 ? 0 : sentiment.weight / totalWeightForType;
+          totalWeightForTag === 0 ? 0 : sentiment.weight / totalWeightForTag;
         return {
           ...sentiment,
-          totalWeightForType,
+          totalWeightForTag,
           ratio,
         } satisfies SentimentAllocation;
       });
@@ -310,52 +385,62 @@ export const createSentimentModel = (ctx: Context) => {
       sentimentLogger.debug("Sentiments listed", {
         beingId,
         count: allocations.length,
-        type: options?.type,
+        tagId: options?.tagId,
+        subjectTable,
         tags: ["query"],
       });
       return allocations;
     },
     async remove({
       beingId,
-      axiomId,
-      type,
+      subjectId,
+      subjectTable = "missive",
+      tagId,
     }: {
       beingId: string;
-      axiomId: string;
-      type: string;
+      subjectId: string;
+      subjectTable?: string;
+      tagId: string;
     }) {
       sentimentLogger.debug("Removing sentiment", {
         beingId,
-        axiomId,
-        type,
+        subjectId,
+        subjectTable,
+        tagId,
         tags: ["mutation", "remove"],
       });
       await ctx.db.delete(
-        new RecordId(SENTIMENT_TABLE, `${beingId}:${type}:${axiomId}`),
+        new RecordId(
+          SENTIMENT_TABLE,
+          `${beingId}:${tagId}:${subjectTable}:${subjectId}`,
+        ),
       );
       sentimentLogger.info("Sentiment removed", {
         beingId,
-        axiomId,
-        type,
+        subjectId,
+        subjectTable,
+        tagId,
         tags: ["mutation", "remove"],
       });
     },
   } satisfies {
     upsert: (input: {
       beingId: string;
-      axiomId: string;
-      type: string;
+      subjectId: string;
+      subjectTable?: string;
+      tagId: string;
       weight: number;
       maxWeight?: number;
     }) => Promise<SentimentAllocation | null>;
     listForBeing: (
       beingId: string,
-      options?: { type?: string },
+      options?: { tagId?: string; subjectTable?: string },
     ) => Promise<SentimentAllocation[]>;
     remove: (input: {
       beingId: string;
-      axiomId: string;
-      type: string;
+      subjectId: string;
+      subjectTable?: string;
+      tagId: string;
     }) => Promise<void>;
   };
 };

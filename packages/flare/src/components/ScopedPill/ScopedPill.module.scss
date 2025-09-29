@@ -1,0 +1,23 @@
+.scoped {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: #f9fafb;
+}
+
+.scoped__scope {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4b5563;
+  background: rgba(17, 24, 39, 0.06);
+}
+
+.scoped__pill {
+  border-radius: 0;
+  border: none;
+  border-left: 1px solid rgba(17, 24, 39, 0.12);
+}

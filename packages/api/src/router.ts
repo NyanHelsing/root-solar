@@ -2,8 +2,9 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createAppLogger } from "@root-solar/observability";
-import { type Context } from "./context.ts";
+import type { Context } from "./context.ts";
 import { getNetworkStatus } from "@root-solar/net/status";
+import { normalizeOptionalSlug } from "@root-solar/globalization";
 import {
   beingRegistrationStartInputSchema,
   beingRegistrationCompleteInputSchema,
@@ -80,10 +81,62 @@ const createBeingRegistrationResolver = (ctx: Context) =>
       }),
   });
 
+const listAxiomsInput = z
+  .object({
+    sentiment: z.string().min(1).optional(),
+  })
+  .optional();
+
+const listTagsOutput = z.array(
+  z.object({
+    id: z.string().min(1),
+    slug: z.string().min(1),
+    label: z.string().min(1),
+    description: z.string().optional(),
+    tags: z.array(z.string().min(1)).optional(),
+  }),
+);
+
 const createAxiomInput = z.object({
   title: z.string().min(5),
   details: z.string().min(5).optional(),
+  tagSlugs: z.array(z.string().min(1)).optional(),
 });
+
+const addMissiveTagInput = z.object({
+  missiveId: z.string().min(1),
+  tagSlug: z.string().min(1),
+});
+
+const addTagTagInput = z.object({
+  tagId: z.string().min(1),
+  tagSlug: z.string().min(1),
+});
+
+const removeMissiveTagInput = addMissiveTagInput;
+
+const stripTagPrefix = (value: string) =>
+  value.slice(0, 4).toLowerCase() === "tag:" ? value.slice(4) : value;
+
+const resolveTagSlug = (input: string): string | null => {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return null;
+  }
+  return normalizeOptionalSlug(stripTagPrefix(trimmed));
+};
+
+const resolveTagId = (input: string): string | null => {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return null;
+  }
+  if (trimmed.includes(":")) {
+    return trimmed;
+  }
+  const normalized = normalizeOptionalSlug(trimmed);
+  return normalized ? `tag:${normalized}` : null;
+};
 
 const getAxiomInput = z.object({
   axiomId: z.string().min(1),
@@ -92,21 +145,24 @@ const getAxiomInput = z.object({
 
 const sentimentInput = z.object({
   beingId: z.string().min(1),
-  axiomId: z.string().min(1),
-  type: z.string().min(1),
+  subjectId: z.string().min(1),
+  subjectTable: z.string().min(1).optional(),
+  tagId: z.string().min(1),
   weight: z.number().int().min(0),
   maxWeight: z.number().int().min(0).optional(),
 });
 
 const listSentimentsInput = z.object({
   beingId: z.string().min(1),
-  type: z.string().min(1).optional(),
+  tagId: z.string().min(1).optional(),
+  subjectTable: z.string().min(1).optional(),
 });
 
 const removeSentimentInput = z.object({
   beingId: z.string().min(1),
-  axiomId: z.string().min(1),
-  type: z.string().min(1),
+  subjectId: z.string().min(1),
+  subjectTable: z.string().min(1).optional(),
+  tagId: z.string().min(1),
 });
 
 const createCommentInput = z.object({
@@ -118,62 +174,215 @@ const createCommentInput = z.object({
 });
 
 export const router = t.router({
-  listAxioms: procedure.query(({ ctx }) => ctx.axioms.list()),
+  listAxioms: procedure
+    .input(listAxiomsInput)
+    .query(({ ctx, input }) =>
+      ctx.missives.list({ sentimentSlug: input?.sentiment }),
+    ),
+  listTags: procedure
+    .output(listTagsOutput)
+    .query(({ ctx }) => ctx.tags.list()),
   getAxiom: procedure
     .input(getAxiomInput)
     .query(async ({ input, ctx }) => {
-      const axiom = await ctx.axioms.get(input.axiomId);
-      if (!axiom) {
-        routerLogger.debug("Axiom not found for detail", {
+      const missive = await ctx.missives.get(input.axiomId);
+      if (!missive) {
+        routerLogger.debug("Missive not found for detail", {
           id: input.axiomId,
           tags: ["query"],
         });
         return null;
       }
-      const comments = await ctx.comments.listForAxiom(axiom.id);
+      const comments = await ctx.comments.listForAxiom(missive.id);
       const sentiments = input.beingId
         ? (await ctx.sentiments.listForBeing(input.beingId)).filter(
-            (sentiment) => sentiment.axiomId === axiom.id,
+            (sentiment) =>
+              sentiment.subjectTable === "missive" &&
+              sentiment.subjectId === missive.id,
           )
         : [];
       return {
-        ...axiom,
+        ...missive,
         comments,
         sentiments,
       };
     }),
   createAxiom: procedure
     .input(createAxiomInput)
-    .mutation(({ input, ctx }) => ctx.axioms.create(input)),
+    .mutation(({ input, ctx }) => ctx.missives.create(input)),
+  addMissiveTag: procedure
+    .input(addMissiveTagInput)
+    .mutation(async ({ input, ctx }) => {
+      routerLogger.debug("addMissiveTag invoked", {
+        missiveId: input.missiveId,
+        tagSlug: input.tagSlug,
+        tags: ["mutation", "tag"],
+      });
+      const normalizedSlug = resolveTagSlug(input.tagSlug);
+      if (!normalizedSlug) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Provide a valid tag slug.",
+        });
+      }
+
+      routerLogger.debug("Normalized tag slug for missive", {
+        missiveId: input.missiveId,
+        normalizedSlug,
+        tags: ["mutation", "tag"],
+      });
+
+      const updatedMissive = await ctx.missives.addTag({
+        missiveId: input.missiveId,
+        tagSlug: normalizedSlug,
+      });
+
+      if (!updatedMissive) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Missive not found.",
+        });
+      }
+
+      routerLogger.debug("Missive updated with tag", {
+        missiveId: updatedMissive.id,
+        ensuredTagSlug: normalizedSlug,
+        tagCount: updatedMissive.tags.length,
+        tags: ["mutation", "tag"],
+      });
+
+      return updatedMissive;
+    }),
+  addTagTag: procedure
+    .input(addTagTagInput)
+    .mutation(async ({ input, ctx }) => {
+      routerLogger.debug("addTagTag invoked", {
+        tagId: input.tagId,
+        tagSlug: input.tagSlug,
+        tags: ["mutation", "tag"],
+      });
+
+      const normalizedTagId = resolveTagId(input.tagId);
+      if (!normalizedTagId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Provide a valid tag identifier.",
+        });
+      }
+
+      const normalizedSlug = resolveTagSlug(input.tagSlug);
+      if (!normalizedSlug) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Provide a valid tag slug.",
+        });
+      }
+
+      routerLogger.debug("Resolved tag tagging payload", {
+        targetTagId: normalizedTagId,
+        parentTagSlug: normalizedSlug,
+        tags: ["mutation", "tag"],
+      });
+
+      const updatedTag = await ctx.tags.addParent({
+        tagId: normalizedTagId,
+        parentTagSlug: normalizedSlug,
+      });
+
+      if (!updatedTag) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Tag not found.",
+        });
+      }
+
+      routerLogger.debug("Tag updated with parent", {
+        tagId: updatedTag.id,
+        parentCount: updatedTag.tags?.length ?? 0,
+        tags: ["mutation", "tag"],
+      });
+
+      return updatedTag;
+    }),
+  removeMissiveTag: procedure
+    .input(removeMissiveTagInput)
+    .mutation(async ({ input, ctx }) => {
+      routerLogger.debug("removeMissiveTag invoked", {
+        missiveId: input.missiveId,
+        tagSlug: input.tagSlug,
+        tags: ["mutation", "tag"],
+      });
+      const normalizedSlug = resolveTagSlug(input.tagSlug);
+      if (!normalizedSlug) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Provide a valid tag slug.",
+        });
+      }
+
+      const updatedMissive = await ctx.missives.removeTag({
+        missiveId: input.missiveId,
+        tagSlug: normalizedSlug,
+      });
+
+      if (!updatedMissive) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Missive not found.",
+        });
+      }
+
+      routerLogger.debug("Missive updated after tag removal", {
+        missiveId: updatedMissive.id,
+        removedTagSlug: normalizedSlug,
+        tagCount: updatedMissive.tags.length,
+        tags: ["mutation", "tag"],
+      });
+
+      return updatedMissive;
+    }),
   setSentiment: procedure
     .input(sentimentInput)
-    .mutation(({ input, ctx }) => ctx.sentiments.upsert(input)),
+    .mutation(({ input, ctx }) =>
+      ctx.sentiments.upsert({
+        beingId: input.beingId,
+        subjectId: input.subjectId,
+        subjectTable: input.subjectTable ?? "missive",
+        tagId: input.tagId,
+        weight: input.weight,
+        maxWeight: input.maxWeight,
+      }),
+    ),
   listSentimentsForBeing: procedure
     .input(listSentimentsInput)
-    .query(async ({ input, ctx }) => {
-      const sentiments = await ctx.sentiments.listForBeing(input.beingId, {
-        type: input.type,
-      });
-      if (!input.type) {
-        return sentiments;
-      }
-      return sentiments.filter((sentiment) => sentiment.type === input.type);
-    }),
+    .query(({ input, ctx }) =>
+      ctx.sentiments.listForBeing(input.beingId, {
+        tagId: input.tagId,
+        subjectTable: input.subjectTable ?? "missive",
+      }),
+    ),
   removeSentiment: procedure
     .input(removeSentimentInput)
-    .mutation(({ input, ctx }) => ctx.sentiments.remove(input)),
+    .mutation(({ input, ctx }) =>
+      ctx.sentiments.remove({
+        beingId: input.beingId,
+        subjectId: input.subjectId,
+        subjectTable: input.subjectTable ?? "missive",
+        tagId: input.tagId,
+      }),
+    ),
   addAxiomComment: procedure
     .input(createCommentInput)
     .mutation(async ({ input, ctx }) => {
-      const axiom = await ctx.axioms.get(input.axiomId);
-      if (!axiom) {
+      const missive = await ctx.missives.get(input.axiomId);
+      if (!missive) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `Axiom ${input.axiomId} not found`,
+          message: `Missive ${input.axiomId} not found`,
         });
       }
       return await ctx.comments.create({
-        axiomId: axiom.id,
+        axiomId: missive.id,
         parentCommentId: input.parentCommentId,
         authorBeingId: input.authorBeingId,
         authorDisplayName: input.authorDisplayName,

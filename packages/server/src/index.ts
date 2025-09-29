@@ -82,7 +82,7 @@ export const startServer = async () => {
       network = undefined;
     }
 
-    if (server && server.listening) {
+    if (server?.listening) {
       serverLogger.debug("Closing HTTP server", {
         tags: ["shutdown", "http"],
       });
@@ -148,8 +148,13 @@ export const startServer = async () => {
     });
 
     if (frontend?.afterServerStart) {
+      const activeServer = server;
+      const afterServerStart = frontend.afterServerStart;
       server.on("listening", () => {
-        Promise.resolve(frontend?.afterServerStart?.(server!)).catch((error) => {
+        if (!afterServerStart || !activeServer) {
+          return;
+        }
+        Promise.resolve(afterServerStart(activeServer)).catch((error) => {
           serverLogger.error("Failed to complete frontend startup", error, {
             tags: ["startup", "frontend"],
           });

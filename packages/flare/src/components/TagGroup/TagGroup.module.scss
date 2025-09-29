@@ -1,0 +1,20 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.group--wrap {
+  flex-wrap: wrap;
+}
+
+.group--gap-xs {
+  gap: 0.25rem;
+}
+
+.group--gap-sm {
+  gap: 0.4rem;
+}
+
+.group--gap-md {
+  gap: 0.6rem;
+}

@@ -1,4 +1,5 @@
 import {
+  type ChangeEvent,
   type FormEvent,
   useCallback,
   useEffect,
@@ -14,22 +15,22 @@ import {
   FlareTextInput,
 } from "@root-solar/flare";
 
-import {
-  type BeingRegistrationCompleteInput,
-  type BeingRegistrationCompleteOutput,
-  type BeingRegistrationProfile,
-  type BeingRegistrationStartInput,
-  type BeingRegistrationStartOutput,
+import type {
+  BeingRegistrationCompleteInput,
+  BeingRegistrationCompleteOutput,
+  BeingRegistrationProfile,
+  BeingRegistrationStartInput,
+  BeingRegistrationStartOutput,
 } from "../procedures/being-registration.ts";
 import {
   beingRegistrationCompleteInputSchema,
   beingRegistrationStartInputSchema,
 } from "../procedures/being-registration.ts";
-import type { AuthRequest, IdpChallenge } from "../handshake.ts";
+import type { AuthRequest, IdpChallenge } from "../handshake/index.ts";
 import {
   createAuthRequest,
   createChallengeResponse,
-} from "../handshake.ts";
+} from "../handshake/index.ts";
 import {
   generateBeingKeyMaterial,
   type BeingKeyMaterial,
@@ -430,7 +431,9 @@ export const BeingAccessWizard = <
                 id="being-name"
                 type="text"
                 value={name}
-                onChange={(event) => setName(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setName(event.target.value)
+                }
                 placeholder="e.g. horizon-keeper"
                 disabled={isBusy}
                 required
@@ -462,7 +465,9 @@ export const BeingAccessWizard = <
                 id="credential-passphrase"
                 type="password"
                 value={credentialPassword}
-                onChange={(event) => setCredentialPassword(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setCredentialPassword(event.target.value)
+                }
                 placeholder="Create a strong passphrase"
                 autoComplete="new-password"
               />
@@ -473,7 +478,9 @@ export const BeingAccessWizard = <
                 id="credential-passphrase-confirm"
                 type="password"
                 value={credentialPasswordConfirm}
-                onChange={(event) => setCredentialPasswordConfirm(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setCredentialPasswordConfirm(event.target.value)
+                }
                 placeholder="Re-enter the passphrase"
                 autoComplete="new-password"
               />

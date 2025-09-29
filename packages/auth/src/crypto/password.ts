@@ -21,7 +21,7 @@ const importPasswordKey = async (password: string) => {
   const subtle = getSubtleCrypto();
   return subtle.importKey(
     "raw",
-    utf8ToBytes(password),
+    ensureArrayBufferView(utf8ToBytes(password)),
     "PBKDF2",
     false,
     ["deriveKey"],
@@ -37,7 +37,7 @@ const deriveEncryptionKey = async (
   return subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt,
+      salt: ensureArrayBufferView(salt),
       iterations: params.iterations,
       hash: params.hash,
     },
@@ -64,11 +64,18 @@ export type EncryptedPayload = {
   keyLength: number;
 };
 
-const ensureUint8Array = (input: Uint8Array | string): Uint8Array => {
-  if (typeof input === "string") {
-    return utf8ToBytes(input);
+const ensureArrayBufferView = (bytes: Uint8Array): Uint8Array<ArrayBuffer> => {
+  if (bytes.buffer instanceof ArrayBuffer) {
+    return bytes as Uint8Array<ArrayBuffer>;
   }
-  return input;
+  return Uint8Array.from(bytes) as Uint8Array<ArrayBuffer>;
+};
+
+const ensureUint8Array = (input: Uint8Array | string): Uint8Array<ArrayBuffer> => {
+  if (typeof input === "string") {
+    return ensureArrayBufferView(utf8ToBytes(input));
+  }
+  return ensureArrayBufferView(input);
 };
 
 export const encryptWithPassword = async (
@@ -83,7 +90,7 @@ export const encryptWithPassword = async (
   const encryptionKey = await deriveEncryptionKey(passwordKey, salt, params);
   const subtle = getSubtleCrypto();
   const ciphertextBuffer = await subtle.encrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: ensureArrayBufferView(iv) },
     encryptionKey,
     ensureUint8Array(plaintext),
   );
@@ -104,9 +111,9 @@ export const decryptWithPassword = async (
   payload: EncryptedPayload,
   password: string,
 ): Promise<Uint8Array> => {
-  const salt = fromBase64(payload.salt);
-  const iv = fromBase64(payload.iv);
-  const ciphertext = fromBase64(payload.ciphertext);
+  const salt = ensureArrayBufferView(fromBase64(payload.salt));
+  const iv = ensureArrayBufferView(fromBase64(payload.iv));
+  const ciphertext = ensureArrayBufferView(fromBase64(payload.ciphertext));
   const params: PasswordKeyDerivationParams = {
     iterations: payload.iterations,
     hash: payload.hash,

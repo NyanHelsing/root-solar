@@ -1,5 +1,5 @@
 declare module "snb/App" {
-  import type { ComponentType, ReactElement } from "react";
+  import type { ComponentType } from "react";
 
   export interface ShellRouteConfig {
     path: string;
@@ -13,7 +13,8 @@ declare module "snb/App" {
   export const ComponentHarness: ComponentType<{ componentName?: string }>;
   export const shellRouteConfig: ShellRouteConfig;
   export const ShellRoutes: ComponentType;
-  export function SearchAndBrowseApp(): ReactElement;
+  export const SearchAndBrowseApp: ComponentType;
+  export default SearchAndBrowseApp;
 }
 
 declare module "auth/App" {
