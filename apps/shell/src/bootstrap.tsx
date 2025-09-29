@@ -1,60 +1,67 @@
-import { Suspense } from "react";
-import { createRoot } from "react-dom/client";
+import { lazy } from "react";
+import { Route } from "react-router";
 
+import { RootSolarHomepage } from "@root-solar/homepage";
 import {
-  LogLevel,
-  createAppLogger,
-  initializeObservability,
-  parseLogLevel,
-} from "@root-solar/observability";
+  MissiveDetail,
+  MissiveListRoute,
+  AxiomaticMissiveListRoute,
+} from "@root-solar/missives";
+import { TagList } from "@root-solar/tagging";
+import { bootstrapShellApp } from "@root-solar/shell";
 
-import AppShell from "./AppShell.tsx";
-
-import "@root-solar/flare/styles/base";
-import "@root-solar/flare/styles/utilities";
-
-console.error("RUNNING APPSHELL BOOTSTRAP");
-
-const environment = process.env.NODE_ENV ?? "development";
-const desiredLevel =
-  parseLogLevel(process.env.PUBLIC_LOG_LEVEL) ??
-  (environment === "development" ? LogLevel.DEBUG : LogLevel.INFO);
-
-const resolvedLevel = initializeObservability({
-  level: desiredLevel,
-  metadata: {
-    environment,
-    platform: typeof window === "undefined" ? "unknown" : "browser",
-  },
-});
-const clientBootstrapLogger = createAppLogger("client:bootstrap", {
-  tags: ["client", "bootstrap"],
-});
-
-clientBootstrapLogger.info("Rendering shell micro frontend", {
-  logLevel: LogLevel.getName(resolvedLevel),
-});
-
-const rootElement = document.getElementById("root");
-if (!rootElement) {
-  clientBootstrapLogger.error("Root element not found", {
-    tags: ["client", "bootstrap"],
-  });
-  throw new Error("Unable to locate #root element for rendering");
-}
-
-createRoot(rootElement).render(
-  <Suspense
-    fallback={
-      <div role="status" aria-live="polite">
-        Loading application shell…
-      </div>
-    }
-  >
-    <AppShell />
-  </Suspense>,
+const loadingFallback = (
+  <output aria-live="polite">
+    Loading experience…
+  </output>
 );
 
-clientBootstrapLogger.info("Shell micro frontend rendered", {
-  tags: ["client", "bootstrap"],
+const AuthApp = lazy(() => import("auth/App"));
+const SearchAndBrowseApp = lazy(() => import("snb/App"));
+
+const HomeRoute = () => <RootSolarHomepage />;
+
+bootstrapShellApp({
+  routes: (
+    <>
+      <Route index element={<HomeRoute />} />
+      <Route
+        path="/auth"
+        element={<AuthApp />}
+        hydrateFallbackElement={loadingFallback}
+      />
+      <Route
+        path="/missives"
+        element={<SearchAndBrowseApp />}
+        hydrateFallbackElement={loadingFallback}
+      >
+        <Route index element={<MissiveListRoute />} />
+        <Route path=":missiveId" element={<MissiveDetail basePath="/missives" />} />
+      </Route>
+      <Route
+        path="/axioms"
+        element={<SearchAndBrowseApp />}
+        hydrateFallbackElement={loadingFallback}
+      >
+        <Route index element={<AxiomaticMissiveListRoute />} />
+        <Route
+          path=":missiveId"
+          element={
+            <MissiveDetail
+              tagSlug="axiomatic"
+              sentiment="axiomatic"
+              basePath="/axioms"
+            />
+          }
+        />
+      </Route>
+      <Route
+        path="/tags"
+        element={<SearchAndBrowseApp />}
+        hydrateFallbackElement={loadingFallback}
+      >
+        <Route index element={<TagList />} />
+      </Route>
+    </>
+  ),
 });

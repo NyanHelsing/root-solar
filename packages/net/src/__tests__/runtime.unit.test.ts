@@ -7,6 +7,7 @@ import {
   getSentimentNetwork,
   getSentimentNetworkStatus,
   registerSentimentNetwork,
+  setSentimentNetworkStatus,
 } from "../runtime.ts";
 
 type StatusListener = (status: SentimentNetworkStatus) => void;
@@ -94,6 +95,35 @@ describe("net/runtime", () => {
       peerId: "peer-id",
       protocol: "test-protocol",
     });
+    assert.deepEqual(getSentimentNetworkStatus(), { state: "offline" });
+  });
+
+  it("handles networks without status helpers", () => {
+    const minimalNetwork: SentimentNetwork = {
+      protocol: "test-protocol",
+      async querySentiment() {
+        return null;
+      },
+      async close() {},
+    };
+
+    registerSentimentNetwork(minimalNetwork);
+
+    assert.equal(getSentimentNetwork(), minimalNetwork);
+    assert.deepEqual(getSentimentNetworkStatus(), { state: "offline" });
+
+    clearSentimentNetwork();
+    assert.equal(getSentimentNetwork(), null);
+    assert.deepEqual(getSentimentNetworkStatus(), { state: "offline" });
+  });
+
+  it("allows manually overriding the network status", () => {
+    setSentimentNetworkStatus({ state: "ready", peerId: "manual" });
+    assert.deepEqual(getSentimentNetworkStatus(), {
+      state: "ready",
+      peerId: "manual",
+    });
+    clearSentimentNetwork();
     assert.deepEqual(getSentimentNetworkStatus(), { state: "offline" });
   });
 });

@@ -1,72 +1,113 @@
 import type { ComponentType, ReactElement } from "react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { MemoryRouter } from "react-router";
 
-import Main from "../Main.tsx";
 import {
   RootSolarFooter as Footer,
   RootSolarHeader as Header,
   ShellHero as Hero,
 } from "@root-solar/layout";
 import NetworkStatusIndicator from "../features/network/NetworkStatusIndicator.tsx";
-import { MissiveDetail, MissiveList } from "@root-solar/declarations";
+import {
+  MissiveDetail,
+  MissiveList,
+  MissiveListRoute,
+  AxiomaticMissiveListRoute,
+} from "@root-solar/missives";
+import { TagList } from "@root-solar/tagging";
+import SearchAndBrowseRoute from "../SearchAndBrowseRoute.tsx";
+import { useSetRouteParams, useSetRoutePath } from "@root-solar/routing";
 
 const pluralize = (value: string) => (value.endsWith("s") ? value : `${value}s`);
 
 const MissiveListHarness: ComponentType<Record<string, unknown>> = (props) => {
-  const { kind, basePath } = props;
-  const resolvedKind = typeof kind === "string" ? kind : undefined;
-  const resolvedBasePath = (() => {
-    if (typeof basePath === "string") {
-      return basePath;
-    }
-    if (resolvedKind === "axiom") {
-      return "/axioms";
-    }
-    if (resolvedKind) {
-      return `/${pluralize(resolvedKind)}`;
-    }
-    return "/missives";
-  })();
-  return <MissiveList kind={resolvedKind} basePath={resolvedBasePath} />;
+  const { sentiment, basePath } = props;
+  const resolvedSentiment = typeof sentiment === "string" ? sentiment : undefined;
+  const resolvedBasePath = typeof basePath === "string" ? basePath : "/missives";
+  const setRouteParams = useSetRouteParams();
+  const setRoutePath = useSetRoutePath();
+
+  useEffect(() => {
+    setRouteParams({});
+    setRoutePath(resolvedBasePath);
+    return () => {
+      setRouteParams({});
+      setRoutePath("/");
+    };
+  }, [setRouteParams, setRoutePath, resolvedBasePath]);
+
+  return (
+    <MissiveList
+      sentiment={resolvedSentiment}
+      basePath={resolvedBasePath}
+      showViewAllLink={resolvedBasePath === "/axioms"}
+    />
+  );
 };
 
 const MissiveDetailHarness: ComponentType<Record<string, unknown>> = (props) => {
-  const { kind, basePath, paramKey, missiveId } = props;
-  const resolvedKind = typeof kind === "string" ? kind : undefined;
+  const { tag, kind: legacyKind, sentiment, basePath, missiveId } = props;
+  const resolvedTag = (() => {
+    if (typeof tag === "string") {
+      return tag;
+    }
+    if (typeof legacyKind === "string") {
+      return legacyKind;
+    }
+    return undefined;
+  })();
+  const resolvedSentiment = typeof sentiment === "string" ? sentiment : undefined;
   const resolvedBasePath = (() => {
     if (typeof basePath === "string") {
       return basePath;
     }
-    if (resolvedKind === "axiom") {
+    if (resolvedSentiment === "axiomatic" || resolvedTag === "axiomatic") {
       return "/axioms";
     }
-    if (resolvedKind) {
-      return `/${pluralize(resolvedKind)}`;
+    if (resolvedTag) {
+      return `/${pluralize(resolvedTag)}`;
     }
     return "/missives";
   })();
-  const resolvedParamKey = typeof paramKey === "string" ? paramKey : "missiveId";
   const resolvedMissiveId = typeof missiveId === "string" ? missiveId : undefined;
+  const setRouteParams = useSetRouteParams();
+  const setRoutePath = useSetRoutePath();
+
+  useEffect(() => {
+    setRouteParams(resolvedMissiveId ? { missiveId: resolvedMissiveId } : {});
+    const path = resolvedMissiveId
+      ? `${resolvedBasePath}/${resolvedMissiveId}`
+      : resolvedBasePath;
+    setRoutePath(path);
+    return () => {
+      setRouteParams({});
+      setRoutePath("/");
+    };
+  }, [resolvedMissiveId, resolvedBasePath, setRouteParams, setRoutePath]);
+
   return (
     <MissiveDetail
-      kind={resolvedKind}
+      tagSlug={resolvedTag}
+      sentiment={resolvedSentiment}
       basePath={resolvedBasePath}
-      paramKey={resolvedParamKey}
-      missiveId={resolvedMissiveId}
     />
   );
 };
 
 const registry: Record<string, ComponentType<Record<string, unknown>>> = {
   axiom: MissiveDetailHarness,
-  axioms: MissiveListHarness,
+  axiomatic: MissiveDetailHarness,
+  axioms: AxiomaticMissiveListRoute,
+  axiomatics: AxiomaticMissiveListRoute,
   "missive-detail": MissiveDetailHarness,
   "missive-list": MissiveListHarness,
+  "missive-list-route": MissiveListRoute,
+  "tag-list": TagList,
+  tags: TagList,
   footer: Footer,
   header: Header,
   hero: Hero,
-  main: Main,
+  main: SearchAndBrowseRoute,
   "network-status-indicator": NetworkStatusIndicator,
 };
 
@@ -124,7 +165,7 @@ const ComponentHarness = ({
   let initialPath = "/";
   if (resolvedProps && typeof resolvedProps.initialPath === "string") {
     initialPath = resolvedProps.initialPath;
-    delete resolvedProps.initialPath;
+    resolvedProps.initialPath = undefined;
   }
 
   return (

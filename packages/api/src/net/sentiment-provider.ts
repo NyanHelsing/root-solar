@@ -6,12 +6,17 @@ import type {
 } from "../persistence/entities/index.ts";
 
 const parseSentimentRecordId = (recordId: string) => {
-  const [beingRaw, type, axiomRaw] = recordId.split(":");
-  if (!beingRaw || !type || !axiomRaw) {
+  const [beingId, tagId, subjectTable, ...subjectParts] = recordId.split(":");
+  if (!beingId || !tagId || !subjectTable || subjectParts.length === 0) {
     throw new Error(`Invalid sentiment record identifier: ${recordId}`);
   }
 
-  return { beingId: beingRaw, type, axiomId: axiomRaw };
+  return {
+    beingId,
+    tagId,
+    subjectTable,
+    subjectId: subjectParts.join(":"),
+  };
 };
 
 const gcd = (a: number, b: number): number => {
@@ -36,7 +41,7 @@ const normaliseFraction = (
     return { numerator: 0, denominator: 1 } satisfies SentimentFraction;
   }
 
-  let safeNumerator = Math.trunc(numerator);
+  const safeNumerator = Math.trunc(numerator);
   let safeDenominator = Math.trunc(denominator);
 
   if (safeNumerator >= safeDenominator) {
@@ -52,20 +57,28 @@ const normaliseFraction = (
 
 const findSentimentAllocation = (
   allocations: SentimentAllocation[],
-  axiomId: string,
-) => allocations.find((allocation) => allocation.axiomId === axiomId);
+  subjectId: string,
+  subjectTable: string,
+) =>
+  allocations.find(
+    (allocation) =>
+      allocation.subjectId === subjectId && allocation.subjectTable === subjectTable,
+  );
 
 export const createModelBackedSentimentProvider = (
   sentiments: Pick<SentimentModel, "listForBeing">,
 ): SentimentProvider => {
   return async (recordId) => {
-    const { beingId, type, axiomId } = parseSentimentRecordId(recordId);
-    const allocations = await sentiments.listForBeing(beingId, { type });
-    const match = findSentimentAllocation(allocations, axiomId);
+    const { beingId, tagId, subjectTable, subjectId } = parseSentimentRecordId(recordId);
+    const allocations = await sentiments.listForBeing(beingId, {
+      tagId,
+      subjectTable,
+    });
+    const match = findSentimentAllocation(allocations, subjectId, subjectTable);
     if (!match) {
       return null;
     }
 
-    return normaliseFraction(match.weight, match.totalWeightForType);
+    return normaliseFraction(match.weight, match.totalWeightForTag);
   };
 };

@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 import PageSection from "../PageSection/PageSection.tsx";
 import Stack from "../Stack/Stack.tsx";

@@ -50,3 +50,4 @@ The project runs on three planes (consensus, coordination, persistence). Read th
 - Contribution workflow: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Roadmap context: [docs/roadmap/horizon.md](docs/roadmap/horizon.md) and [docs/roadmap/epics](docs/roadmap/epics)
 - Best practices: [docs/coe/best-practices/engineering-principles.md](docs/coe/best-practices/engineering-principles.md) and [docs/coe/index.md](docs/coe/index.md)
+- Validation routines: `pnpm run check` runs typechecking, linting, and tests; use `pnpm run test:unit`, `pnpm run test:component`, or `pnpm run test:integration` as needed during focused development

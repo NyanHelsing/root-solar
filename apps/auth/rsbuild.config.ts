@@ -14,6 +14,8 @@ import {
   resolveMountPath,
 } from "../../config/mfePaths.ts";
 
+const workspaceSingleton = () => ({ singleton: true });
+
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const authDistSubdir = resolveDistSubdir(
@@ -57,18 +59,11 @@ export default defineConfig({
         "react-router": {
           singleton: true,
         },
-        "@root-solar/api": {
-          singleton: true,
-        },
-        "@root-solar/auth": {
-          singleton: true,
-        },
-        "@root-solar/layout": {
-          singleton: true,
-        },
-        "@root-solar/observability": {
-          singleton: true,
-        },
+        "@root-solar/api": workspaceSingleton(),
+        "@root-solar/auth": workspaceSingleton(),
+        "@root-solar/routing": workspaceSingleton(),
+        "@root-solar/layout": workspaceSingleton(),
+        "@root-solar/observability": workspaceSingleton(),
       },
     }),
   ],

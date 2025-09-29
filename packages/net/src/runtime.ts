@@ -1,4 +1,4 @@
-import type { SentimentNetwork, SentimentNetworkStatus } from "./index.ts";
+import type { SentimentNetwork, SentimentNetworkStatus } from "./types.ts";
 
 let network: SentimentNetwork | null = null;
 let unsubscribe: (() => void) | undefined;

@@ -1,4 +1,4 @@
-import { type CSSProperties, type HTMLAttributes } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
 import styles from "./BrandMark.module.scss";
 
 export interface BrandMarkProps extends HTMLAttributes<HTMLSpanElement> {
@@ -17,7 +17,7 @@ const BrandMark = ({
   className,
   ...rest
 }: BrandMarkProps) => {
-  const styleOverrides: CSSProperties = {};
+  const styleOverrides: Record<string, string> = {};
 
   if (size) {
     styleOverrides["--flare-brand-mark-size"] = size;
@@ -46,7 +46,14 @@ const BrandMark = ({
         {...rest}
       >
         <span aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            aria-hidden="true"
+            focusable="false"
+          >
             <circle cx="9" cy="9" r="5.5" fill="currentColor" />
           </svg>
         </span>
@@ -62,7 +69,14 @@ const BrandMark = ({
       style={mergedStyle}
       {...rest}
     >
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 18 18"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
         <circle cx="9" cy="9" r="5.5" fill="currentColor" />
       </svg>
     </span>

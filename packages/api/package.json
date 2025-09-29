@@ -41,6 +41,7 @@
   "types": "./src/index.ts",
   "dependencies": {
     "@root-solar/auth": "workspace:*",
+    "@root-solar/globalization": "workspace:*",
     "@root-solar/net": "workspace:*",
     "@root-solar/observability": "workspace:*",
     "@surrealdb/node": "1.0.0-beta.3",

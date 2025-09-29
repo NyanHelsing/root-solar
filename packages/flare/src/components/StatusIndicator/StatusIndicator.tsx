@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import styles from "./StatusIndicator.module.scss";
 
 export type StatusIndicatorTone = "success" | "warning" | "danger" | "info" | "muted";

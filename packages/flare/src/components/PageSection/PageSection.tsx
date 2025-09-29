@@ -18,7 +18,7 @@ const PageSection = ({
   children,
   ...rest
 }: PageSectionProps) => {
-  const styleOverrides: CSSProperties = {};
+  const styleOverrides: Record<string, string> = {};
 
   if (maxWidth) {
     styleOverrides["--flare-page-section-max-width"] = maxWidth;

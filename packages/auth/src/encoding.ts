@@ -3,9 +3,9 @@ const base64Encode = (input: Uint8Array): string => {
     return Buffer.from(input).toString("base64");
   }
   let binary = "";
-  input.forEach((byte) => {
+  for (const byte of input) {
     binary += String.fromCharCode(byte);
-  });
+  }
   if (typeof btoa !== "undefined") {
     return btoa(binary);
   }

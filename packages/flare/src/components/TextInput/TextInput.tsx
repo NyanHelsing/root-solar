@@ -1,7 +1,8 @@
 import { forwardRef, type InputHTMLAttributes } from "react";
 import styles from "./TextInput.module.scss";
 
-export interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface TextInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
   invalid?: boolean;
   size?: "md" | "compact" | "numeric";
 }

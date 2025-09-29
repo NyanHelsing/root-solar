@@ -8,7 +8,12 @@ import "@root-solar/flare/styles/utilities";
 
 console.error("RUNNING SNB BOOTSTRAP");
 
-createRoot(document.getElementById("root")).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Unable to locate #root element for rendering");
+}
+
+createRoot(rootElement).render(
   <BrowserRouter>
     <SearchAndBrowseApp />
   </BrowserRouter>,

@@ -1,4 +1,5 @@
 import {
+  type ChangeEvent,
   type DragEvent,
   type FormEvent,
   useCallback,
@@ -174,10 +175,10 @@ export const BeingLogin = ({
   const onInputChange = useCallback(
     async (event: FormEvent<HTMLInputElement>) => {
       const { files } = event.currentTarget;
-      if (!files || files.length === 0) {
+      const file = files?.item(0);
+      if (!file) {
         return;
       }
-      const [file] = files;
       await handleFileLoad(file);
       event.currentTarget.value = "";
     },
@@ -192,10 +193,10 @@ export const BeingLogin = ({
         return;
       }
       const files = event.dataTransfer?.files;
-      if (!files || files.length === 0) {
+      const file = files?.item(0);
+      if (!file) {
         return;
       }
-      const [file] = files;
       await handleFileLoad(file);
     },
     [handleFileLoad, isBusy],
@@ -279,14 +280,6 @@ export const BeingLogin = ({
         onDragEnter={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            handleBrowseRequest();
-          }
-        }}
         style={{
           border: "1px dashed rgba(59, 130, 246, 0.5)",
           borderRadius: "0.75rem",
@@ -296,7 +289,6 @@ export const BeingLogin = ({
           cursor: isBusy ? "progress" : "pointer",
           outline: "none",
         }}
-        aria-label="Upload credential file"
       >
         <FlareStack gap="sm" align="center">
           <span className="rs-text-soft">
@@ -341,7 +333,9 @@ export const BeingLogin = ({
             id="credential-passphrase"
             type="password"
             value={credentialPassphrase}
-            onChange={(event) => setCredentialPassphrase(event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setCredentialPassphrase(event.target.value)
+            }
             placeholder="Enter the passphrase you set when downloading"
             autoComplete={variant === "login" ? "current-password" : "one-time-code"}
             disabled={status === "unlocking"}

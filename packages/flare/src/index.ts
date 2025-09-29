@@ -64,6 +64,22 @@ export {
 } from "./components/TextInput/TextInput.tsx";
 
 export {
+  default as FlarePill,
+  type PillProps,
+  type PillTone
+} from "./components/Pill/index.ts";
+
+export {
+  default as FlareTagGroup,
+  type TagGroupProps,
+} from "./components/TagGroup/index.ts";
+
+export {
+  default as FlareScopedPill,
+  type ScopedPillProps,
+} from "./components/ScopedPill/index.ts";
+
+export {
   default as FlareIconButton,
   type IconButtonProps,
   type IconButtonVariant

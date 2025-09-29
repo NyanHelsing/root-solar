@@ -21,7 +21,11 @@ export type BeingSessionAction =
   | { type: "set"; record: BeingSessionRecord }
   | { type: "clear" };
 
-export const beingSessionAtom = atom<BeingSessionRecord | null, BeingSessionAction>(
+export const beingSessionAtom = atom<
+  BeingSessionRecord | null,
+  [BeingSessionAction],
+  void
+>(
   (get) => get(baseSessionAtom),
   (_get, set, action) => {
     if (action.type === "set") {

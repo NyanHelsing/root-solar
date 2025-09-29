@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { FlarePageSection, FlareStack } from "@root-solar/flare";
 
@@ -14,6 +14,7 @@ import RootSolarHeader, {
 const DEFAULT_NAV_LINKS: RootSolarNavLink[] = [
   { href: "/missives", label: "Missives" },
   { href: "/axioms", label: "Axioms" },
+  { href: "/tags", label: "Tags" },
 ];
 
 export interface ShellLayoutProps {

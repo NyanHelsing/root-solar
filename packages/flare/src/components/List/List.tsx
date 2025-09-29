@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import styles from "./List.module.scss";
 
 export type ListVariant = "plain" | "bordered" | "surface";
@@ -58,14 +58,14 @@ const List = ({
         );
 
         return (
-          <li key={key} className={styles["list__item"]}>
+          <li key={key} className={styles.list__item}>
             {marker}
             <div>
               {item.title !== undefined ? (
-                <div className={styles["list__title"]}>{item.title}</div>
+                <div className={styles.list__title}>{item.title}</div>
               ) : null}
               {item.description !== undefined ? (
-                <span className={styles["list__content"]}>{item.description}</span>
+                <span className={styles.list__content}>{item.description}</span>
               ) : null}
               {item.content}
             </div>

@@ -1,10 +1,10 @@
-import { type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import styles from "./Hero.module.scss";
 
 export type HeroTone = "brand" | "surface" | "minimal" | "dark";
 export type HeroAlignment = "center" | "start";
 
-export interface HeroProps extends HTMLAttributes<HTMLElement> {
+export interface HeroProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   title: ReactNode;
   description?: ReactNode;
   eyebrow?: ReactNode;

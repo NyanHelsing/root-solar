@@ -76,7 +76,13 @@ export default defineConfig({
         "@root-solar/auth": {
           singleton: true,
         },
-        "@root-solar/declarations": {
+        "@root-solar/missives": {
+          singleton: true,
+        },
+        "@root-solar/routing": {
+          singleton: true,
+        },
+        "@root-solar/tagging": {
           singleton: true,
         },
         "@root-solar/observability": {
@@ -93,6 +99,15 @@ export default defineConfig({
       shell: "./apps/shell/src/index.ts",
     },
   },
+  //server: {
+  //  historyApiFallback: {
+  //    index: "/index.html",
+  //    rewrites: [
+  //      { from: /^\/$/, to: "/index.html" },
+  //      { from: /^\/shell(\/.*)?$/, to: "/index.html" },
+  //    ],
+  //  },
+  //},
   output: {
     distPath: {
       root: path.join(dirname, "../../dist/shell"),

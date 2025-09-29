@@ -1,4 +1,5 @@
 import express from "express";
+import type { RequestHandler } from "express";
 
 import { createAppLogger } from "@root-solar/observability";
 import { apiMiddleware } from "@root-solar/api/middleware";
@@ -7,12 +8,18 @@ const appLogger = createAppLogger("server:app", {
   tags: ["server", "express"],
 });
 
-export const createBaseApp = () => {
+export type CreateBaseAppOptions = {
+  apiHandler?: RequestHandler;
+};
+
+export const createBaseApp = ({
+  apiHandler = apiMiddleware,
+}: CreateBaseAppOptions = {}) => {
   appLogger.debug("Creating base express app", {
     tags: ["startup"],
   });
-  const router = express.Router();
-  router.get("/health", (req, res) => {
+  const app = express();
+  app.get("/health", (req, res) => {
     appLogger.debug("Healthcheck requested", {
       method: req.method,
       path: req.path,
@@ -21,7 +28,7 @@ export const createBaseApp = () => {
     res.status(200).send("ok");
   });
 
-  const app = express().use("/", router).use("/api", apiMiddleware);
+  app.use("/api", apiHandler);
   appLogger.debug("Base express app configured", {
     tags: ["startup"],
   });

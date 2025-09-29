@@ -126,7 +126,7 @@ export const createCommentModel = (ctx: Context) => {
         axiomId,
         tags: ["query"],
       });
-      const records = await ctx.db.select<RawCommentRecord[] | RawCommentRecord | null>(TABLE);
+      const records = await ctx.db.select<RawCommentRecord>(TABLE);
       const collection = Array.isArray(records) ? records : records ? [records] : [];
       const normalized = collection
         .filter((record) => toId(record.axiomId) === toId(axiomId))
@@ -182,9 +182,15 @@ export const createCommentModel = (ctx: Context) => {
       });
 
       await ensureCommentTable(ctx);
-      const record = await ctx.db.create<CommentRecord>(commentRef, payload);
+      const record = await ctx.db.create<RawCommentRecord>(commentRef, {
+        ...payload,
+        axiomId: normalizedAxiomId,
+        parentCommentId: payload.parentCommentId
+          ? payload.parentCommentId
+          : null,
+      } satisfies Omit<RawCommentRecord, "replies">);
       const stored = unwrapSingle(record);
-      const normalized = stored ? toCommentRecord(stored as unknown as RawCommentRecord) : payload;
+      const normalized = stored ? toCommentRecord(stored) : payload;
 
       commentLogger.info("Comment created", {
         id,

@@ -1,9 +1,8 @@
-@use "sass:math";
-
 @mixin center-page($min-width, $min-inline-padding) {
-  $half-width: math.div($min-width, 2);
-
-  padding-inline: max($min-inline-padding, calc(50% - #{$half-width}));
+  padding-inline: max(
+    $min-inline-padding,
+    calc(50% - (#{$min-width} / 2))
+  );
 }
 
 @mixin surface($background, $foreground, $radius, $shadow: none, $border: 1px solid transparent) {

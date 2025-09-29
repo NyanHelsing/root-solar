@@ -14,6 +14,8 @@ import {
   resolveMountPath,
 } from "../../config/mfePaths.ts";
 
+const workspaceSingleton = () => ({ singleton: true });
+
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const snbDistSubdir = resolveDistSubdir(
@@ -42,45 +44,21 @@ export default defineConfig({
         fileName: "mf-manifest.json",
       },
       shared: {
-        react: {
-          singleton: true,
-        },
-        "react-dom": {
-          singleton: true,
-        },
-        "react/jsx-runtime": {
-          singleton: true,
-        },
-        "react/jsx-dev-runtime": {
-          singleton: true,
-        },
-        jotai: {
-          singleton: true,
-        },
-        "jotai-optics": {
-          singleton: true,
-        },
-        "react-router": {
-          singleton: true,
-        },
-        "@root-solar/api": {
-          singleton: true,
-        },
-        "@root-solar/auth": {
-          singleton: true,
-        },
-        "@root-solar/declarations": {
-          singleton: true,
-        },
-        "@root-solar/layout": {
-          singleton: true,
-        },
-        "@root-solar/observability": {
-          singleton: true,
-        },
-        "react-icons": {
-          singleton: true,
-        },
+        react: { singleton: true },
+        "react-dom": { singleton: true },
+        "react/jsx-runtime": { singleton: true },
+        "react/jsx-dev-runtime": { singleton: true },
+        jotai: { singleton: true },
+        "jotai-optics": { singleton: true },
+        "react-router": { singleton: true },
+        "@root-solar/api": workspaceSingleton(),
+        "@root-solar/auth": workspaceSingleton(),
+        "@root-solar/missives": workspaceSingleton(),
+        "@root-solar/tagging": workspaceSingleton(),
+        "@root-solar/routing": workspaceSingleton(),
+        "@root-solar/layout": workspaceSingleton(),
+        "@root-solar/observability": workspaceSingleton(),
+        "react-icons": { singleton: true },
       },
     }),
   ],
