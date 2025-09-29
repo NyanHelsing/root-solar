@@ -18,6 +18,8 @@ import {
   useMissiveDetailView,
   useAddActiveMissiveTag,
   useRemoveActiveMissiveTag,
+  useAddActiveMissiveComment,
+  useResolvedMissiveLabels,
 } from "../state/detail/index.ts";
 import {
   useCreateMissive,
@@ -25,6 +27,7 @@ import {
   useLoadMissives,
   useUpdateMissive,
 } from "../hooks/useMissiveActions.ts";
+import DiscussionSection from "./missive-detail/DiscussionSection.tsx";
 
 export type MissiveDetailProps = {
   tagSlug?: string;
@@ -86,8 +89,16 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
   const resolvedBasePath = basePath ?? "/missives";
   const resolvedTagSlug = tagSlug ?? null;
   const resolvedSentiment = sentiment ?? null;
+  const labels = useResolvedMissiveLabels(resolvedTagSlug ?? undefined);
 
   const tags = detail.record?.tags ?? [];
+
+  const addComment = useAddActiveMissiveComment();
+
+  const handleSubmitComment = useCallback(
+    (body: string, parentCommentId?: string) => addComment(body, parentCommentId),
+    [addComment],
+  );
 
   useEffect(() => {
     if (isCreationPath) {
@@ -385,6 +396,13 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
                   : null
                 : "Select a missive before adding tags."
             }
+          />
+        </section>
+        <section className="rs-stack" data-spacing="md">
+          <DiscussionSection
+            labels={labels}
+            comments={detail.comments}
+            onSubmitComment={handleSubmitComment}
           />
         </section>
       </FlareStack>
