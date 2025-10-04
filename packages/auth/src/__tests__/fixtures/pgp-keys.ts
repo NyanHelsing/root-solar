@@ -95,17 +95,17 @@ W+jLJoo9616V/sZDQ++cMN0r0rW7YpgA/0E5Sj5pCVYhn6xXweIEN7dfLRGo
 `;
 
 export const BEING_KEY_MATERIAL = {
-  signing: {
-    publicKey: BEING_SIGNING_PUBLIC_KEY,
-    privateKey: BEING_SIGNING_PRIVATE_KEY,
-  },
-  encryption: {
-    publicKey: BEING_ENCRYPTION_PUBLIC_KEY,
-    privateKey: BEING_ENCRYPTION_PRIVATE_KEY,
-  },
+    signing: {
+        publicKey: BEING_SIGNING_PUBLIC_KEY,
+        privateKey: BEING_SIGNING_PRIVATE_KEY,
+    },
+    encryption: {
+        publicKey: BEING_ENCRYPTION_PUBLIC_KEY,
+        privateKey: BEING_ENCRYPTION_PRIVATE_KEY,
+    },
 };
 
 export const IDP_SIGNING_KEY_PAIR = {
-  publicKey: IDP_SIGNING_PUBLIC_KEY,
-  privateKey: IDP_SIGNING_PRIVATE_KEY,
+    publicKey: IDP_SIGNING_PUBLIC_KEY,
+    privateKey: IDP_SIGNING_PRIVATE_KEY,
 };

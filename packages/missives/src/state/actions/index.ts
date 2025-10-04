@@ -5,6 +5,6 @@ export { createMissiveAtom } from "./createMissiveAtom.ts";
 export { updateMissiveAtom } from "./updateMissiveAtom.ts";
 export { addMissiveCommentAtom } from "./addMissiveCommentAtom.ts";
 export {
-  addCommentMutationAtom,
-  buildMissiveCommentPayloadAtom,
+    addCommentMutationAtom,
+    buildMissiveCommentPayloadAtom,
 } from "@root-solar/commentary";

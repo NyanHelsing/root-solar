@@ -6,18 +6,18 @@ import { routePathAtom } from "@root-solar/routing";
 import { resolveBasePath } from "../../utils/resolveBasePath.ts";
 
 export type ResolvedBasePathInput = {
-  basePath?: string;
-  tagSlug?: string;
+    basePath?: string;
+    tagSlug?: string;
 };
 
 const resolvedMissiveBasePathFamily = atomFamily((input: ResolvedBasePathInput) =>
-  atom<string>((get) => {
-    const routePath = get(routePathAtom);
-    return resolveBasePath(input.basePath ?? routePath, input.tagSlug);
-  }),
+    atom<string>((get) => {
+        const routePath = get(routePathAtom);
+        return resolveBasePath(input.basePath ?? routePath, input.tagSlug);
+    }),
 );
 
 export const useResolvedMissiveBasePath = (input: ResolvedBasePathInput) =>
-  useAtomValue(resolvedMissiveBasePathFamily(input));
+    useAtomValue(resolvedMissiveBasePathFamily(input));
 
 export default resolvedMissiveBasePathFamily;

@@ -8,22 +8,20 @@ import { setupProdFrontend } from "./ssr.ts";
 import type { FrontendLifecycle } from "./types.ts";
 
 const frontendLogger = createAppLogger("server:frontend", {
-  tags: ["server", "frontend"],
+    tags: ["server", "frontend"],
 });
 
-export const setupFrontend = async (
-  app: Application,
-): Promise<FrontendLifecycle | null> => {
-  if (IS_DEVELOPMENT) {
-    frontendLogger.info("Configuring development frontend", {
-      tags: ["startup", "frontend"],
+export const setupFrontend = async (app: Application): Promise<FrontendLifecycle | null> => {
+    if (IS_DEVELOPMENT) {
+        frontendLogger.info("Configuring development frontend", {
+            tags: ["startup", "frontend"],
+        });
+        return setupDevFrontend(app);
+    }
+    frontendLogger.info("Configuring production frontend", {
+        tags: ["startup", "frontend"],
     });
-    return setupDevFrontend(app);
-  }
-  frontendLogger.info("Configuring production frontend", {
-    tags: ["startup", "frontend"],
-  });
-  return setupProdFrontend(app);
+    return setupProdFrontend(app);
 };
 
 export type { FrontendLifecycle } from "./types.ts";

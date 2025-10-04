@@ -3,14 +3,14 @@ export { bootstrapShellApp } from "./bootstrap.tsx";
 export type { BootstrapShellAppOptions } from "./bootstrap.tsx";
 export { ShellRouter } from "./router.ts";
 export type {
-  ShellRouterProps,
-  RouterProvider,
-  ShellRuntimeConfig,
+    ShellRouterProps,
+    RouterProvider,
+    ShellRuntimeConfig,
 } from "./router.ts";
 export { RouteErrorBoundary } from "./RouteErrorBoundary.ts";
 export type { RouteErrorBoundaryProps } from "./RouteErrorBoundary.ts";
 export {
-  shellDefaultFallback,
-  defaultShellErrorFallback,
-  defaultRouteFallback,
+    shellDefaultFallback,
+    defaultShellErrorFallback,
+    defaultRouteFallback,
 } from "./fallbacks.tsx";

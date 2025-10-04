@@ -3,6 +3,6 @@ import { missiveDetailRecordFamily } from "./missiveDetailRecordFamily.ts";
 import { emptyDetailRecordAtom } from "./emptyDetailRecordAtom.ts";
 
 export const missiveDetailRecordAtom = (missiveId?: string) =>
-  missiveId ? missiveDetailRecordFamily(missiveId) : emptyDetailRecordAtom;
+    missiveId ? missiveDetailRecordFamily(missiveId) : emptyDetailRecordAtom;
 
 export default missiveDetailRecordAtom;

@@ -4,8 +4,8 @@ import cloneTag from "./cloneTag.ts";
 import type { MissiveRecord } from "../types.ts";
 
 const withDerivedFields = (record: AxiomRecord): MissiveRecord => ({
-  ...record,
-  tags: record.tags.map(cloneTag),
+    ...record,
+    tags: record.tags.map(cloneTag),
 });
 
 export default withDerivedFields;

@@ -6,58 +6,64 @@ import { useQueryParamSlug } from "@root-solar/routing";
 import { SENTIMENT_TAG_SLUG } from "../constants.ts";
 
 type MissiveListRouteProps = {
-  defaultSentiment?: string | null;
+    defaultSentiment?: string | null;
 };
 
 const MissiveListRoute = ({ defaultSentiment = null }: MissiveListRouteProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+    const location = useLocation();
+    const navigate = useNavigate();
 
-  const { value: sentiment, setValue: setSentiment } = useQueryParamSlug({
-    key: "sentiment",
-    defaultValue: defaultSentiment,
-  });
+    const { value: sentiment, setValue: setSentiment } = useQueryParamSlug({
+        key: "sentiment",
+        defaultValue: defaultSentiment,
+    });
 
-  const basePath = useMemo(() => {
-    return location.pathname.startsWith("/axioms") ? "/axioms" : "/missives";
-  }, [location.pathname]);
+    const basePath = useMemo(() => {
+        return location.pathname.startsWith("/axioms") ? "/axioms" : "/missives";
+    }, [location.pathname]);
 
-  const handleSentimentChange = (next: string | null) => {
-    setSentiment(next);
+    const handleSentimentChange = (next: string | null) => {
+        setSentiment(next);
 
-    if (next === SENTIMENT_TAG_SLUG && basePath !== "/axioms") {
-      navigate({
-        pathname: "/axioms",
-        search: next ? `?sentiment=${next}` : undefined,
-      }, { replace: true });
-      return;
-    }
+        if (next === SENTIMENT_TAG_SLUG && basePath !== "/axioms") {
+            navigate(
+                {
+                    pathname: "/axioms",
+                    search: next ? `?sentiment=${next}` : undefined,
+                },
+                { replace: true },
+            );
+            return;
+        }
 
-    if (next !== SENTIMENT_TAG_SLUG && basePath === "/axioms") {
-      navigate({
-        pathname: "/missives",
-        search: next ? `?sentiment=${next}` : undefined,
-      }, { replace: true });
-    }
-  };
+        if (next !== SENTIMENT_TAG_SLUG && basePath === "/axioms") {
+            navigate(
+                {
+                    pathname: "/missives",
+                    search: next ? `?sentiment=${next}` : undefined,
+                },
+                { replace: true },
+            );
+        }
+    };
 
-  const handleCreateMissive = () => {
-    navigate({ pathname: "/missives/new" });
-  };
+    const handleCreateMissive = () => {
+        navigate({ pathname: "/missives/new" });
+    };
 
-  return (
-    <MissiveList
-      sentiment={sentiment}
-      onSentimentChanged={handleSentimentChange}
-      basePath={basePath}
-      showViewAllLink={basePath === "/axioms"}
-      onCreateMissive={basePath === "/missives" ? handleCreateMissive : undefined}
-    />
-  );
+    return (
+        <MissiveList
+            sentiment={sentiment}
+            onSentimentChanged={handleSentimentChange}
+            basePath={basePath}
+            showViewAllLink={basePath === "/axioms"}
+            onCreateMissive={basePath === "/missives" ? handleCreateMissive : undefined}
+        />
+    );
 };
 
 export default MissiveListRoute;
 
 export const AxiomaticMissiveListRoute = () => (
-  <MissiveListRoute defaultSentiment={SENTIMENT_TAG_SLUG} />
+    <MissiveListRoute defaultSentiment={SENTIMENT_TAG_SLUG} />
 );

@@ -7,17 +7,14 @@ import { loadMissiveDetailAtom } from "./loadMissiveDetailAtom.ts";
 
 const removeMissiveTagMutationAtom = trpc.removeMissiveTag.atomWithMutation();
 
-export const removeActiveMissiveTagAtom = atom(
-  null,
-  async (get, set, tagSlug: string) => {
+export const removeActiveMissiveTagAtom = atom(null, async (get, set, tagSlug: string) => {
     const missiveId = get(activeMissiveIdAtom);
     if (!missiveId) {
-      throw new Error("Select a missive before removing tags.");
+        throw new Error("Select a missive before removing tags.");
     }
     await set(removeMissiveTagMutationAtom, [{ missiveId, tagSlug }]);
     await set(loadMissiveDetailAtom, missiveId);
-  },
-);
+});
 
 export const useRemoveActiveMissiveTag = () => useSetAtom(removeActiveMissiveTagAtom);
 

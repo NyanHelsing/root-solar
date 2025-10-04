@@ -6,26 +6,26 @@ import { createMissiveListCopy } from "../utils/listUtils.ts";
 import type { TagOption } from "../utils/tagFilterUtils.ts";
 
 export const useMissiveListCopy = (
-  activeTag: TagOption | undefined,
-  sentimentFilterSlug: string | null,
-  normalizedSentiment: string | null,
+    activeTag: TagOption | undefined,
+    sentimentFilterSlug: string | null,
+    normalizedSentiment: string | null,
 ): MissiveListCopy => {
-  const sentimentLabel = useMemo(() => {
-    if (!normalizedSentiment) {
-      return undefined;
-    }
-    return labelFromSlug(normalizedSentiment);
-  }, [normalizedSentiment]);
+    const sentimentLabel = useMemo(() => {
+        if (!normalizedSentiment) {
+            return undefined;
+        }
+        return labelFromSlug(normalizedSentiment);
+    }, [normalizedSentiment]);
 
-  return useMemo(
-    () =>
-      createMissiveListCopy({
-        tag: activeTag,
-        sentimentSlug: sentimentFilterSlug ?? undefined,
-        sentimentLabel,
-      }),
-    [activeTag, sentimentFilterSlug, sentimentLabel],
-  );
+    return useMemo(
+        () =>
+            createMissiveListCopy({
+                tag: activeTag,
+                sentimentSlug: sentimentFilterSlug ?? undefined,
+                sentimentLabel,
+            }),
+        [activeTag, sentimentFilterSlug, sentimentLabel],
+    );
 };
 
 export default useMissiveListCopy;

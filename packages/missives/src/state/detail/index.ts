@@ -7,24 +7,24 @@ export { missiveDetailRecordAtom } from "./missiveDetailRecordAtom.ts";
 export { activeMissiveIdAtom, useActiveMissiveId } from "./activeMissiveIdAtom.ts";
 export { missiveDetailViewAtom, useMissiveDetailView } from "./missiveDetailViewAtom.ts";
 export {
-  commitActiveMissiveSentimentAtom,
-  useCommitActiveMissiveSentiment,
+    commitActiveMissiveSentimentAtom,
+    useCommitActiveMissiveSentiment,
 } from "./commitActiveMissiveSentimentAtom.ts";
 export {
-  addActiveMissiveCommentAtom,
-  useAddActiveMissiveComment,
+    addActiveMissiveCommentAtom,
+    useAddActiveMissiveComment,
 } from "./addActiveMissiveCommentAtom.ts";
 export {
-  addActiveMissiveTagAtom,
-  useAddActiveMissiveTag,
+    addActiveMissiveTagAtom,
+    useAddActiveMissiveTag,
 } from "./addActiveMissiveTagAtom.ts";
 export {
-  removeActiveMissiveTagAtom,
-  useRemoveActiveMissiveTag,
+    removeActiveMissiveTagAtom,
+    useRemoveActiveMissiveTag,
 } from "./removeActiveMissiveTagAtom.ts";
 export {
-  refreshActiveMissiveDetailAtom,
-  useRefreshActiveMissiveDetail,
+    refreshActiveMissiveDetailAtom,
+    useRefreshActiveMissiveDetail,
 } from "./refreshActiveMissiveDetailAtom.ts";
 export { useDerivedSentimentSlug } from "./derivedSentimentSlugAtom.ts";
 export { useResolvedMissiveLabels } from "./resolvedMissiveLabelsAtom.ts";

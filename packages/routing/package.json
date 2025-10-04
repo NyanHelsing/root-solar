@@ -1,40 +1,40 @@
 {
-  "name": "@root-solar/routing",
-  "version": "0.0.1",
-  "private": true,
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+    "name": "@root-solar/routing",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        },
+        "./routeParamsAtom": {
+            "types": "./src/routeParamsAtom.ts",
+            "default": "./src/routeParamsAtom.ts"
+        },
+        "./routePathAtom": {
+            "types": "./src/routePathAtom.ts",
+            "default": "./src/routePathAtom.ts"
+        },
+        "./routeQueryParamsAtom": {
+            "types": "./src/routeQueryParamsAtom.ts",
+            "default": "./src/routeQueryParamsAtom.ts"
+        },
+        "./useRouteStateSync": {
+            "types": "./src/useRouteStateSync.ts",
+            "default": "./src/useRouteStateSync.ts"
+        },
+        "./useQueryParamSlug": {
+            "types": "./src/useQueryParamSlug.ts",
+            "default": "./src/useQueryParamSlug.ts"
+        }
     },
-    "./routeParamsAtom": {
-      "types": "./src/routeParamsAtom.ts",
-      "default": "./src/routeParamsAtom.ts"
+    "peerDependencies": {
+        "react": "^19.1.1",
+        "jotai": "^2.14.0",
+        "react-router": "^7.9.1"
     },
-    "./routePathAtom": {
-      "types": "./src/routePathAtom.ts",
-      "default": "./src/routePathAtom.ts"
-    },
-    "./routeQueryParamsAtom": {
-      "types": "./src/routeQueryParamsAtom.ts",
-      "default": "./src/routeQueryParamsAtom.ts"
-    },
-    "./useRouteStateSync": {
-      "types": "./src/useRouteStateSync.ts",
-      "default": "./src/useRouteStateSync.ts"
-    },
-    "./useQueryParamSlug": {
-      "types": "./src/useQueryParamSlug.ts",
-      "default": "./src/useQueryParamSlug.ts"
+    "dependencies": {
+        "jotai": "^2.14.0"
     }
-  },
-  "peerDependencies": {
-    "react": "^19.1.1",
-    "jotai": "^2.14.0",
-    "react-router": "^7.9.1"
-  },
-  "dependencies": {
-    "jotai": "^2.14.0"
-  }
 }

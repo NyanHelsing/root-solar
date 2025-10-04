@@ -1,18 +1,18 @@
 export {
-  AUTHENTICATION_CONTEXT,
-  CHALLENGE_ID_LENGTH,
-  CHALLENGE_NONCE_LENGTH,
+    AUTHENTICATION_CONTEXT,
+    CHALLENGE_ID_LENGTH,
+    CHALLENGE_NONCE_LENGTH,
 } from "./constants.ts";
 export type {
-  AuthIntent,
-  AuthRequest,
-  AuthRequestPayload,
-  VerifiedAuthRequest,
-  IdpChallenge,
-  IdpChallengeRecord,
-  ChallengeResponse,
-  BeingKeyMaterial,
-  KeyPair,
+    AuthIntent,
+    AuthRequest,
+    AuthRequestPayload,
+    VerifiedAuthRequest,
+    IdpChallenge,
+    IdpChallengeRecord,
+    ChallengeResponse,
+    BeingKeyMaterial,
+    KeyPair,
 } from "./types.ts";
 export { normalizeIntent } from "./normalize-intent.ts";
 export { buildAuthMessage } from "./build-auth-message.ts";

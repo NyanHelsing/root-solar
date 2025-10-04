@@ -3,11 +3,11 @@ import { parseBeingCredentialBundle, type BeingCredentialBundle } from "../crede
 import type { BeingSessionRecord } from "./schema.ts";
 
 export const unlockBeingSessionRecord = async (
-  record: BeingSessionRecord,
-  pin: string,
+    record: BeingSessionRecord,
+    pin: string,
 ): Promise<BeingCredentialBundle> => {
-  const serialized = await decryptToUtf8(record.encryptedBundle, pin);
-  return parseBeingCredentialBundle(JSON.parse(serialized));
+    const serialized = await decryptToUtf8(record.encryptedBundle, pin);
+    return parseBeingCredentialBundle(JSON.parse(serialized));
 };
 
 export default unlockBeingSessionRecord;

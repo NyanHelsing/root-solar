@@ -11,7 +11,11 @@ export { selectActiveSentiments } from "./selectActiveSentiments.ts";
 export { toMissiveRecord } from "./toMissiveRecord.ts";
 export { toErrorMessage } from "./toErrorMessage.ts";
 
-export { missiveTagSelectionAtom, useSelectedMissiveTag, useSetSelectedMissiveTag } from "./missiveTagSelectionAtom.ts";
+export {
+    missiveTagSelectionAtom,
+    useSelectedMissiveTag,
+    useSetSelectedMissiveTag,
+} from "./missiveTagSelectionAtom.ts";
 export { missiveTagOptionsAtom, useMissiveTagOptions } from "./missiveTagOptionsAtom.ts";
 export { activeTagDescriptorAtom, useActiveTagDescriptor } from "./activeTagDescriptorAtom.ts";
 export { filteredMissivesAtom, useFilteredMissives } from "./filteredMissivesAtom.ts";

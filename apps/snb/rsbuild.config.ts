@@ -7,84 +7,75 @@ import { pluginSass } from "@rsbuild/plugin-sass";
 import { pluginModuleFederation } from "@module-federation/rsbuild-plugin";
 
 import {
-  DEFAULT_SNB_DIST_SUBDIR,
-  DEFAULT_SNB_MOUNT,
-  resolveAssetPrefix,
-  resolveDistSubdir,
-  resolveMountPath,
+    DEFAULT_SNB_DIST_SUBDIR,
+    DEFAULT_SNB_MOUNT,
+    resolveAssetPrefix,
+    resolveDistSubdir,
+    resolveMountPath,
 } from "../../config/mfePaths.ts";
 
 const workspaceSingleton = () => ({ singleton: true });
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const snbDistSubdir = resolveDistSubdir(
-  process.env.SNB_DIST_SUBDIR,
-  DEFAULT_SNB_DIST_SUBDIR,
-);
-const snbMountPath = resolveMountPath(
-  process.env.SNB_REMOTE_PATH,
-  DEFAULT_SNB_MOUNT,
-);
-const snbAssetPrefix = resolveAssetPrefix(
-  process.env.SNB_ASSET_PREFIX,
-  snbMountPath,
-);
+const snbDistSubdir = resolveDistSubdir(process.env.SNB_DIST_SUBDIR, DEFAULT_SNB_DIST_SUBDIR);
+const snbMountPath = resolveMountPath(process.env.SNB_REMOTE_PATH, DEFAULT_SNB_MOUNT);
+const snbAssetPrefix = resolveAssetPrefix(process.env.SNB_ASSET_PREFIX, snbMountPath);
 
 export default defineConfig({
-  plugins: [
-    pluginReact(),
-    pluginSass(),
-    pluginModuleFederation({
-      name: "snb",
-      exposes: {
-        "./App": "./apps/snb/src/App.tsx",
-      },
-      manifest: {
-        fileName: "mf-manifest.json",
-      },
-      shared: {
-        react: { singleton: true },
-        "react-dom": { singleton: true },
-        "react/jsx-runtime": { singleton: true },
-        "react/jsx-dev-runtime": { singleton: true },
-        jotai: { singleton: true },
-        "jotai-optics": { singleton: true },
-        "react-router": { singleton: true },
-        "@root-solar/api": workspaceSingleton(),
-        "@root-solar/auth": workspaceSingleton(),
-        "@root-solar/missives": workspaceSingleton(),
-        "@root-solar/tagging": workspaceSingleton(),
-        "@root-solar/routing": workspaceSingleton(),
-        "@root-solar/layout": workspaceSingleton(),
-        "@root-solar/observability": workspaceSingleton(),
-        "react-icons": { singleton: true },
-      },
-    }),
-  ],
-  server: {
-    port: 3101,
-    strictPort: true,
-  },
-  source: {
-    entry: {
-      index: "./apps/snb/src/index.ts",
+    plugins: [
+        pluginReact(),
+        pluginSass(),
+        pluginModuleFederation({
+            name: "snb",
+            exposes: {
+                "./App": "./apps/snb/src/App.tsx",
+            },
+            manifest: {
+                fileName: "mf-manifest.json",
+            },
+            shared: {
+                react: { singleton: true },
+                "react-dom": { singleton: true },
+                "react/jsx-runtime": { singleton: true },
+                "react/jsx-dev-runtime": { singleton: true },
+                jotai: { singleton: true },
+                "jotai-optics": { singleton: true },
+                "react-router": { singleton: true },
+                "@root-solar/api": workspaceSingleton(),
+                "@root-solar/auth": workspaceSingleton(),
+                "@root-solar/missives": workspaceSingleton(),
+                "@root-solar/tagging": workspaceSingleton(),
+                "@root-solar/routing": workspaceSingleton(),
+                "@root-solar/layout": workspaceSingleton(),
+                "@root-solar/observability": workspaceSingleton(),
+                "react-icons": { singleton: true },
+            },
+        }),
+    ],
+    server: {
+        port: 3101,
+        strictPort: true,
     },
-  },
-  output: {
-    distPath: {
-      root: path.join(dirname, "../../dist", snbDistSubdir),
-      js: "js",
-      jsAsync: "js/async",
-      css: "css",
-      cssAsync: "css/async",
-      svg: "svg",
-      image: "image",
-      font: "font",
-      media: "media",
-      assets: "assets",
-      wasm: "wasm",
+    source: {
+        entry: {
+            index: "./apps/snb/src/index.ts",
+        },
     },
-    assetPrefix: snbAssetPrefix,
-  },
+    output: {
+        distPath: {
+            root: path.join(dirname, "../../dist", snbDistSubdir),
+            js: "js",
+            jsAsync: "js/async",
+            css: "css",
+            cssAsync: "css/async",
+            svg: "svg",
+            image: "image",
+            font: "font",
+            media: "media",
+            assets: "assets",
+            wasm: "wasm",
+        },
+        assetPrefix: snbAssetPrefix,
+    },
 });
