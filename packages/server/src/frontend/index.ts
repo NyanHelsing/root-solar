@@ -12,15 +12,26 @@ const frontendLogger = createAppLogger("server:frontend", {
 });
 
 export const setupFrontend = async (app: Application): Promise<FrontendLifecycle | null> => {
-    if (IS_DEVELOPMENT) {
+    const devFrontendDisabled = process.env.FRONTEND_DEV_DISABLED === "true";
+
+    if (IS_DEVELOPMENT && !devFrontendDisabled) {
         frontendLogger.info("Configuring development frontend", {
             tags: ["startup", "frontend"]
         });
         return setupDevFrontend(app);
     }
-    frontendLogger.info("Configuring production frontend", {
-        tags: ["startup", "frontend"]
-    });
+    if (devFrontendDisabled) {
+        frontendLogger.info(
+            "Development frontend disabled via environment; using production assets",
+            {
+                tags: ["startup", "frontend"]
+            }
+        );
+    } else {
+        frontendLogger.info("Configuring production frontend", {
+            tags: ["startup", "frontend"]
+        });
+    }
     return setupProdFrontend(app);
 };
 

@@ -5,7 +5,7 @@ import { setNetworkStatus } from "@root-solar/net/status";
 
 import { createBaseApp } from "./app.ts";
 import { createServerContext } from "./context.ts";
-import { PORT } from "./config.ts";
+import { HOST, PORT } from "./config.ts";
 import { setupFrontend, type FrontendLifecycle } from "./frontend/index.ts";
 import { createNetwork, shutdownNetwork, type NetworkResources } from "./network.ts";
 
@@ -19,9 +19,13 @@ export interface ShutdownOptions {
 }
 
 export const startServer = async () => {
+    const networkEnabled =
+        process.env.DISABLE_NETWORK !== "true" && process.env.ENABLE_NETWORK !== "false";
+
     setNetworkStatus({ state: "starting" });
     serverLogger.info("Server startup initiated", {
-        tags: ["startup"]
+        tags: ["startup"],
+        networkEnabled
     });
 
     let shuttingDown = false;
@@ -115,12 +119,18 @@ export const startServer = async () => {
         serverLogger.debug("Server context ready", {
             tags: ["startup"]
         });
-        network = await createNetwork(context);
-        serverLogger.info("Network resources initialized", {
-            tags: ["startup", "network"],
-            peerId: network.libp2p.peerId.toString(),
-            protocols: [network.sentimentNetwork.protocol]
-        });
+        if (networkEnabled) {
+            network = await createNetwork(context);
+            serverLogger.info("Network resources initialized", {
+                tags: ["startup", "network"],
+                peerId: network.libp2p.peerId.toString(),
+                protocols: [network.sentimentNetwork.protocol]
+            });
+        } else {
+            serverLogger.warn("Network startup disabled via environment", {
+                tags: ["startup", "network"]
+            });
+        }
 
         const app = createBaseApp();
         frontend = await setupFrontend(app);
@@ -128,8 +138,14 @@ export const startServer = async () => {
             tags: ["startup", "frontend"]
         });
 
-        server = app.listen(PORT, () => {
+        server = app.listen(PORT, HOST, () => {
             if (!network) {
+                setNetworkStatus({ state: "ready" });
+                serverLogger.info("Server listening (network disabled)", {
+                    tags: ["startup", "http"],
+                    host: HOST,
+                    port: PORT
+                });
                 return;
             }
             setNetworkStatus({
@@ -139,6 +155,7 @@ export const startServer = async () => {
             });
             serverLogger.info("Server listening", {
                 tags: ["startup", "http"],
+                host: HOST,
                 port: PORT,
                 protocol: network.sentimentNetwork.protocol
             });

@@ -10,6 +10,8 @@ test.describe("root.solar homepage", () => {
 
     test("exposes the primary call to action", async ({ page }) => {
         await page.goto("/");
-        await expect(page.getByRole("button", { name: "Enter the commons" })).toBeVisible();
+
+        const primaryCta = page.getByRole("button", { name: "Enter the commons" }).first();
+        await expect(primaryCta).toBeVisible();
     });
 });

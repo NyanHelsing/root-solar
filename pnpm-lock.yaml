@@ -62,6 +62,9 @@ importers:
       '@root-solar/shell':
         specifier: workspace:*
         version: link:packages/shell
+      '@root-solar/testing':
+        specifier: workspace:*
+        version: link:packages/testing
       '@root-solar/tagging':
         specifier: workspace:*
         version: link:packages/tagging
@@ -422,6 +425,24 @@ importers:
       react:
         specifier: ^19.1.1
         version: 19.1.1
+
+  packages/testing:
+    dependencies:
+      '@root-solar/flare':
+        specifier: workspace:*
+        version: link:../flare
+      '@root-solar/homepage':
+        specifier: workspace:*
+        version: link:../homepage
+      react:
+        specifier: ^19.1.1
+        version: 19.1.1
+      react-dom:
+        specifier: ^19.1.1
+        version: 19.1.1(react@19.1.1)
+      react-router:
+        specifier: ^7.9.1
+        version: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
 
   packages/types: {}
 
