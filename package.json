@@ -39,6 +39,7 @@
         "@root-solar/routing": "workspace:*",
         "@root-solar/server": "workspace:*",
         "@root-solar/shell": "workspace:*",
+        "@root-solar/testing": "workspace:*",
         "@root-solar/tagging": "workspace:*",
         "@rsbuild/core": "^1.4.15",
         "@rsbuild/plugin-react": "^1.3.5",

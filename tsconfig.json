@@ -24,7 +24,9 @@
         "baseUrl": ".",
         "paths": {
             "@root-solar/config": ["packages/config/src/index.ts"],
-            "@root-solar/config/*": ["packages/config/src/*"]
+            "@root-solar/config/*": ["packages/config/src/*"],
+            "@root-solar/testing": ["packages/testing/src/index.ts"],
+            "@root-solar/testing/*": ["packages/testing/src/*"]
         }
     },
     "include": [
