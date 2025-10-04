@@ -9,7 +9,7 @@ import {
     type VerifiedAuthRequest,
     createIdpChallenge,
     verifyAuthRequest,
-    verifyChallengeResponse,
+    verifyChallengeResponse
 } from "../handshake/index.ts";
 import { toBase64 } from "../encoding.ts";
 
@@ -17,12 +17,12 @@ export const authRequestPayloadSchema = z.object({
     signingPublicKey: z.string().min(1, "Signing key is required"),
     encryptionPublicKey: z.string().min(1, "Encryption key is required"),
     signature: z.string().min(1, "Signature is required"),
-    intent: z.string().min(1).optional(),
+    intent: z.string().min(1).optional()
 });
 
 export const authRequestSchema = z.object({
     payload: authRequestPayloadSchema,
-    message: z.string().min(1, "Request message is required"),
+    message: z.string().min(1, "Request message is required")
 });
 
 export type BeingRegistrationStartInput = {
@@ -32,7 +32,7 @@ export type BeingRegistrationStartInput = {
 
 export const beingRegistrationStartInputSchema = z.object({
     name: z.string().min(3, "Name must be at least three characters"),
-    request: authRequestSchema,
+    request: authRequestSchema
 });
 
 export type BeingRegistrationStartOutput = {
@@ -68,8 +68,8 @@ export type BeingRegistrationCompleteInput = {
 export const beingRegistrationCompleteInputSchema = z.object({
     response: z.object({
         challengeId: z.string().min(1, "Response challenge ID is required"),
-        signature: z.string().min(1, "Challenge response signature is required"),
-    }),
+        signature: z.string().min(1, "Challenge response signature is required")
+    })
 });
 
 export type BeingRegistrationCompleteOutput<BeingRecord extends BeingRegistrationProfile> = {
@@ -94,20 +94,20 @@ const toChallengeRecord = (
     verified: VerifiedAuthRequest,
     persistable: IdpChallengeRecord,
     beingName: string,
-    messageBase64: string,
+    messageBase64: string
 ): BeingRegistrationChallengeRecord => ({
     ...persistable,
     beingName,
     createdAt: new Date().toISOString(),
     intentBase64: encodeIntent(verified),
-    messageBase64,
+    messageBase64
 });
 
 export const createBeingRegistrationHandlers = <BeingRecord extends BeingRegistrationProfile>(
-    deps: BeingRegistrationDependencies<BeingRecord>,
+    deps: BeingRegistrationDependencies<BeingRecord>
 ) => {
     const start = async (
-        input: BeingRegistrationStartInput,
+        input: BeingRegistrationStartInput
     ): Promise<BeingRegistrationStartOutput> => {
         const verified = await verifyAuthRequest(input.request.payload);
 
@@ -119,14 +119,14 @@ export const createBeingRegistrationHandlers = <BeingRecord extends BeingRegistr
         const { challenge, record } = await createIdpChallenge(verified);
 
         await deps.store.persistChallenge(
-            toChallengeRecord(verified, record, input.name, messageBase64),
+            toChallengeRecord(verified, record, input.name, messageBase64)
         );
 
         return { challenge } satisfies BeingRegistrationStartOutput;
     };
 
     const complete = async (
-        input: BeingRegistrationCompleteInput,
+        input: BeingRegistrationCompleteInput
     ): Promise<BeingRegistrationCompleteOutput<BeingRecord>> => {
         const stored = await deps.store.loadChallenge(input.response.challengeId);
         if (!stored) {
@@ -143,7 +143,7 @@ export const createBeingRegistrationHandlers = <BeingRecord extends BeingRegistr
             signingPublicKey: stored.beingSigningPublicKey,
             encryptionPublicKey: stored.beingEncryptionPublicKey,
             intentBase64: stored.intentBase64,
-            messageBase64: stored.messageBase64,
+            messageBase64: stored.messageBase64
         });
 
         await deps.store.completeChallenge(input.response.challengeId);

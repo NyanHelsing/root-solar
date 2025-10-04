@@ -10,11 +10,11 @@ const clientOptions: CreateTRPCClientOptions<ApiRouter> = {
             url: "http://localhost:3000/api",
             async headers() {
                 return {
-                    authorization: "",
+                    authorization: ""
                 };
-            },
-        }),
-    ],
+            }
+        })
+    ]
 };
 
 export const client = createTRPCProxyClient<ApiRouter>(clientOptions);

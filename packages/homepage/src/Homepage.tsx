@@ -7,7 +7,7 @@ import {
     ShellLayout,
     type RootSolarHeaderProps,
     type RootSolarNavLink,
-    type RootSolarSession,
+    type RootSolarSession
 } from "@root-solar/layout";
 
 const heroBackground = new URL("../../../assets/milkyway.jpg", import.meta.url).href;
@@ -16,18 +16,18 @@ const motivations = [
     {
         title: "Stop silent fragmentation",
         description:
-            "Capture the principles you live by so decisions aren't made for your community while you're not in the room.",
+            "Capture the principles you live by so decisions aren't made for your community while you're not in the room."
     },
     {
         title: "Make integrity visible",
         description:
-            "Translate gut-level intuition into shared operating axioms, so collaborators can trust the intent behind your actions.",
+            "Translate gut-level intuition into shared operating axioms, so collaborators can trust the intent behind your actions."
     },
     {
         title: "Give future beings a foothold",
         description:
-            "Archive agreements and tradeoffs in one canonical commons, giving tomorrow's stewards a map instead of scattered anecdotes.",
-    },
+            "Archive agreements and tradeoffs in one canonical commons, giving tomorrow's stewards a map instead of scattered anecdotes."
+    }
 ] as const;
 
 const mechanics = [
@@ -35,20 +35,20 @@ const mechanics = [
         id: "capture",
         title: "Capture priorities",
         description:
-            "Log the principles shaping your projects, weight their urgency, and see how they offset with the collective.",
+            "Log the principles shaping your projects, weight their urgency, and see how they offset with the collective."
     },
     {
         id: "align",
         title: "Align in the open",
         description:
-            "Point collaborators to a transparent ledger of intent so negotiations start with context instead of suspicion.",
+            "Point collaborators to a transparent ledger of intent so negotiations start with context instead of suspicion."
     },
     {
         id: "anchor",
         title: "Anchor decisions",
         description:
-            "Tie commitments to shared axioms, creating receipts that travel with every deployment, handoff, or policy.",
-    },
+            "Tie commitments to shared axioms, creating receipts that travel with every deployment, handoff, or policy."
+    }
 ];
 
 const HomepageHero = ({ session }: { session: RootSolarSession | null | undefined }) => {
@@ -120,7 +120,7 @@ const MechanicsSection = () => (
                 items={mechanics.map((mechanic) => ({
                     id: mechanic.id,
                     title: mechanic.title,
-                    description: mechanic.description,
+                    description: mechanic.description
                 }))}
                 variant="surface"
             />
@@ -182,7 +182,7 @@ const RootSolarHomepage = ({
     session = null,
     loginHref = "/auth",
     navLinks,
-    headerActions,
+    headerActions
 }: RootSolarHomepageProps) => {
     return (
         <ShellLayout

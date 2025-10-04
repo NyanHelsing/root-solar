@@ -9,7 +9,7 @@ describe("auth/crypto/password", () => {
         const passwordModule = await importPasswordModule();
         const encrypted = await passwordModule.encryptWithPassword("hello world", "s3cret", {
             iterations: 64,
-            keyLength: 256,
+            keyLength: 256
         });
 
         assert.equal(encrypted.algorithm, "AES-GCM");

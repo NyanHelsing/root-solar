@@ -10,7 +10,7 @@ export type ShellRouteComponent = ComponentType;
 
 export const shellRouteConfig = {
     path: "/missives/*",
-    Component: SearchAndBrowseRoute as ShellRouteComponent,
+    Component: SearchAndBrowseRoute as ShellRouteComponent
 } as const;
 
 export const SearchAndBrowseApp = () => <SearchAndBrowseRoute />;
@@ -56,7 +56,7 @@ export {
     RootSolarHeader as Header,
     ShellHero as Hero,
     RootSolarFooter as Footer,
-    ShellLayout,
+    ShellLayout
 } from "@root-solar/layout";
 
 export default SearchAndBrowseApp;

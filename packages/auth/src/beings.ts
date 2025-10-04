@@ -12,7 +12,7 @@ export type Being = {
 const fallbackBeing: Being = {
     id: "guest",
     name: "Guest",
-    role: "participant",
+    role: "participant"
 };
 
 const toBeing = (session: { being: { id: string; name?: string | null } }): Being => {
@@ -20,7 +20,7 @@ const toBeing = (session: { being: { id: string; name?: string | null } }): Bein
     return {
         id: session.being.id,
         name: displayName,
-        role: "participant",
+        role: "participant"
     } satisfies Being;
 };
 

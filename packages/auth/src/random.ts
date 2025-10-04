@@ -1,5 +1,5 @@
 const getCrypto = (
-    scope: typeof globalThis | null | undefined = globalThis,
+    scope: typeof globalThis | null | undefined = globalThis
 ): {
     getRandomValues: <T extends ArrayBufferView>(array: T) => T;
 } => {
@@ -17,7 +17,7 @@ const getCrypto = (
 
     if (!candidate || typeof candidate.getRandomValues !== "function") {
         throw new Error(
-            "Secure random source unavailable: Web Crypto getRandomValues not supported",
+            "Secure random source unavailable: Web Crypto getRandomValues not supported"
         );
     }
 
@@ -26,7 +26,7 @@ const getCrypto = (
 
 export const getRandomBytes = (
     length: number,
-    scope: typeof globalThis | null | undefined = globalThis,
+    scope: typeof globalThis | null | undefined = globalThis
 ): Uint8Array => {
     if (!Number.isInteger(length) || length <= 0) {
         throw new Error("Random byte length must be a positive integer");

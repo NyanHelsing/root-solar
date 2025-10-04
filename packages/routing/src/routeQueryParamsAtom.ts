@@ -14,10 +14,7 @@ const normalizeRouteQueryParams = (params: RouteQueryParams): RouteQueryParams =
     return normalized;
 };
 
-const areRouteQueryParamsEqual = (
-    current: RouteQueryParams,
-    next: RouteQueryParams,
-): boolean => {
+const areRouteQueryParamsEqual = (current: RouteQueryParams, next: RouteQueryParams): boolean => {
     const currentKeys = Object.keys(current);
     const nextKeys = Object.keys(next);
     if (currentKeys.length !== nextKeys.length) {
@@ -42,7 +39,7 @@ export const routeQueryParamsAtom = atom(
         }
         console.debug("[routing] setRouteQueryParams", { current, next });
         set(baseRouteQueryParamsAtom, next);
-    },
+    }
 );
 
 export const setRouteQueryParamsAtom = atom(null, (_get, set, params: RouteQueryParams) => {
@@ -65,7 +62,7 @@ const resolveQueryParamValue = (value: string | null | undefined): string | unde
 const applyQueryParamUpdate = (
     current: RouteQueryParams,
     key: string,
-    value: string | undefined,
+    value: string | undefined
 ): RouteQueryParams => {
     if (value === undefined) {
         if (!(key in current)) {
@@ -82,7 +79,7 @@ const applyQueryParamUpdate = (
 
     return {
         ...current,
-        [key]: value,
+        [key]: value
     };
 };
 
@@ -98,7 +95,7 @@ export const setRouteQueryParamAtom = atom(
         }
 
         set(routeQueryParamsAtom, next);
-    },
+    }
 );
 
 export const useRouteQueryParams = () => useAtomValue(routeQueryParamsAtom);

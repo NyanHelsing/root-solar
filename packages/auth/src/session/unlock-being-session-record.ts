@@ -4,7 +4,7 @@ import type { BeingSessionRecord } from "./schema.ts";
 
 export const unlockBeingSessionRecord = async (
     record: BeingSessionRecord,
-    pin: string,
+    pin: string
 ): Promise<BeingCredentialBundle> => {
     const serialized = await decryptToUtf8(record.encryptedBundle, pin);
     return parseBeingCredentialBundle(JSON.parse(serialized));

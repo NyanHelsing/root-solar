@@ -12,7 +12,7 @@ export const routePathAtom = atom(
         }
         console.debug("[routing] routePathAtom update", { current, next });
         set(baseRoutePathAtom, next);
-    },
+    }
 );
 
 export const useRoutePath = () => useAtomValue(routePathAtom);

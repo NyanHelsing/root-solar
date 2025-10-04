@@ -14,8 +14,8 @@ const mockNanoid = async () => {
                     throw new Error("No nanoid value provided");
                 }
                 return next;
-            },
-        },
+            }
+        }
     });
 };
 
@@ -32,24 +32,24 @@ describe("persistence/being", () => {
             },
             async upsert() {
                 return {};
-            },
+            }
         },
-        ...overrides,
+        ...overrides
     });
 
     it("lists beings sorted by name", async () => {
         const records = [
             { id: "being:b", name: "Bravo" },
             { id: "being:a", name: "Alpha" },
-            { id: "being:c", name: "Charlie" },
+            { id: "being:c", name: "Charlie" }
         ];
 
         const ctx = createContext({
             db: {
                 async select() {
                     return records;
-                },
-            },
+                }
+            }
         });
 
         await mockNanoid();
@@ -59,7 +59,7 @@ describe("persistence/being", () => {
         const all = await model.list();
         assert.deepEqual(
             all.map((record) => record.name),
-            ["Alpha", "Bravo", "Charlie"],
+            ["Alpha", "Bravo", "Charlie"]
         );
     });
 
@@ -73,10 +73,10 @@ describe("persistence/being", () => {
                     }
                     return {
                         id: "being:123",
-                        name: "Being 123",
+                        name: "Being 123"
                     };
-                },
-            },
+                }
+            }
         });
 
         await mockNanoid();
@@ -99,8 +99,8 @@ describe("persistence/being", () => {
                 async upsert(_id, payload) {
                     upsertCalls.push(payload);
                     return payload;
-                },
-            },
+                }
+            }
         });
 
         await mockNanoid();
@@ -110,7 +110,7 @@ describe("persistence/being", () => {
         const created = await model.create({
             name: "Example",
             signingPublicKey: "sign",
-            encryptionPublicKey: "enc",
+            encryptionPublicKey: "enc"
         });
 
         assert.equal(created.id, "being-xyz");
@@ -124,11 +124,11 @@ describe("persistence/being", () => {
                     return [
                         {
                             id: "being:abc",
-                            name: "Being ABC",
-                        },
+                            name: "Being ABC"
+                        }
                     ];
-                },
-            },
+                }
+            }
         });
 
         const { createBeingModel } = await import(`${moduleSpecifier}?case=${Date.now()}-upsert`);
@@ -136,7 +136,7 @@ describe("persistence/being", () => {
 
         const stored = await model.upsert({
             id: "abc",
-            name: "Being ABC",
+            name: "Being ABC"
         });
         assert.equal(stored.id, "being:abc");
 
@@ -144,8 +144,8 @@ describe("persistence/being", () => {
             db: {
                 async upsert() {
                     return null;
-                },
-            },
+                }
+            }
         });
 
         const nullingModel = createBeingModel(nullingCtx);

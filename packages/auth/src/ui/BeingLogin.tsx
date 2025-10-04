@@ -6,7 +6,7 @@ import {
     useEffect,
     useMemo,
     useRef,
-    useState,
+    useState
 } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
@@ -16,7 +16,7 @@ import {
     deserializeBeingCredentialFile,
     decryptBeingCredentialFile,
     readFileAsText,
-    type BeingCredentialFile,
+    type BeingCredentialFile
 } from "../credentials.ts";
 import { createBeingSession, type BeingSessionRecord } from "../session.ts";
 import { beingSessionAtom } from "../session-atoms.ts";
@@ -42,12 +42,12 @@ type LoginStatus =
 
 const defaultHeadings: Record<NonNullable<BeingLoginProps["variant"]>, string> = {
     login: "Sign in with credentials",
-    verify: "Verify your credential",
+    verify: "Verify your credential"
 };
 
 const defaultDescriptions: Record<NonNullable<BeingLoginProps["variant"]>, string> = {
     login: "Drop your credential file to unlock your keys. We will store the sensitive material encrypted in this browser with a temporary 4-digit PIN so you can authorize actions without re-uploading the file each time.",
-    verify: "Upload the credential you just downloaded to confirm it unlocks correctly. We will finish by creating a session secured with a temporary 4-digit PIN.",
+    verify: "Upload the credential you just downloaded to confirm it unlocks correctly. We will finish by creating a session secured with a temporary 4-digit PIN."
 };
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
@@ -65,7 +65,7 @@ export const BeingLogin = ({
     expectedBeingName,
     onComplete,
     onRequestReset,
-    allowSessionReset = true,
+    allowSessionReset = true
 }: BeingLoginProps) => {
     if (variant === "verify" && !expectedBeingId) {
         throw new Error("BeingLogin in verify mode requires an expectedBeingId");
@@ -96,7 +96,7 @@ export const BeingLogin = ({
 
     const isBusy = useMemo(
         () => status === "loadingCredential" || status === "unlocking",
-        [status],
+        [status]
     );
 
     const resetState = useCallback(() => {
@@ -127,7 +127,7 @@ export const BeingLogin = ({
             }
             setDragActive(true);
         },
-        [isBusy],
+        [isBusy]
     );
 
     const handleDragLeave = useCallback((event: DragEvent<HTMLDivElement>) => {
@@ -140,7 +140,7 @@ export const BeingLogin = ({
             const parsed = deserializeBeingCredentialFile(text);
             if (variant === "verify" && expectedBeingId && parsed.being.id !== expectedBeingId) {
                 throw new Error(
-                    "This credential belongs to a different being. Upload the file you just downloaded.",
+                    "This credential belongs to a different being. Upload the file you just downloaded."
                 );
             }
             setCredentialFile(parsed);
@@ -149,7 +149,7 @@ export const BeingLogin = ({
             setSessionPin(null);
             setStatus("credentialReady");
         },
-        [expectedBeingId, variant],
+        [expectedBeingId, variant]
     );
 
     const handleFileLoad = useCallback(
@@ -162,11 +162,11 @@ export const BeingLogin = ({
             } catch (fileError) {
                 setStatus("error");
                 setError(
-                    getErrorMessage(fileError, "Unable to read credential file. Please try again."),
+                    getErrorMessage(fileError, "Unable to read credential file. Please try again.")
                 );
             }
         },
-        [handleFileParsed],
+        [handleFileParsed]
     );
 
     const onInputChange = useCallback(
@@ -179,7 +179,7 @@ export const BeingLogin = ({
             await handleFileLoad(file);
             event.currentTarget.value = "";
         },
-        [handleFileLoad],
+        [handleFileLoad]
     );
 
     const handleDrop = useCallback(
@@ -196,7 +196,7 @@ export const BeingLogin = ({
             }
             await handleFileLoad(file);
         },
-        [handleFileLoad, isBusy],
+        [handleFileLoad, isBusy]
     );
 
     const credentialSummary = useMemo(() => {
@@ -206,7 +206,7 @@ export const BeingLogin = ({
         return {
             id: credentialFile.being.id,
             name: credentialFile.being.name,
-            createdAt: credentialFile.createdAt,
+            createdAt: credentialFile.createdAt
         };
     }, [credentialFile]);
 
@@ -215,7 +215,7 @@ export const BeingLogin = ({
             status === "credentialReady" &&
             credentialFile !== null &&
             credentialPassphrase.trim().length > 0,
-        [credentialFile, credentialPassphrase, status],
+        [credentialFile, credentialPassphrase, status]
     );
 
     const handleUnlock = useCallback(async () => {
@@ -229,7 +229,7 @@ export const BeingLogin = ({
             const bundle = await decryptBeingCredentialFile(credentialFile, credentialPassphrase);
             if (variant === "verify" && expectedBeingId && bundle.beingId !== expectedBeingId) {
                 throw new Error(
-                    "This credential belongs to a different being. Upload the saved file.",
+                    "This credential belongs to a different being. Upload the saved file."
                 );
             }
             const { pin, record } = await createBeingSession(bundle);
@@ -243,8 +243,8 @@ export const BeingLogin = ({
             setError(
                 getErrorMessage(
                     unlockError,
-                    "Unable to unlock credential. Check the passphrase and try again.",
-                ),
+                    "Unable to unlock credential. Check the passphrase and try again."
+                )
             );
         }
     }, [
@@ -254,7 +254,7 @@ export const BeingLogin = ({
         expectedBeingId,
         onComplete,
         setSessionRecord,
-        variant,
+        variant
     ]);
 
     const sessionSummary = useMemo(() => {
@@ -266,7 +266,7 @@ export const BeingLogin = ({
             pin: sessionPin,
             createdAt: sessionRecord.createdAt,
             beingId: sessionRecord.being.id,
-            beingName: displayName,
+            beingName: displayName
         };
     }, [sessionPin, sessionRecord]);
 
@@ -291,7 +291,7 @@ export const BeingLogin = ({
                     textAlign: "center",
                     background: dragActive ? "rgba(59, 130, 246, 0.08)" : "transparent",
                     cursor: isBusy ? "progress" : "pointer",
-                    outline: "none",
+                    outline: "none"
                 }}
             >
                 <FlareStack gap="sm" align="center">
@@ -373,7 +373,7 @@ export const BeingLogin = ({
                         borderRadius: "0.75rem",
                         padding: "1.5rem",
                         background: "rgba(34, 197, 94, 0.12)",
-                        border: "1px solid rgba(34, 197, 94, 0.32)",
+                        border: "1px solid rgba(34, 197, 94, 0.32)"
                     }}
                 >
                     <h3 className="rs-heading-md">
@@ -394,7 +394,7 @@ export const BeingLogin = ({
                                     fontSize: "2.5rem",
                                     fontWeight: 700,
                                     letterSpacing: "0.2rem",
-                                    textAlign: "center",
+                                    textAlign: "center"
                                 }}
                                 aria-label="Session PIN"
                             >

@@ -9,7 +9,7 @@ export const persistBeingSessionRecord = (record: BeingSessionRecord): void => {
         storage.setItem(SESSION_STORAGE_KEY, serializeSessionRecord(record));
     } catch (error) {
         throw new Error("Failed to persist session to local storage", {
-            cause: error instanceof Error ? error : undefined,
+            cause: error instanceof Error ? error : undefined
         });
     }
 };

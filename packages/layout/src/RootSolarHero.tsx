@@ -25,7 +25,7 @@ const RootSolarHero = ({
     backgroundImage,
     overlay = "rgba(15, 23, 42, 0.55)",
     imageOpacity = 0.42,
-    children,
+    children
 }: RootSolarHeroProps) => {
     return (
         <FlareHero

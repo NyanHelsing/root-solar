@@ -38,7 +38,7 @@ const List = ({
         variant === "surface" ? styles["list--surface"] : undefined,
         density === "tight" ? styles["list--tight"] : undefined,
         density === "loose" ? styles["list--loose"] : undefined,
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");

@@ -1,12 +1,12 @@
 export type {
     BeingKeyMaterial,
-    KeyPair,
+    KeyPair
 } from "./identities.ts";
 
 export {
     generateBeingKeyMaterial,
     generateEncryptionKeyPair,
-    generateSigningKeyPair,
+    generateSigningKeyPair
 } from "./identities.ts";
 
 export type {
@@ -16,7 +16,7 @@ export type {
     VerifiedAuthRequest,
     IdpChallenge,
     IdpChallengeRecord,
-    ChallengeResponse,
+    ChallengeResponse
 } from "./handshake/index.ts";
 
 export {
@@ -25,14 +25,14 @@ export {
     createIdpChallenge,
     createChallengeResponse,
     verifyChallengeResponse,
-    AUTHENTICATION_CONTEXT,
+    AUTHENTICATION_CONTEXT
 } from "./handshake/index.ts";
 
 export {
     toBase64,
     fromBase64,
     utf8ToBytes,
-    bytesToUtf8,
+    bytesToUtf8
 } from "./encoding.ts";
 
 export {
@@ -43,17 +43,17 @@ export {
     unlockBeingSessionRecord,
     generateSessionPin,
     getSessionStorageKey,
-    type BeingSessionRecord,
+    type BeingSessionRecord
 } from "./session.ts";
 
 export {
     beingSessionAtom,
     beingSessionSummaryAtom,
-    type BeingSessionAction,
+    type BeingSessionAction
 } from "./session-atoms.ts";
 
 export {
     beingAtom,
     useBeing,
-    type Being,
+    type Being
 } from "./beings.ts";

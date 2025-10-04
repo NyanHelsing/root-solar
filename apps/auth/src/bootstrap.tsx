@@ -16,5 +16,5 @@ if (!rootElement) {
 createRoot(rootElement).render(
     <BrowserRouter>
         <AuthApp />
-    </BrowserRouter>,
+    </BrowserRouter>
 );

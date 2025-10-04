@@ -1,14 +1,14 @@
 export {
     activeSentimentAtom,
     useActiveSentimentTag,
-    useActiveSentimentFilter,
+    useActiveSentimentFilter
 } from "./activeSentimentAtom.ts";
 export {
     setActiveSentimentTagAtom,
-    useSetActiveSentimentTag,
+    useSetActiveSentimentTag
 } from "./setActiveSentimentTagAtom.ts";
 export {
     setActiveSentimentFilterAtom,
-    useSetActiveSentimentFilter,
+    useSetActiveSentimentFilter
 } from "./setActiveSentimentFilterAtom.ts";
 export { useActiveSentimentSync } from "./useActiveSentimentSync.ts";

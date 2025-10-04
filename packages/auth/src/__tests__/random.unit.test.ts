@@ -25,8 +25,8 @@ describe("auth/random", () => {
                         array[index] = index + 1;
                     }
                     return array;
-                },
-            } as unknown as Crypto,
+                }
+            } as unknown as Crypto
         });
 
         const result = getRandomBytes(4);
@@ -40,8 +40,8 @@ describe("auth/random", () => {
             value: {
                 getRandomValues(array: Uint8Array) {
                     return array;
-                },
-            } as unknown as Crypto,
+                }
+            } as unknown as Crypto
         });
 
         assert.throws(() => getRandomBytes(0), /positive integer/);
@@ -51,7 +51,7 @@ describe("auth/random", () => {
     it("throws when crypto is unavailable", () => {
         Object.defineProperty(globalThis, "crypto", {
             configurable: true,
-            value: undefined,
+            value: undefined
         });
         assert.throws(() => getRandomBytes(2), /Secure random source unavailable/);
     });
@@ -59,7 +59,7 @@ describe("auth/random", () => {
     it("requires crypto.getRandomValues to be implemented", () => {
         Object.defineProperty(globalThis, "crypto", {
             configurable: true,
-            value: {},
+            value: {}
         });
 
         assert.throws(() => getRandomBytes(2), /getRandomValues not supported/);
@@ -73,8 +73,8 @@ describe("auth/random", () => {
                         array[index] = 9;
                     }
                     return array;
-                },
-            },
+                }
+            }
         };
 
         const bytes = getRandomBytes(2, fakeScope as typeof globalThis);
@@ -82,7 +82,7 @@ describe("auth/random", () => {
 
         assert.throws(
             () => getRandomBytes(2, null as unknown as typeof globalThis),
-            /global scope missing/,
+            /global scope missing/
         );
     });
 });

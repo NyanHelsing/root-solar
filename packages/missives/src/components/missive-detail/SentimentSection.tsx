@@ -6,7 +6,7 @@ import {
     FlareCard,
     FlareIconButton,
     FlareStack,
-    FlareTextInput,
+    FlareTextInput
 } from "@root-solar/flare";
 import type { SentimentAllocation } from "@root-solar/api";
 import { labelFromSlug } from "@root-solar/globalization";
@@ -26,7 +26,7 @@ export const SentimentSection = ({
     sentiments,
     labels,
     activeSentimentId,
-    onCommitSentiment,
+    onCommitSentiment
 }: SentimentSectionProps) => {
     const [busySentimentTagId, setBusySentimentTagId] = useState<string | null>(null);
     const [sentimentError, setSentimentError] = useState<string | null>(null);
@@ -63,7 +63,7 @@ export const SentimentSection = ({
             }
             return normalized;
         },
-        [activeSentimentId],
+        [activeSentimentId]
     );
 
     const handleCommitSentiment = useCallback(
@@ -74,7 +74,7 @@ export const SentimentSection = ({
             if (nextWeight === previousWeight) {
                 setSentimentDrafts((current) => ({
                     ...current,
-                    [tagId]: nextWeight.toString(),
+                    [tagId]: nextWeight.toString()
                 }));
                 return;
             }
@@ -84,24 +84,24 @@ export const SentimentSection = ({
                 const resolvedWeight = await onCommitSentiment(tagId, nextWeight);
                 setSentimentDrafts((current) => ({
                     ...current,
-                    [tagId]: resolvedWeight.toString(),
+                    [tagId]: resolvedWeight.toString()
                 }));
             } catch (error) {
                 console.error("Failed to update sentiment weight", error);
                 setSentimentError(
                     error instanceof Error && error.message
                         ? error.message
-                        : "Unable to update sentiment weight. Please try again.",
+                        : "Unable to update sentiment weight. Please try again."
                 );
                 setSentimentDrafts((current) => ({
                     ...current,
-                    [tagId]: previousWeight.toString(),
+                    [tagId]: previousWeight.toString()
                 }));
             } finally {
                 setBusySentimentTagId(null);
             }
         },
-        [clampWeightForTag, onCommitSentiment, sentiments],
+        [clampWeightForTag, onCommitSentiment, sentiments]
     );
 
     const handleCreateSentiment = useCallback(
@@ -144,13 +144,13 @@ export const SentimentSection = ({
                 setSentimentError(
                     error instanceof Error && error.message
                         ? error.message
-                        : "Unable to create sentiment tag. Please try again.",
+                        : "Unable to create sentiment tag. Please try again."
                 );
             } finally {
                 setIsCreatingSentiment(false);
             }
         },
-        [clampWeightForTag, newSentimentLabel, newSentimentWeight, onCommitSentiment, sentiments],
+        [clampWeightForTag, newSentimentLabel, newSentimentWeight, onCommitSentiment, sentiments]
     );
 
     const sentimentCards = useMemo(
@@ -171,7 +171,7 @@ export const SentimentSection = ({
                 const handleDraftChange = (value: string) => {
                     setSentimentDrafts((current) => ({
                         ...current,
-                        [sentiment.tagId]: value,
+                        [sentiment.tagId]: value
                     }));
                 };
 
@@ -183,10 +183,10 @@ export const SentimentSection = ({
                     isBusy,
                     ratioLabel,
                     displayLabel,
-                    handleDraftChange,
+                    handleDraftChange
                 };
             }),
-        [sentiments, sentimentDrafts, activeSentimentId, busySentimentTagId],
+        [sentiments, sentimentDrafts, activeSentimentId, busySentimentTagId]
     );
 
     return (
@@ -213,7 +213,7 @@ export const SentimentSection = ({
                             isBusy,
                             ratioLabel,
                             displayLabel,
-                            handleDraftChange,
+                            handleDraftChange
                         }) => (
                             <FlareCard key={sentiment.tagId} padding="md">
                                 <FlareStack gap="md">
@@ -235,7 +235,7 @@ export const SentimentSection = ({
                                             onClick={() => {
                                                 const next = clampWeightForTag(
                                                     sentiment.tagId,
-                                                    resolvedWeight + 1,
+                                                    resolvedWeight + 1
                                                 );
                                                 if (next === resolvedWeight) {
                                                     return;
@@ -268,12 +268,12 @@ export const SentimentSection = ({
                                                 const parsed = Number.parseInt(currentDraft, 10);
                                                 if (Number.isNaN(parsed)) {
                                                     setSentimentError(
-                                                        "Enter a numeric weight for the sentiment.",
+                                                        "Enter a numeric weight for the sentiment."
                                                     );
                                                     setSentimentDrafts((current) => ({
                                                         ...current,
                                                         [sentiment.tagId]:
-                                                            sentiment.weight.toString(),
+                                                            sentiment.weight.toString()
                                                     }));
                                                     return;
                                                 }
@@ -295,7 +295,7 @@ export const SentimentSection = ({
                                             onClick={() => {
                                                 const next = clampWeightForTag(
                                                     sentiment.tagId,
-                                                    resolvedWeight - 1,
+                                                    resolvedWeight - 1
                                                 );
                                                 if (next === resolvedWeight) {
                                                     return;
@@ -315,7 +315,7 @@ export const SentimentSection = ({
                                     </span>
                                 </FlareStack>
                             </FlareCard>
-                        ),
+                        )
                     )}
                 </FlareStack>
             ) : (

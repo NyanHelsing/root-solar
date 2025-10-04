@@ -12,11 +12,11 @@ export const addActiveMissiveCommentAtom = atom(
         set,
         {
             body,
-            parentCommentId,
+            parentCommentId
         }: {
             body: string;
             parentCommentId?: string;
-        },
+        }
     ) => {
         const missiveId = get(activeMissiveIdAtom);
         if (!missiveId) {
@@ -25,9 +25,9 @@ export const addActiveMissiveCommentAtom = atom(
         return set(addMissiveCommentAtom, {
             missiveId,
             body,
-            parentCommentId,
+            parentCommentId
         });
-    },
+    }
 );
 
 export default addActiveMissiveCommentAtom;
@@ -38,6 +38,6 @@ export const useAddActiveMissiveComment = () => {
         async (body: string, parentCommentId?: string) => {
             await setComment({ body, parentCommentId });
         },
-        [setComment],
+        [setComment]
     );
 };

@@ -21,7 +21,7 @@ export const buildMissiveCommentPayloadAtom = atom<
         parentCommentId,
         authorBeingId: being.id,
         authorDisplayName: being.name,
-        body: trimmed,
+        body: trimmed
     } satisfies MissiveCommentPayload;
 });
 

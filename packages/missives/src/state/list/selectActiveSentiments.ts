@@ -4,7 +4,7 @@ import type { SentimentAllocation } from "@root-solar/api";
 
 export const selectActiveSentiments = (
     loadableSentiments: Loadable<SentimentAllocation[]>,
-    tagId: string,
+    tagId: string
 ): SentimentAllocation[] => {
     if (loadableSentiments.state !== "hasData") {
         return [];

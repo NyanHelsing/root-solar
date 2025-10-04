@@ -51,5 +51,5 @@ bootstrapShellApp({
                 <Route index element={<TagList />} />
             </Route>
         </>
-    ),
+    )
 });

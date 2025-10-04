@@ -3,7 +3,7 @@ import { afterEach, describe, it, mock } from "node:test";
 
 const dataConfig = {
     seedTags: [],
-    seedMissives: [],
+    seedMissives: []
 };
 
 let currentDb: ReturnType<typeof createFakeDb> | undefined;
@@ -32,8 +32,8 @@ const setupDbMocks = async () => {
         namedExports: {
             surrealdbNodeEngines() {
                 return {};
-            },
-        },
+            }
+        }
     });
 
     await mock.module("surrealdb", {
@@ -45,8 +45,8 @@ const setupDbMocks = async () => {
                     throw new Error("currentDb not configured");
                 }
                 return currentDb;
-            },
-        },
+            }
+        }
     });
 
     await mock.module("../../data/index.ts", {
@@ -56,8 +56,8 @@ const setupDbMocks = async () => {
             },
             get seedMissives() {
                 return dataConfig.seedMissives;
-            },
-        },
+            }
+        }
     });
 };
 
@@ -92,7 +92,7 @@ const createFakeDb = () => {
         async query(text, params) {
             queryCalls.push({ text, params });
             return [];
-        },
+        }
     };
 };
 
@@ -130,11 +130,11 @@ describe("persistence/db", () => {
         assert.match(fakeDb.connectUrls[0], /^surrealkv:\/\//);
         assert.deepEqual(fakeDb.namespaces[0], {
             namespace: "root-solar",
-            database: "root-solar",
+            database: "root-solar"
         });
         assert.equal(
             fakeDb.upsertCalls.length,
-            dataConfig.seedTags.length + dataConfig.seedMissives.length,
+            dataConfig.seedTags.length + dataConfig.seedMissives.length
         );
     });
 
@@ -164,8 +164,8 @@ describe("persistence/db", () => {
                     {
                         id: "missive:legacy",
                         tags: ["tag:other"],
-                        kind: "axiom",
-                    },
+                        kind: "axiom"
+                    }
                 ];
             }
             if (table === "axiom") {
@@ -173,8 +173,8 @@ describe("persistence/db", () => {
                     {
                         id: "axiom:legacy",
                         title: "Legacy",
-                        kind: "axiom",
-                    },
+                        kind: "axiom"
+                    }
                 ];
             }
             return [];
@@ -191,7 +191,7 @@ describe("persistence/db", () => {
         assert.equal(query.params.tags[0], "tag:axiomatic");
         assert.deepEqual(
             new Set(query.params.tags),
-            new Set(["tag:axiomatic", "tag:axiom", "tag:other"]),
+            new Set(["tag:axiomatic", "tag:axiom", "tag:other"])
         );
     });
 

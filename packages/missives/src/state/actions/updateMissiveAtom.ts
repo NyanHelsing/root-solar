@@ -12,7 +12,7 @@ export const updateMissiveAtom = atom<null, [MissiveUpdateInput], Promise<Missiv
     async (_get, set, input) => {
         const record = await set(updateMissiveMutationAtom, [input]);
         return record;
-    },
+    }
 );
 
 export default updateMissiveAtom;

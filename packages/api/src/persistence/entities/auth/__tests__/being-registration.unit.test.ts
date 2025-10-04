@@ -10,9 +10,9 @@ describe("auth/being-registration store", () => {
             async select() {
                 return null;
             },
-            async delete() {},
+            async delete() {}
         },
-        ...overrides,
+        ...overrides
     });
 
     it("persists challenges with pending status", async () => {
@@ -26,8 +26,8 @@ describe("auth/being-registration store", () => {
                 async select() {
                     return null;
                 },
-                async delete() {},
-            },
+                async delete() {}
+            }
         });
 
         const { createBeingRegistrationStore } = await import(
@@ -42,7 +42,7 @@ describe("auth/being-registration store", () => {
             signingPublicKey: "sign",
             encryptionPublicKey: "enc",
             intentBase64: "intent",
-            messageBase64: "message",
+            messageBase64: "message"
         });
 
         assert.equal(upsertCalls.length, 1);
@@ -65,7 +65,7 @@ describe("auth/being-registration store", () => {
                             beingEncryptionPublicKey: "enc",
                             beingName: "Being",
                             intentBase64: undefined,
-                            messageBase64: "message",
+                            messageBase64: "message"
                         };
                     }
                     if (identifier.includes("done")) {
@@ -79,14 +79,14 @@ describe("auth/being-registration store", () => {
                             beingEncryptionPublicKey: "enc",
                             beingName: "Being",
                             intentBase64: undefined,
-                            messageBase64: "message",
+                            messageBase64: "message"
                         };
                     }
                     return [];
                 },
                 async upsert() {},
-                async delete() {},
-            },
+                async delete() {}
+            }
         });
 
         const { createBeingRegistrationStore } = await import(
@@ -115,8 +115,8 @@ describe("auth/being-registration store", () => {
                 async upsert() {},
                 async select() {
                     return null;
-                },
-            },
+                }
+            }
         });
 
         const { createBeingRegistrationStore } = await import(

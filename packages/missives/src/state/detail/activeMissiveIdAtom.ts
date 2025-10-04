@@ -24,7 +24,7 @@ export const activeMissiveIdAtom = atom<string | null>((get) => {
     console.debug("[missives] activeMissiveIdAtom", {
         params,
         path,
-        resolved,
+        resolved
     });
     return resolved;
 });

@@ -27,7 +27,7 @@ const MissiveCard = ({
     moreInfoLabel,
     sentimentTagId,
     isSentimentCapped,
-    sentimentSlug,
+    sentimentSlug
 }: MissiveCardProps) => {
     const updateSentiment = useUpdateMissiveSentiment();
     const [draft, setDraft] = useState(() => weight.toString());
@@ -42,7 +42,7 @@ const MissiveCard = ({
         (next: number) => {
             void updateSentiment({ missiveId: id, tagId: sentimentTagId, weight: next });
         },
-        [id, sentimentTagId, updateSentiment],
+        [id, sentimentTagId, updateSentiment]
     );
 
     const adjust = (delta: number) => {

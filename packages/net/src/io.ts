@@ -44,7 +44,7 @@ export const writeJson = async (stream: Stream, value: unknown, logger: AppLogge
             await stream.closeWrite();
         } catch (error) {
             logger.debug("Failed closing write side", error, {
-                tags: ["network", "stream"],
+                tags: ["network", "stream"]
             });
         }
     }
@@ -56,7 +56,7 @@ export const closeStream = async (stream: Stream, logger: AppLogger) => {
             await stream.close();
         } catch (error) {
             logger.debug("Failed closing stream", error, {
-                tags: ["network", "stream"],
+                tags: ["network", "stream"]
             });
         }
     }

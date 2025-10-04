@@ -32,7 +32,7 @@ describe("createIdpChallenge", () => {
         const options = {
             idpSigningKeyPair: IDP_SIGNING_KEY_PAIR,
             nonceLength: 4,
-            challengeId: "custom-challenge",
+            challengeId: "custom-challenge"
         } as const;
 
         const { challenge, record } = await createIdpChallenge(verifiedRequest, options);
@@ -49,9 +49,9 @@ const decryptNonce = async (challenge: { encryptedNonce: string; idpSigningPubli
     const decrypted = await openpgp.decrypt({
         message,
         decryptionKeys: await openpgp.readPrivateKey({
-            armoredKey: BEING_KEY_MATERIAL.encryption.privateKey,
+            armoredKey: BEING_KEY_MATERIAL.encryption.privateKey
         }),
-        verificationKeys: await openpgp.readKey({ armoredKey: challenge.idpSigningPublicKey }),
+        verificationKeys: await openpgp.readKey({ armoredKey: challenge.idpSigningPublicKey })
     });
 
     const data = decrypted.data;

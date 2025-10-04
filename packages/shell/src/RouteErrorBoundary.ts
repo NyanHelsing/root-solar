@@ -3,7 +3,7 @@ import {
     createElement,
     type ErrorInfo,
     type PropsWithChildren,
-    type ReactNode,
+    type ReactNode
 } from "react";
 
 import { createAppLogger } from "@root-solar/observability";
@@ -58,7 +58,7 @@ export class RouteErrorBoundary extends Component<
             "div",
             { role: "alert" },
             createElement("h1", null, "Something went wrong"),
-            createElement("p", null, error.message),
+            createElement("p", null, error.message)
         );
     }
 }

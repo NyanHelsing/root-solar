@@ -7,7 +7,7 @@ const cleanupTasks: Array<() => void> = [];
 export const overrideModuleProperty = (
     target: Record<string, unknown>,
     key: string,
-    replacement: unknown,
+    replacement: unknown
 ) => {
     const descriptor = Object.getOwnPropertyDescriptor(target, key);
 
@@ -15,7 +15,7 @@ export const overrideModuleProperty = (
         Object.defineProperty(target, key, {
             value: replacement,
             configurable: true,
-            writable: true,
+            writable: true
         });
         cleanupTasks.push(() => {
             delete target[key];
@@ -26,7 +26,7 @@ export const overrideModuleProperty = (
     if (descriptor.configurable) {
         Object.defineProperty(target, key, {
             ...descriptor,
-            value: replacement,
+            value: replacement
         });
         cleanupTasks.push(() => {
             Object.defineProperty(target, key, descriptor);
@@ -85,5 +85,5 @@ export const createWebStream = (chunks: Array<string>) =>
                 controller.enqueue(chunk);
             }
             controller.close();
-        },
+        }
     });

@@ -5,7 +5,7 @@ import { normalizeFilterValue } from "../../utils/listUtils.ts";
 import {
     useActiveSentimentTag,
     useSetActiveSentimentFilter,
-    useSetActiveSentimentTag,
+    useSetActiveSentimentTag
 } from "./index.ts";
 
 export const useActiveSentimentSync = (slug: string | null) => {
@@ -28,7 +28,7 @@ export const useActiveSentimentSync = (slug: string | null) => {
         activeSentiment.slug,
         setActiveSentimentFilter,
         setActiveSentimentTag,
-        slug,
+        slug
     ]);
 };
 

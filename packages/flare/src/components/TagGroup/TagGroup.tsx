@@ -11,7 +11,7 @@ export type TagGroupProps = {
 const gapClass = {
     xs: styles["group--gap-xs"],
     sm: styles["group--gap-sm"],
-    md: styles["group--gap-md"],
+    md: styles["group--gap-md"]
 };
 
 const TagGroup = ({ children, wrap = true, gap = "sm", className }: TagGroupProps) => {
@@ -19,7 +19,7 @@ const TagGroup = ({ children, wrap = true, gap = "sm", className }: TagGroupProp
         styles.group,
         wrap ? styles["group--wrap"] : undefined,
         gapClass[gap],
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");

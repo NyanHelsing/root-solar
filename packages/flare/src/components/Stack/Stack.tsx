@@ -3,7 +3,7 @@ import {
     type CSSProperties,
     type ComponentPropsWithoutRef,
     type ElementType,
-    type ReactNode,
+    type ReactNode
 } from "react";
 import styles from "./Stack.module.scss";
 
@@ -12,7 +12,7 @@ const gapMap = {
     xs: "0.5rem",
     sm: "var(--flare-gap-sm, 0.75rem)",
     md: "var(--flare-gap-md, 1.25rem)",
-    lg: "var(--flare-gap-lg, 2rem)",
+    lg: "var(--flare-gap-lg, 2rem)"
 } as const;
 
 export type StackGap = keyof typeof gapMap | string;
@@ -58,7 +58,7 @@ const Stack = <T extends ElementType = "div">({
     const resolvedGap = gapMap[gap as keyof typeof gapMap] ?? gap;
     const styleOverrides: Record<string, string> = {
         "--flare-stack-direction": direction,
-        "--flare-stack-gap": resolvedGap,
+        "--flare-stack-gap": resolvedGap
     };
 
     if (align) {
@@ -75,7 +75,7 @@ const Stack = <T extends ElementType = "div">({
 
     const mergedStyle = {
         ...styleOverrides,
-        ...(style as CSSProperties | undefined),
+        ...(style as CSSProperties | undefined)
     } as CSSProperties;
 
     const classes = [styles.stack, fullWidth ? styles["stack--full"] : undefined, className]
@@ -89,9 +89,9 @@ const Stack = <T extends ElementType = "div">({
         {
             className: classes,
             style: mergedStyle,
-            ...rest,
+            ...rest
         },
-        children,
+        children
     );
 };
 

@@ -27,14 +27,14 @@ const AuthRoute = (): ReactElement => {
         }
         return {
             name: storedSession.being.name ?? storedSession.being.id,
-            profileHref: "/auth",
+            profileHref: "/auth"
         };
     }, [storedSession]);
 
     const startRegistration = (input: Parameters<typeof client.startBeingRegistration.mutate>[0]) =>
         client.startBeingRegistration.mutate(input);
     const completeRegistration = (
-        input: Parameters<typeof client.completeBeingRegistration.mutate>[0],
+        input: Parameters<typeof client.completeBeingRegistration.mutate>[0]
     ) => client.completeBeingRegistration.mutate(input);
 
     return (

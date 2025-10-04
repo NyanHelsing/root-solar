@@ -15,7 +15,7 @@ const MissiveListRoute = ({ defaultSentiment = null }: MissiveListRouteProps) =>
 
     const { value: sentiment, setValue: setSentiment } = useQueryParamSlug({
         key: "sentiment",
-        defaultValue: defaultSentiment,
+        defaultValue: defaultSentiment
     });
 
     const basePath = useMemo(() => {
@@ -29,9 +29,9 @@ const MissiveListRoute = ({ defaultSentiment = null }: MissiveListRouteProps) =>
             navigate(
                 {
                     pathname: "/axioms",
-                    search: next ? `?sentiment=${next}` : undefined,
+                    search: next ? `?sentiment=${next}` : undefined
                 },
-                { replace: true },
+                { replace: true }
             );
             return;
         }
@@ -40,9 +40,9 @@ const MissiveListRoute = ({ defaultSentiment = null }: MissiveListRouteProps) =>
             navigate(
                 {
                     pathname: "/missives",
-                    search: next ? `?sentiment=${next}` : undefined,
+                    search: next ? `?sentiment=${next}` : undefined
                 },
-                { replace: true },
+                { replace: true }
             );
         }
     };

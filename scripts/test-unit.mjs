@@ -26,15 +26,15 @@ const nodeArgs = [
     "--test-coverage-exclude=**/*.unit.test.ts",
     "--test-coverage-exclude=**/*.integration.test.ts",
     "--test-coverage-exclude=**/__tests__/**",
-    ...testPatterns,
+    ...testPatterns
 ];
 
 const child = spawn(process.execPath, nodeArgs, {
     stdio: "inherit",
     env: {
         ...process.env,
-        NODE_V8_COVERAGE: coverageDir,
-    },
+        NODE_V8_COVERAGE: coverageDir
+    }
 });
 
 child.once("close", (code) => {

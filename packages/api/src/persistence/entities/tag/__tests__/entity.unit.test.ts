@@ -6,14 +6,14 @@ import type { Context } from "../../../../context.ts";
 
 const createTestContext = (overrides?: Partial<Context>) => {
     const ctx = {
-        ...(overrides ?? {}),
+        ...(overrides ?? {})
     } as Context;
     if (!ctx.db) {
         ctx.db = {
             select: async () => [],
             upsert: async () => [],
             query: async () => [null],
-            merge: async () => [],
+            merge: async () => []
         } as unknown as Context["db"];
     }
     if (!ctx.tags) {
@@ -32,22 +32,22 @@ describe("tag entity", () => {
                     {
                         id: new RecordId("tag", "b"),
                         slug: "beta",
-                        label: "Beta",
+                        label: "Beta"
                     },
                     {
                         id: "tag:alpha",
                         slug: "alpha",
-                        label: "Alpha",
-                    },
-                ],
-            } as Context["db"],
+                        label: "Alpha"
+                    }
+                ]
+            } as Context["db"]
         });
         const { createTagModel } = await import("../entity.ts");
         const model = createTagModel(ctx);
         const tags = await model.list();
         assert.deepEqual(
             tags.map((tag) => tag.slug),
-            ["alpha", "beta"],
+            ["alpha", "beta"]
         );
     });
 
@@ -61,10 +61,10 @@ describe("tag entity", () => {
                         id: new RecordId("tag", "test"),
                         slug: "test",
                         label: "Test",
-                        tags: [new RecordId("tag", "meta")],
+                        tags: [new RecordId("tag", "meta")]
                     };
-                },
-            } as Context["db"],
+                }
+            } as Context["db"]
         });
 
         const { createTagModel } = await import("../entity.ts");
@@ -78,8 +78,8 @@ describe("tag entity", () => {
 
         const missingCtx = createTestContext({
             db: {
-                select: async () => null,
-            } as Context["db"],
+                select: async () => null
+            } as Context["db"]
         });
         const missingModel = createTagModel(missingCtx);
         const missing = await missingModel.get("missing");
@@ -97,10 +97,10 @@ describe("tag entity", () => {
                         slug: "sample",
                         label: "Sample",
                         description: "desc",
-                        tags: ["tag:meta"],
+                        tags: ["tag:meta"]
                     };
-                },
-            } as Context["db"],
+                }
+            } as Context["db"]
         });
         const { createTagModel } = await import("../entity.ts");
         const model = createTagModel(ctx);
@@ -108,7 +108,7 @@ describe("tag entity", () => {
             slug: "sample",
             label: "Sample",
             description: "desc",
-            tags: ["tag:meta"],
+            tags: ["tag:meta"]
         });
         assert.ok(stored);
         assert.equal(stored?.id, "tag:sample");
@@ -116,8 +116,8 @@ describe("tag entity", () => {
 
         const emptyCtx = createTestContext({
             db: {
-                upsert: async () => [],
-            } as Context["db"],
+                upsert: async () => []
+            } as Context["db"]
         });
         const emptyModel = createTagModel(emptyCtx);
         const empty = await emptyModel.upsert({ slug: "empty", label: "Empty" });
@@ -126,7 +126,7 @@ describe("tag entity", () => {
 
     it("ensures tags by reusing existing definitions", async () => {
         const stored = new Map<string, { slug: string; label: string; tags?: string[] }>([
-            ["existing", { slug: "existing", label: "Existing", tags: ["tag:meta"] }],
+            ["existing", { slug: "existing", label: "Existing", tags: ["tag:meta"] }]
         ]);
         const ctx = createTestContext({
             db: {
@@ -138,7 +138,7 @@ describe("tag entity", () => {
                     }
                     return {
                         id: recordId,
-                        ...record,
+                        ...record
                     };
                 },
                 upsert: async (_recordId: RecordId, payload: unknown) => {
@@ -152,18 +152,18 @@ describe("tag entity", () => {
                         id: _recordId,
                         slug,
                         label,
-                        tags,
+                        tags
                     };
                 },
-                query: async () => [null],
-            } as Context["db"],
+                query: async () => [null]
+            } as Context["db"]
         });
         const { createTagModel } = await import("../entity.ts");
         const model = createTagModel(ctx);
 
         const definitions = [
             { slug: "existing", label: "Existing", tags: ["tag:meta"] },
-            { slug: "new", label: "New", tags: ["tag:meta"] },
+            { slug: "new", label: "New", tags: ["tag:meta"] }
         ];
 
         const ensured = await model.ensureMany(definitions);
@@ -181,9 +181,9 @@ describe("tag entity", () => {
                 {
                     id: new RecordId("tag", "one"),
                     slug: "one",
-                    label: "One",
-                },
-            ],
+                    label: "One"
+                }
+            ]
         ]);
 
         const ctx = createTestContext({
@@ -195,8 +195,8 @@ describe("tag entity", () => {
                 },
                 query: async () => [null],
                 upsert: async () => [],
-                merge: async () => [],
-            } as Context["db"],
+                merge: async () => []
+            } as Context["db"]
         });
 
         const { createTagModel } = await import("../entity.ts");
@@ -204,7 +204,7 @@ describe("tag entity", () => {
         const many = await model.getMany(["one", "missing"]);
         assert.deepEqual(
             many.map((tag) => tag.id),
-            ["tag:one"],
+            ["tag:one"]
         );
 
         const none = await model.getMany([]);
@@ -227,9 +227,9 @@ describe("tag entity", () => {
                     id: new RecordId("tag", "child"),
                     slug: "child",
                     label: "Child",
-                    tags: [],
-                },
-            ],
+                    tags: []
+                }
+            ]
         ]);
 
         const ctx = (() => {
@@ -243,7 +243,7 @@ describe("tag entity", () => {
                         return {
                             ...record,
                             id: record.id,
-                            tags: record.tags,
+                            tags: record.tags
                         };
                     },
                     upsert: async (identifier: RecordId, payload: unknown) => {
@@ -256,26 +256,26 @@ describe("tag entity", () => {
                             id: identifier,
                             slug,
                             label,
-                            tags,
+                            tags
                         };
                         storedRecords.set(identifier.toString(), record);
                         return record;
                     },
                     merge: async (
                         identifier: RecordId | StringRecordId,
-                        payload: { tags: string[] },
+                        payload: { tags: string[] }
                     ) => {
                         const existing = storedRecords.get(identifier.toString());
                         if (existing) {
                             storedRecords.set(identifier.toString(), {
                                 ...existing,
-                                tags: payload.tags,
+                                tags: payload.tags
                             });
                         }
                         return [];
                     },
-                    query: async () => [null],
-                } as unknown as Context["db"],
+                    query: async () => [null]
+                } as unknown as Context["db"]
             });
             return baseCtx;
         })();
@@ -287,7 +287,7 @@ describe("tag entity", () => {
         assert.ok(updated);
         assert.equal(
             updated?.tags?.some((tag) => extractSlug(tag) === "parent-tag"),
-            true,
+            true
         );
 
         const storedChild = storedRecords.get("tag:child");
@@ -296,12 +296,12 @@ describe("tag entity", () => {
 
         const noDuplicate = await model.addParent({
             tagId: "child",
-            parentTagSlug: "tag:parent-tag",
+            parentTagSlug: "tag:parent-tag"
         });
         assert.ok(noDuplicate);
         assert.equal(
             noDuplicate?.tags?.filter((slug) => extractSlug(slug) === "parent-tag").length,
-            1,
+            1
         );
     });
 });

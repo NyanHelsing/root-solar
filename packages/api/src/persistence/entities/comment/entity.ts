@@ -5,7 +5,7 @@ import { createAppLogger } from "@root-solar/observability";
 import type { Context } from "../../../context.ts";
 
 const commentLogger = createAppLogger("persistence:comment", {
-    tags: ["persistence", "comment"],
+    tags: ["persistence", "comment"]
 });
 
 const TABLE = "comment" as const;
@@ -48,7 +48,7 @@ const toCommentRecord = (record: RawCommentRecord): CommentRecord => ({
     authorBeingId: record.authorBeingId,
     authorDisplayName: record.authorDisplayName,
     body: record.body,
-    createdAt: record.createdAt,
+    createdAt: record.createdAt
 });
 
 const unwrapSingle = <T>(value: T | T[] | null): T | null => {
@@ -109,12 +109,12 @@ const ensureCommentTable = async (ctx: Context) => {
         return;
     }
     commentLogger.debug("Ensuring comment table exists", {
-        tags: ["setup"],
+        tags: ["setup"]
     });
     await ctx.db.query("DEFINE TABLE IF NOT EXISTS comment SCHEMALESS");
     commentTablePrepared = true;
     commentLogger.debug("Comment table ready", {
-        tags: ["setup"],
+        tags: ["setup"]
     });
 };
 
@@ -124,7 +124,7 @@ export const createCommentModel = (ctx: Context) => {
             await ensureCommentTable(ctx);
             commentLogger.debug("Listing comments for axiom", {
                 axiomId,
-                tags: ["query"],
+                tags: ["query"]
             });
             const records = await ctx.db.select<RawCommentRecord>(TABLE);
             const collection = Array.isArray(records) ? records : records ? [records] : [];
@@ -135,7 +135,7 @@ export const createCommentModel = (ctx: Context) => {
             commentLogger.debug("Comments listed", {
                 axiomId,
                 count: normalized.length,
-                tags: ["query"],
+                tags: ["query"]
             });
             return tree;
         },
@@ -144,7 +144,7 @@ export const createCommentModel = (ctx: Context) => {
             parentCommentId,
             authorBeingId,
             authorDisplayName,
-            body,
+            body
         }: {
             axiomId: string;
             parentCommentId?: string;
@@ -173,21 +173,21 @@ export const createCommentModel = (ctx: Context) => {
                 authorBeingId,
                 authorDisplayName,
                 body,
-                createdAt,
+                createdAt
             } satisfies CommentRecord;
 
             commentLogger.debug("Creating comment", {
                 id,
                 axiomId,
                 parentCommentId,
-                tags: ["mutation", "create"],
+                tags: ["mutation", "create"]
             });
 
             await ensureCommentTable(ctx);
             const record = await ctx.db.create<RawCommentRecord>(commentRef, {
                 ...payload,
                 axiomId: normalizedAxiomId,
-                parentCommentId: payload.parentCommentId ? payload.parentCommentId : null,
+                parentCommentId: payload.parentCommentId ? payload.parentCommentId : null
             } satisfies Omit<RawCommentRecord, "replies">);
             const stored = unwrapSingle(record);
             const normalized = stored ? toCommentRecord(stored) : payload;
@@ -196,14 +196,14 @@ export const createCommentModel = (ctx: Context) => {
                 id,
                 axiomId,
                 parentCommentId,
-                tags: ["mutation", "create"],
+                tags: ["mutation", "create"]
             });
 
             return {
                 ...normalized,
-                replies: [],
+                replies: []
             } satisfies CommentTreeNode;
-        },
+        }
     } satisfies {
         listForAxiom: (axiomId: string) => Promise<CommentTreeNode[]>;
         create: (input: {

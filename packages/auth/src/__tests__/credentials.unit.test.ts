@@ -18,7 +18,7 @@ describe("auth/credentials", () => {
         if (originalFileReader) {
             Object.defineProperty(globalThis, "FileReader", {
                 configurable: true,
-                value: originalFileReader,
+                value: originalFileReader
             });
         } else {
             Reflect.deleteProperty(globalThis, "FileReader");
@@ -26,7 +26,7 @@ describe("auth/credentials", () => {
         if (originalFile) {
             Object.defineProperty(globalThis, "File", {
                 configurable: true,
-                value: originalFile,
+                value: originalFile
             });
         } else {
             Reflect.deleteProperty(globalThis, "File");
@@ -42,15 +42,15 @@ describe("auth/credentials", () => {
             { id: "being-1", name: "Being One" },
             {
                 signing: { publicKey: "sign-public", privateKey: "sign-private" },
-                encryption: { publicKey: "enc-public", privateKey: "enc-private" },
-            },
+                encryption: { publicKey: "enc-public", privateKey: "enc-private" }
+            }
         );
 
         assert.deepEqual(bundle, {
             beingId: "being-1",
             beingName: "Being One",
             signing: { publicKey: "sign-public", privateKey: "sign-private" },
-            encryption: { publicKey: "enc-public", privateKey: "enc-private" },
+            encryption: { publicKey: "enc-public", privateKey: "enc-private" }
         });
 
         const credentialFile = await credentials.createBeingCredentialFile(bundle, "secret");
@@ -61,7 +61,7 @@ describe("auth/credentials", () => {
         assert.equal(credentialFile.encryption.encryptedKeyPair.algorithm, "AES-GCM");
         assert.equal(
             credentialFile.signing.encryptedKeyPair.iterations,
-            credentialFile.encryption.encryptedKeyPair.iterations,
+            credentialFile.encryption.encryptedKeyPair.iterations
         );
 
         const serialized = credentials.serializeBeingCredentialFile(credentialFile, 0);
@@ -82,13 +82,13 @@ describe("auth/credentials", () => {
             beingId: credentialFile.being.id,
             beingName: credentialFile.being.name,
             signing: bundle.signing,
-            encryption: bundle.encryption,
+            encryption: bundle.encryption
         });
 
         const keyMaterial = credentials.credentialBundleToKeyMaterial(bundle);
         assert.deepEqual(keyMaterial, {
             signing: bundle.signing,
-            encryption: bundle.encryption,
+            encryption: bundle.encryption
         });
 
         const dataUrl = credentials.credentialFileToDataUrl(credentialFile);
@@ -122,11 +122,11 @@ describe("auth/credentials", () => {
 
         Object.defineProperty(globalThis, "FileReader", {
             configurable: true,
-            value: FakeFileReader,
+            value: FakeFileReader
         });
         Object.defineProperty(globalThis, "File", {
             configurable: true,
-            value: FakeFile,
+            value: FakeFile
         });
 
         const credentials = await import(moduleSpecifier);
@@ -177,12 +177,12 @@ describe("auth/credentials", () => {
 
         Object.defineProperty(globalThis, "File", {
             configurable: true,
-            value: FakeFile,
+            value: FakeFile
         });
 
         Object.defineProperty(globalThis, "FileReader", {
             configurable: true,
-            value: RejectingFileReader,
+            value: RejectingFileReader
         });
 
         const credentials = await import(moduleSpecifier);
@@ -190,12 +190,12 @@ describe("auth/credentials", () => {
 
         Object.defineProperty(globalThis, "FileReader", {
             configurable: true,
-            value: NonStringResultReader,
+            value: NonStringResultReader
         });
 
         await assert.rejects(
             credentials.readFileAsText(new FakeFile("binary.json")),
-            /Unexpected file reader result type/,
+            /Unexpected file reader result type/
         );
     });
 });

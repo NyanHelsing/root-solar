@@ -26,7 +26,7 @@ describe("commentary/utils", () => {
                         authorDisplayName: "Being Two",
                         body: "First reply",
                         createdAt: new Date("2024-01-01T01:00:00Z").toISOString(),
-                        replies: [],
+                        replies: []
                     },
                     {
                         id: "child-2",
@@ -45,12 +45,12 @@ describe("commentary/utils", () => {
                                 authorDisplayName: "Being Four",
                                 body: "Nested reply",
                                 createdAt: new Date("2024-01-01T02:30:00Z").toISOString(),
-                                replies: [],
-                            },
-                        ],
-                    },
-                ],
-            },
+                                replies: []
+                            }
+                        ]
+                    }
+                ]
+            }
         ];
 
         assert.equal(countComments(comments), 4);
@@ -60,7 +60,7 @@ describe("commentary/utils", () => {
         const iso = "2024-07-15T12:34:56.000Z";
         const expected = new Date(iso).toLocaleString(undefined, {
             dateStyle: "medium",
-            timeStyle: "short",
+            timeStyle: "short"
         });
 
         assert.equal(formatTimestamp(iso), expected);

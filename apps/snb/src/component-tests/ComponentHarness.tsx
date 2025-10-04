@@ -5,14 +5,14 @@ import { MemoryRouter } from "react-router";
 import {
     RootSolarFooter as Footer,
     RootSolarHeader as Header,
-    ShellHero as Hero,
+    ShellHero as Hero
 } from "@root-solar/layout";
 import NetworkStatusIndicator from "../features/network/NetworkStatusIndicator.tsx";
 import {
     MissiveDetail,
     MissiveList,
     MissiveListRoute,
-    AxiomaticMissiveListRoute,
+    AxiomaticMissiveListRoute
 } from "@root-solar/missives";
 import { TagList } from "@root-solar/tagging";
 import SearchAndBrowseRoute from "../SearchAndBrowseRoute.tsx";
@@ -108,7 +108,7 @@ const registry: Record<string, ComponentType<Record<string, unknown>>> = {
     header: Header,
     hero: Hero,
     main: SearchAndBrowseRoute,
-    "network-status-indicator": NetworkStatusIndicator,
+    "network-status-indicator": NetworkStatusIndicator
 };
 
 const normalizeKey = (value: string): string =>
@@ -140,7 +140,7 @@ const parseProps = (search: string): Record<string, unknown> | undefined => {
 };
 
 const ComponentHarness = ({
-    componentName,
+    componentName
 }: {
     componentName?: string;
 }): ReactElement => {

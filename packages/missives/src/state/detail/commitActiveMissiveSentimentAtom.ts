@@ -12,11 +12,11 @@ export const commitActiveMissiveSentimentAtom = atom(
         set,
         {
             tagId,
-            weight,
+            weight
         }: {
             tagId: string;
             weight: number;
-        },
+        }
     ) => {
         const missiveId = get(activeMissiveIdAtom);
         if (!missiveId) {
@@ -25,9 +25,9 @@ export const commitActiveMissiveSentimentAtom = atom(
         return set(updateMissiveSentimentAtom, {
             missiveId,
             tagId,
-            weight,
+            weight
         });
-    },
+    }
 );
 
 export default commitActiveMissiveSentimentAtom;
@@ -36,6 +36,6 @@ export const useCommitActiveMissiveSentiment = () => {
     const setCommit = useSetAtom(commitActiveMissiveSentimentAtom);
     return useCallback(
         (tagId: string, weight: number) => setCommit({ tagId, weight }),
-        [setCommit],
+        [setCommit]
     );
 };

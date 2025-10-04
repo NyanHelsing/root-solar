@@ -9,12 +9,12 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
     { variant = "default", className, ...props },
-    ref,
+    ref
 ) {
     const classes = [
         styles["icon-button"],
         variant !== "default" ? styles[`icon-button--${variant}`] : undefined,
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");

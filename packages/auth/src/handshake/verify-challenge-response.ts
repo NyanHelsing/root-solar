@@ -6,20 +6,20 @@ import type { ChallengeResponse, IdpChallengeRecord } from "./types.ts";
 
 export const verifyChallengeResponse = async (
     response: ChallengeResponse,
-    record: IdpChallengeRecord,
+    record: IdpChallengeRecord
 ): Promise<boolean> => {
     if (response.challengeId !== record.challengeId) {
         return false;
     }
 
     const message = await openpgp.createMessage({
-        text: buildChallengeMessageText(record.challengeId, record.nonce),
+        text: buildChallengeMessageText(record.challengeId, record.nonce)
     });
 
     let signature: openpgp.Signature;
     try {
         signature = await openpgp.readSignature({
-            armoredSignature: response.signature,
+            armoredSignature: response.signature
         });
     } catch {
         return false;
@@ -31,7 +31,7 @@ export const verifyChallengeResponse = async (
         verificationResult = await openpgp.verify({
             message,
             signature,
-            verificationKeys: verificationKey,
+            verificationKeys: verificationKey
         });
     } catch {
         return false;

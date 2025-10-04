@@ -6,7 +6,7 @@ import { createAppLogger } from "@root-solar/observability";
 import { seedMissives, seedTags } from "../data/index.ts";
 
 const dbLogger = createAppLogger("persistence:db", {
-    tags: ["persistence", "database"],
+    tags: ["persistence", "database"]
 });
 
 const DEFAULT_DB_URL = "surrealkv://root-solar";
@@ -29,7 +29,7 @@ const normaliseTagId = (slugOrId: string) =>
 const ensureTagSeeds = async (db: Surreal) => {
     dbLogger.debug("Ensuring seed tags", {
         count: seedTags.length,
-        tags: ["seed"],
+        tags: ["seed"]
     });
     await Promise.all(
         seedTags.map(async ({ slug, label, description, tags }) => {
@@ -38,12 +38,12 @@ const ensureTagSeeds = async (db: Surreal) => {
                 slug,
                 label,
                 description,
-                tags,
+                tags
             });
-        }),
+        })
     );
     dbLogger.debug("Seed tags ensured", {
-        tags: ["seed"],
+        tags: ["seed"]
     });
 };
 
@@ -92,7 +92,7 @@ const ensureMissiveTags = async (db: Surreal) => {
             if (nextTags.includes(axiomaticTagId)) {
                 const ordered = [
                     axiomaticTagId,
-                    ...nextTags.filter((value) => value !== axiomaticTagId),
+                    ...nextTags.filter((value) => value !== axiomaticTagId)
                 ];
                 nextTags.splice(0, nextTags.length, ...ordered);
             }
@@ -100,9 +100,9 @@ const ensureMissiveTags = async (db: Surreal) => {
             await db.query("UPDATE type::thing($table, $id) MERGE { tags: $tags }", {
                 table: MISSIVE_TABLE,
                 id: normalizedId,
-                tags: nextTags,
+                tags: nextTags
             });
-        }),
+        })
     );
 };
 
@@ -110,7 +110,7 @@ const ensureSeeds = async (db: Surreal) => {
     await ensureTagSeeds(db);
 
     dbLogger.debug("Ensuring seed missives", {
-        tags: ["seed"],
+        tags: ["seed"]
     });
 
     const migrateLegacyAxioms = async () => {
@@ -124,7 +124,7 @@ const ensureSeeds = async (db: Surreal) => {
         }
         dbLogger.info("Migrating legacy axioms into missive table", {
             count: legacyAxioms.length,
-            tags: ["seed", "migration"],
+            tags: ["seed", "migration"]
         });
         await Promise.all(
             legacyAxioms.map(async ({ id, kind, ...record }) => {
@@ -140,9 +140,9 @@ const ensureSeeds = async (db: Surreal) => {
                 }
                 await db.upsert(new StringRecordId(missiveId), {
                     ...record,
-                    tags: Array.from(tagIds),
+                    tags: Array.from(tagIds)
                 });
-            }),
+            })
         );
         return true;
     };
@@ -158,7 +158,7 @@ const ensureSeeds = async (db: Surreal) => {
     if (!existing || existing.length === 0) {
         dbLogger.info("Seeding missives", {
             count: seedMissives.length,
-            tags: ["seed"],
+            tags: ["seed"]
         });
         await Promise.all(
             seedMissives.map(async ({ id, tagSlugs, ...missive }) => {
@@ -169,17 +169,17 @@ const ensureSeeds = async (db: Surreal) => {
                 const tags = Array.from(tagSet);
                 await db.upsert(new StringRecordId(id), {
                     ...missive,
-                    tags,
+                    tags
                 });
-            }),
+            })
         );
         dbLogger.info("Seed missives inserted", {
-            tags: ["seed"],
+            tags: ["seed"]
         });
     } else {
         dbLogger.debug("Seed missives already present", {
             existingCount: existing.length,
-            tags: ["seed"],
+            tags: ["seed"]
         });
         await ensureMissiveTags(db);
     }
@@ -192,22 +192,22 @@ export const getDb = async () => {
                 url: DB_URL,
                 namespace: NAMESPACE,
                 database: DATABASE,
-                tags: ["startup"],
+                tags: ["startup"]
             });
             const db = new Surreal({
-                engines: surrealdbNodeEngines(),
+                engines: surrealdbNodeEngines()
             });
             await db.connect(DB_URL);
             dbLogger.debug("Connected to SurrealDB", {
-                tags: ["startup"],
+                tags: ["startup"]
             });
             await db.use({ namespace: NAMESPACE, database: DATABASE });
             dbLogger.debug("Selected namespace and database", {
-                tags: ["startup"],
+                tags: ["startup"]
             });
             await ensureSeeds(db);
             dbLogger.info("SurrealDB ready", {
-                tags: ["startup"],
+                tags: ["startup"]
             });
             return db;
         })();

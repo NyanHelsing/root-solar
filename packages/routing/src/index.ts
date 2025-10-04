@@ -3,13 +3,13 @@ export {
     routeParamsAtom,
     setRouteParamsAtom,
     useRouteParams,
-    useSetRouteParams,
+    useSetRouteParams
 } from "./routeParamsAtom.ts";
 
 export {
     routePathAtom,
     useRoutePath,
-    useSetRoutePath,
+    useSetRoutePath
 } from "./routePathAtom.ts";
 
 export type { RouteQueryParams } from "./routeQueryParamsAtom.ts";
@@ -19,7 +19,7 @@ export {
     setRouteQueryParamAtom,
     useRouteQueryParams,
     useSetRouteQueryParams,
-    useSetRouteQueryParam,
+    useSetRouteQueryParam
 } from "./routeQueryParamsAtom.ts";
 
 export { useRouteStateSync } from "./useRouteStateSync.ts";

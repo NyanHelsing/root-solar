@@ -8,7 +8,7 @@ import type { Context } from "../../../context.ts";
 const TAG_TABLE = "tag" as const;
 
 const tagLogger = createAppLogger("persistence:tag", {
-    tags: ["persistence", "tag"],
+    tags: ["persistence", "tag"]
 });
 
 export type TagRecord = {
@@ -33,7 +33,7 @@ const toTagRecordId = (value: string) =>
 const toTagRecord = (record: RawTagRecord): TagRecord => ({
     ...record,
     id: typeof record.id === "string" ? record.id : record.id.toString(),
-    tags: record.tags?.map((tag) => (typeof tag === "string" ? tag : tag.toString())),
+    tags: record.tags?.map((tag) => (typeof tag === "string" ? tag : tag.toString()))
 });
 
 const unwrapSingle = <T>(value: T | T[] | null): T | null => {
@@ -57,7 +57,7 @@ const selectMany = async (ctx: Context, ids: string[]) => {
             const record = await ctx.db.select<RawTagRecord>(new StringRecordId(identifier));
             const stored = unwrapSingle(record);
             return stored ? toTagRecord(stored) : null;
-        }),
+        })
     );
 
     return selections.filter((value): value is TagRecord => Boolean(value));
@@ -88,14 +88,14 @@ export const createTagModel = (ctx: Context) => {
     return {
         async list() {
             tagLogger.debug("Listing tags", {
-                tags: ["query"],
+                tags: ["query"]
             });
             const records = await ctx.db.select<RawTagRecord>(TAG_TABLE);
             const mapped = (records ?? []).map(toTagRecord);
             mapped.sort((a, b) => a.label.localeCompare(b.label));
             tagLogger.debug("Tags listed", {
                 count: mapped.length,
-                tags: ["query"],
+                tags: ["query"]
             });
             return mapped;
         },
@@ -103,7 +103,7 @@ export const createTagModel = (ctx: Context) => {
             const id = normaliseId(slugOrId);
             tagLogger.debug("Fetching tag", {
                 id,
-                tags: ["query"],
+                tags: ["query"]
             });
             const recordIdentifier = id.includes(":")
                 ? new StringRecordId(id)
@@ -113,14 +113,14 @@ export const createTagModel = (ctx: Context) => {
             if (!stored) {
                 tagLogger.debug("Tag not found", {
                     id,
-                    tags: ["query"],
+                    tags: ["query"]
                 });
                 return null;
             }
             const mapped = toTagRecord(stored);
             tagLogger.debug("Tag fetched", {
                 id: mapped.id,
-                tags: ["query"],
+                tags: ["query"]
             });
             return mapped;
         },
@@ -128,7 +128,7 @@ export const createTagModel = (ctx: Context) => {
             slug,
             label,
             description,
-            tags,
+            tags
         }: {
             slug: string;
             label: string;
@@ -139,7 +139,7 @@ export const createTagModel = (ctx: Context) => {
             tagLogger.debug("Upserting tag", {
                 id,
                 label,
-                tags: ["mutation", "upsert"],
+                tags: ["mutation", "upsert"]
             });
             const recordId = new RecordId(TAG_TABLE, slug);
             const record = await ctx.db.upsert<RawTagRecord>(recordId, {
@@ -147,13 +147,13 @@ export const createTagModel = (ctx: Context) => {
                 slug,
                 label,
                 description,
-                tags,
+                tags
             });
             const stored = unwrapSingle(record);
             if (!stored) {
                 tagLogger.warn("Tag upsert returned empty record", {
                     id,
-                    tags: ["mutation", "upsert"],
+                    tags: ["mutation", "upsert"]
                 });
                 return null;
             }
@@ -161,7 +161,7 @@ export const createTagModel = (ctx: Context) => {
             tagLogger.info("Tag upserted", {
                 id: mapped.id,
                 slug: mapped.slug,
-                tags: ["mutation", "upsert"],
+                tags: ["mutation", "upsert"]
             });
             return mapped;
         },
@@ -171,7 +171,7 @@ export const createTagModel = (ctx: Context) => {
                 label: string;
                 description?: string;
                 tags?: string[];
-            }>,
+            }>
         ) {
             const results = await Promise.all(
                 definitions.map(async (definition) => {
@@ -185,21 +185,21 @@ export const createTagModel = (ctx: Context) => {
                         if (!needsUpdate) {
                             tagLogger.debug("Ensured existing tag without changes", {
                                 slug: definition.slug,
-                                tags: ["mutation", "ensure"],
+                                tags: ["mutation", "ensure"]
                             });
                             return current;
                         }
                         tagLogger.debug("Updating tag while ensuring definition", {
                             slug: definition.slug,
-                            tags: ["mutation", "ensure"],
+                            tags: ["mutation", "ensure"]
                         });
                     }
                     tagLogger.debug("Creating tag while ensuring definition", {
                         slug: definition.slug,
-                        tags: ["mutation", "ensure"],
+                        tags: ["mutation", "ensure"]
                     });
                     return await this.upsert(definition);
-                }),
+                })
             );
             return results.filter((item): item is TagRecord => item !== null);
         },
@@ -208,7 +208,7 @@ export const createTagModel = (ctx: Context) => {
         },
         async addParent({
             tagId,
-            parentTagSlug,
+            parentTagSlug
         }: {
             tagId: string;
             parentTagSlug: string;
@@ -218,7 +218,7 @@ export const createTagModel = (ctx: Context) => {
                 tagLogger.debug("Skipped adding invalid parent tag slug", {
                     tagId,
                     providedSlug: parentTagSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return null;
             }
@@ -227,8 +227,8 @@ export const createTagModel = (ctx: Context) => {
                 {
                     slug: resolvedParentSlug,
                     label: labelFromSlug(resolvedParentSlug),
-                    tags: ["tag:sentimental"],
-                },
+                    tags: ["tag:sentimental"]
+                }
             ]);
 
             const parentTag = parentDefinitions[0];
@@ -236,7 +236,7 @@ export const createTagModel = (ctx: Context) => {
                 tagLogger.warn("Unable to ensure parent tag", {
                     tagId,
                     slug: resolvedParentSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return null;
             }
@@ -247,21 +247,21 @@ export const createTagModel = (ctx: Context) => {
             if (!stored) {
                 tagLogger.debug("Tag not found when adding parent", {
                     tagId,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return null;
             }
 
             const existingParentIds = new Set(
                 (stored.tags ?? []).map((value) =>
-                    typeof value === "string" ? value : value.toString(),
-                ),
+                    typeof value === "string" ? value : value.toString()
+                )
             );
             if (existingParentIds.has(parentTag.id)) {
                 tagLogger.debug("Parent tag already linked", {
                     tagId,
                     parentTagId: parentTag.id,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return toTagRecord(stored);
             }
@@ -272,11 +272,11 @@ export const createTagModel = (ctx: Context) => {
             tagLogger.debug("Appending parent tag", {
                 tagId,
                 parentTagId: parentTag.id,
-                tags: ["mutation", "tag"],
+                tags: ["mutation", "tag"]
             });
 
             await ctx.db.merge(recordIdentifier, {
-                tags: nextParentIds,
+                tags: nextParentIds
             });
 
             const refreshed = await ctx.db.select<RawTagRecord>(recordIdentifier);
@@ -285,17 +285,17 @@ export const createTagModel = (ctx: Context) => {
                 reloaded ??
                 ({
                     ...stored,
-                    tags: nextParentIds,
+                    tags: nextParentIds
                 } satisfies RawTagRecord);
 
             const mapped = toTagRecord(updatedRecord);
             tagLogger.info("Parent tag appended", {
                 tagId: mapped.id,
                 parentTagId: parentTag.id,
-                tags: ["mutation", "tag"],
+                tags: ["mutation", "tag"]
             });
             return mapped;
-        },
+        }
     } satisfies {
         list: () => Promise<TagRecord[]>;
         get: (slugOrId: string) => Promise<TagRecord | null>;
@@ -311,7 +311,7 @@ export const createTagModel = (ctx: Context) => {
                 label: string;
                 description?: string;
                 tags?: string[];
-            }>,
+            }>
         ) => Promise<TagRecord[]>;
         getMany: (ids: string[]) => Promise<TagRecord[]>;
         addParent: (input: { tagId: string; parentTagSlug: string }) => Promise<TagRecord | null>;

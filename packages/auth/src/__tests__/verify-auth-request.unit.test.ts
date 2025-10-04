@@ -21,7 +21,7 @@ describe("verifyAuthRequest", () => {
         const expectedMessage = buildAuthMessage(
             BEING_KEY_MATERIAL.signing.publicKey,
             BEING_KEY_MATERIAL.encryption.publicKey,
-            intentBytes,
+            intentBytes
         );
 
         assert.equal(result.signingPublicKey, BEING_KEY_MATERIAL.signing.publicKey);
@@ -38,7 +38,7 @@ describe("verifyAuthRequest", () => {
         assert.equal(result.intent, undefined);
         const expectedMessage = buildAuthMessage(
             BEING_KEY_MATERIAL.signing.publicKey,
-            BEING_KEY_MATERIAL.encryption.publicKey,
+            BEING_KEY_MATERIAL.encryption.publicKey
         );
         assert.deepEqual(result.message, expectedMessage);
     });
@@ -51,9 +51,9 @@ describe("verifyAuthRequest", () => {
                 signingPublicKey: BEING_KEY_MATERIAL.encryption.publicKey,
                 encryptionPublicKey: request.payload.encryptionPublicKey,
                 signature: request.payload.signature,
-                intent: request.payload.intent,
+                intent: request.payload.intent
             }),
-            /Invalid authentication request signature/,
+            /Invalid authentication request signature/
         );
     });
 });

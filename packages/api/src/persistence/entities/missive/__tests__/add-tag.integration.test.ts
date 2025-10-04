@@ -22,7 +22,7 @@ test("appending a tag to a missive persists and hydrates", async () => {
     assert.equal(
         before.tags.some((tag) => tag.slug === uniqueSlug),
         false,
-        "tag should not exist before mutation",
+        "tag should not exist before mutation"
     );
 
     const updated = await ctx.missives.addTag({ missiveId, tagSlug: uniqueSlug });
@@ -30,7 +30,7 @@ test("appending a tag to a missive persists and hydrates", async () => {
     assert.equal(
         updated.tags.some((tag) => tag.slug === uniqueSlug),
         true,
-        "updated missive should contain the new tag",
+        "updated missive should contain the new tag"
     );
 
     const fetched = await ctx.missives.get(missiveId);
@@ -38,7 +38,7 @@ test("appending a tag to a missive persists and hydrates", async () => {
     assert.equal(
         fetched.tags.some((tag) => tag.slug === uniqueSlug),
         true,
-        "fetching the missive should include the new tag",
+        "fetching the missive should include the new tag"
     );
 
     const allMissives = await ctx.missives.list();
@@ -47,7 +47,7 @@ test("appending a tag to a missive persists and hydrates", async () => {
     assert.equal(
         fromList.tags.some((tag) => tag.slug === uniqueSlug),
         true,
-        "list query should include the new tag in hydrated records",
+        "list query should include the new tag in hydrated records"
     );
 
     const afterRemoval = await ctx.missives.removeTag({ missiveId, tagSlug: uniqueSlug });
@@ -55,7 +55,7 @@ test("appending a tag to a missive persists and hydrates", async () => {
     assert.equal(
         afterRemoval?.tags.some((tag) => tag.slug === uniqueSlug),
         false,
-        "updated missive should no longer contain the removed tag",
+        "updated missive should no longer contain the removed tag"
     );
 
     const fetchedAfterRemoval = await ctx.missives.get(missiveId);
@@ -63,6 +63,6 @@ test("appending a tag to a missive persists and hydrates", async () => {
     assert.equal(
         fetchedAfterRemoval.tags.some((tag) => tag.slug === uniqueSlug),
         false,
-        "fetching the missive should omit the removed tag",
+        "fetching the missive should omit the removed tag"
     );
 });

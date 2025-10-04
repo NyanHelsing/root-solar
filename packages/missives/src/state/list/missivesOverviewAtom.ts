@@ -20,12 +20,12 @@ export const missivesOverviewAtom = atom<MissiveOverview[]>((get) => {
     const missives = loadableMissives.data.map(toMissiveRecord);
     const activeSentiments = selectActiveSentiments(loadableSentiments, activeSentimentId);
     const sentimentBySubject = new Map(
-        activeSentiments.map((allocation) => [allocation.subjectId, allocation]),
+        activeSentiments.map((allocation) => [allocation.subjectId, allocation])
     );
 
     const totalWeightForTag = activeSentiments.reduce(
         (total, allocation) => total + allocation.weight,
-        0,
+        0
     );
 
     return missives.map((record) => {
@@ -39,7 +39,7 @@ export const missivesOverviewAtom = atom<MissiveOverview[]>((get) => {
             details: record.details,
             weight,
             ratio,
-            tags: record.tags.map(cloneTag),
+            tags: record.tags.map(cloneTag)
         } satisfies MissiveOverview;
     });
 });

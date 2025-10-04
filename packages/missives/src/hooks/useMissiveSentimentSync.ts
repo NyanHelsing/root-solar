@@ -5,7 +5,7 @@ import { normalizeFilterValue } from "../utils/listUtils.ts";
 import {
     useActiveSentimentTag,
     useSetActiveSentimentFilter,
-    useSetActiveSentimentTag,
+    useSetActiveSentimentTag
 } from "../state/sentiment/index.ts";
 
 // Route-level sentiment input still needs an effect to push into atoms; normalization now happens inside the atom setters.
@@ -30,7 +30,7 @@ export const useMissiveSentimentSync = (sentiment?: string | null) => {
         normalizedSentiment,
         activeSentimentTagId,
         sentimentFilterSlug,
-        isSentimentCapped: activeTagSlug === SENTIMENT_TAG_SLUG,
+        isSentimentCapped: activeTagSlug === SENTIMENT_TAG_SLUG
     } as const;
 };
 

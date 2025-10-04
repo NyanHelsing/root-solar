@@ -7,7 +7,7 @@ import { buildTagOptions, filterMissivesByTag } from "../utils/tagFilterUtils.ts
 
 const createMissive = (
     id: string,
-    tags: Array<{ slug: string; label?: string }>,
+    tags: Array<{ slug: string; label?: string }>
 ): MissiveOverview => ({
     id,
     title: `Missive ${id}`,
@@ -18,14 +18,14 @@ const createMissive = (
         id: `tag:${slug}`,
         slug,
         label: label ?? "",
-        tags: [],
-    })),
+        tags: []
+    }))
 });
 
 describe("missives/tagFilterUtils", () => {
     const missives = [
         createMissive("m-1", [{ slug: "Coordination", label: "Coordination" }]),
-        createMissive("m-2", [{ slug: "momentum", label: "" }]),
+        createMissive("m-2", [{ slug: "momentum", label: "" }])
     ];
 
     it("builds tag options with sentiment defaults and sorted labels", () => {
@@ -34,7 +34,7 @@ describe("missives/tagFilterUtils", () => {
         assert.deepEqual(options, [
             { slug: SENTIMENT_TAG_SLUG, label: "Axiomatic" },
             { slug: "coordination", label: "Coordination" },
-            { slug: "momentum", label: "Momentum" },
+            { slug: "momentum", label: "Momentum" }
         ]);
     });
 

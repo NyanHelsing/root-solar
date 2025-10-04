@@ -9,7 +9,7 @@ describe("commentary/buildMissiveCommentPayloadAtom", () => {
         const store = createStore();
         const payload = store.set(buildMissiveCommentPayloadAtom, {
             missiveId: "missive-123",
-            body: "  Hello world  ",
+            body: "  Hello world  "
         });
 
         assert.equal(payload.axiomId, "missive-123");
@@ -24,7 +24,7 @@ describe("commentary/buildMissiveCommentPayloadAtom", () => {
         assert.throws(() => {
             store.set(buildMissiveCommentPayloadAtom, {
                 missiveId: "missive-123",
-                body: "   ",
+                body: "   "
             });
         }, /Comment body cannot be empty/);
     });

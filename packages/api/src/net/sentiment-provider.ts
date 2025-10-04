@@ -12,7 +12,7 @@ const parseSentimentRecordId = (recordId: string) => {
         beingId,
         tagId,
         subjectTable,
-        subjectId: subjectParts.join(":"),
+        subjectId: subjectParts.join(":")
     };
 };
 
@@ -45,28 +45,28 @@ const normaliseFraction = (numerator: number, denominator: number): SentimentFra
     const divisor = gcd(safeNumerator, safeDenominator);
     return {
         numerator: safeNumerator / divisor,
-        denominator: safeDenominator / divisor,
+        denominator: safeDenominator / divisor
     } satisfies SentimentFraction;
 };
 
 const findSentimentAllocation = (
     allocations: SentimentAllocation[],
     subjectId: string,
-    subjectTable: string,
+    subjectTable: string
 ) =>
     allocations.find(
         (allocation) =>
-            allocation.subjectId === subjectId && allocation.subjectTable === subjectTable,
+            allocation.subjectId === subjectId && allocation.subjectTable === subjectTable
     );
 
 export const createModelBackedSentimentProvider = (
-    sentiments: Pick<SentimentModel, "listForBeing">,
+    sentiments: Pick<SentimentModel, "listForBeing">
 ): SentimentProvider => {
     return async (recordId) => {
         const { beingId, tagId, subjectTable, subjectId } = parseSentimentRecordId(recordId);
         const allocations = await sentiments.listForBeing(beingId, {
             tagId,
-            subjectTable,
+            subjectTable
         });
         const match = findSentimentAllocation(allocations, subjectId, subjectTable);
         if (!match) {

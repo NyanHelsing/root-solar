@@ -4,7 +4,7 @@ import { SENTIMENT_TAG_SLUG } from "../constants.ts";
 
 export const resolveBasePath = (
     basePath: string | undefined,
-    tagSlug: string | undefined,
+    tagSlug: string | undefined
 ): string => {
     if (basePath) {
         const normalized = basePath.startsWith("/") ? basePath : `/${basePath}`;

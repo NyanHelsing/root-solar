@@ -10,7 +10,7 @@ import { createSentimentNetwork, type SentimentNetwork } from "@root-solar/net";
 import { createAppLogger } from "@root-solar/observability";
 
 const networkLogger = createAppLogger("server:network", {
-    tags: ["server", "network"],
+    tags: ["server", "network"]
 });
 
 export interface NetworkResources {
@@ -20,37 +20,37 @@ export interface NetworkResources {
 
 export const createNetwork = async (context: Context): Promise<NetworkResources> => {
     networkLogger.debug("Creating libp2p instance", {
-        tags: ["startup"],
+        tags: ["startup"]
     });
     const libp2p = await createLibp2p({
         start: false,
         addresses: {
-            listen: ["/ip4/0.0.0.0/tcp/0"],
+            listen: ["/ip4/0.0.0.0/tcp/0"]
         },
         transports: [tcp()],
         streamMuxers: [yamux()],
         connectionEncrypters: [noise()],
         services: {
-            identify: identify(),
-        },
+            identify: identify()
+        }
     });
 
     networkLogger.debug("Initializing sentiment network", {
-        tags: ["startup", "sentiment"],
+        tags: ["startup", "sentiment"]
     });
     const sentimentNetwork = await createSentimentNetwork({
         libp2p,
-        getSentiment: createModelBackedSentimentProvider(context.sentiments),
+        getSentiment: createModelBackedSentimentProvider(context.sentiments)
     });
 
     networkLogger.debug("Starting libp2p instance", {
-        tags: ["startup"],
+        tags: ["startup"]
     });
     await libp2p.start();
     networkLogger.info("Network resources ready", {
         tags: ["startup"],
         peerId: libp2p.peerId.toString(),
-        protocols: [sentimentNetwork.protocol],
+        protocols: [sentimentNetwork.protocol]
     });
 
     return { libp2p, sentimentNetwork };
@@ -58,11 +58,11 @@ export const createNetwork = async (context: Context): Promise<NetworkResources>
 
 export const shutdownNetwork = async ({ sentimentNetwork, libp2p }: NetworkResources) => {
     networkLogger.debug("Shutting down network resources", {
-        tags: ["shutdown"],
+        tags: ["shutdown"]
     });
     await sentimentNetwork.close();
     await libp2p.stop();
     networkLogger.info("Network resources stopped", {
-        tags: ["shutdown"],
+        tags: ["shutdown"]
     });
 };

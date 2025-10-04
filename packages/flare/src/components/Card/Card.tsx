@@ -35,7 +35,7 @@ const Card = <T extends ElementType = "div">({
         tone !== "default" ? styles[`card--${tone}`] : undefined,
         padding !== "md" ? styles[`card--pad-${padding}`] : undefined,
         borderless ? styles["card--borderless"] : undefined,
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");

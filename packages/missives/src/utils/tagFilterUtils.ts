@@ -25,7 +25,7 @@ const ensureSlugLabel = (map: Map<string, string>, slug: string | null | undefin
 
 export const buildTagOptions = (
     missives: MissiveOverview[],
-    activeTag: string | null,
+    activeTag: string | null
 ): TagOption[] => {
     const map = new Map<string, string>();
 
@@ -51,7 +51,7 @@ export const buildTagOptions = (
 export const filterMissivesByTag = (
     missives: MissiveOverview[],
     activeTag: string | null,
-    sentimentFilterSlug: string | null,
+    sentimentFilterSlug: string | null
 ): MissiveOverview[] => {
     const canonicalActiveTag = canonicalizeSlug(activeTag);
     if (!canonicalActiveTag) {
@@ -66,6 +66,6 @@ export const filterMissivesByTag = (
         return missives;
     }
     return missives.filter((item) =>
-        item.tags.some((tag) => canonicalizeSlug(tag.slug) === canonicalActiveTag),
+        item.tags.some((tag) => canonicalizeSlug(tag.slug) === canonicalActiveTag)
     );
 };

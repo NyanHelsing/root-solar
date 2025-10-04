@@ -11,7 +11,7 @@ import {
     DEFAULT_AUTH_MOUNT,
     resolveAssetPrefix,
     resolveDistSubdir,
-    resolveMountPath,
+    resolveMountPath
 } from "../../config/mfePaths.ts";
 
 const workspaceSingleton = () => ({ singleton: true });
@@ -29,43 +29,43 @@ export default defineConfig({
         pluginModuleFederation({
             name: "auth",
             exposes: {
-                "./App": "./apps/auth/src/App.tsx",
+                "./App": "./apps/auth/src/App.tsx"
             },
             manifest: {
-                fileName: "mf-manifest.json",
+                fileName: "mf-manifest.json"
             },
             shared: {
                 react: {
-                    singleton: true,
+                    singleton: true
                 },
                 "react-dom": {
-                    singleton: true,
+                    singleton: true
                 },
                 "react/jsx-runtime": {
-                    singleton: true,
+                    singleton: true
                 },
                 "react/jsx-dev-runtime": {
-                    singleton: true,
+                    singleton: true
                 },
                 "react-router": {
-                    singleton: true,
+                    singleton: true
                 },
                 "@root-solar/api": workspaceSingleton(),
                 "@root-solar/auth": workspaceSingleton(),
                 "@root-solar/routing": workspaceSingleton(),
                 "@root-solar/layout": workspaceSingleton(),
-                "@root-solar/observability": workspaceSingleton(),
-            },
-        }),
+                "@root-solar/observability": workspaceSingleton()
+            }
+        })
     ],
     server: {
         port: 3102,
-        strictPort: true,
+        strictPort: true
     },
     source: {
         entry: {
-            index: "./apps/auth/src/index.ts",
-        },
+            index: "./apps/auth/src/index.ts"
+        }
     },
     output: {
         distPath: {
@@ -79,8 +79,8 @@ export default defineConfig({
             font: "font",
             media: "media",
             assets: "assets",
-            wasm: "wasm",
+            wasm: "wasm"
         },
-        assetPrefix: authAssetPrefix,
-    },
+        assetPrefix: authAssetPrefix
+    }
 });

@@ -30,8 +30,8 @@ export const addActiveMissiveTagAtom = atom(null, async (get, set, tagInput: str
     await set(addMissiveTagMutationAtom, [
         {
             missiveId,
-            tagSlug: slug,
-        },
+            tagSlug: slug
+        }
     ]);
     await set(loadMissiveDetailAtom, missiveId);
 });

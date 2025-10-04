@@ -1,9 +1,9 @@
 import {
-  createElement,
-  useMemo,
-  type ComponentType,
-  type PropsWithChildren,
-  type ReactElement,
+    createElement,
+    useMemo,
+    type ComponentType,
+    type PropsWithChildren,
+    type ReactElement
 } from "react";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 
@@ -35,7 +35,7 @@ const defaultRouterProvider: RouterProvider = ({ children }) =>
 
 const getResolvedShellConfig = (
     config: ShellConfigSlice,
-    defaults: ShellRuntimeConfig,
+    defaults: ShellRuntimeConfig
 ): ShellRuntimeConfig => {
     if (!config.shell) {
         return defaults;
@@ -43,7 +43,7 @@ const getResolvedShellConfig = (
 
     return {
         routeFallback: config.shell.routeFallback ?? defaults.routeFallback,
-        routerProvider: config.shell.routerProvider ?? defaults.routerProvider,
+        routerProvider: config.shell.routerProvider ?? defaults.routerProvider
     };
 };
 
@@ -57,7 +57,7 @@ export const ShellRouter = ({
     fallback,
     children,
     routeFallback,
-    routerProvider,
+    routerProvider
 }: ShellRouterProps): ReactElement => {
     const resolvedRouteFallback = routeFallback ?? defaultRouteFallback;
     const resolvedRouterProvider = routerProvider ?? defaultRouterProvider;
@@ -66,10 +66,10 @@ export const ShellRouter = ({
         () => ({
             shell: {
                 routeFallback: resolvedRouteFallback,
-                routerProvider: resolvedRouterProvider,
-            },
+                routerProvider: resolvedRouterProvider
+            }
         }),
-        [resolvedRouteFallback, resolvedRouterProvider],
+        [resolvedRouteFallback, resolvedRouterProvider]
     );
 
     useInitializeConfig<ShellConfigSlice>(initializationConfig, [initializationConfig]);
@@ -77,7 +77,7 @@ export const ShellRouter = ({
     const config = useConfig<ShellConfigSlice>();
     const shellConfig = getResolvedShellConfig(config, {
         routeFallback: resolvedRouteFallback,
-        routerProvider: resolvedRouterProvider,
+        routerProvider: resolvedRouterProvider
     });
 
     const Router = shellConfig.routerProvider;
@@ -92,9 +92,9 @@ export const ShellRouter = ({
             createElement(
                 Routes,
                 null,
-                createElement(Route, { element: createElement(RouteStateSyncBoundary) }, children),
-            ),
-        ),
+                createElement(Route, { element: createElement(RouteStateSyncBoundary) }, children)
+            )
+        )
     );
 };
 

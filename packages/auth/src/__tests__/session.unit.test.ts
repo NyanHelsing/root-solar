@@ -28,7 +28,7 @@ const createStorage = (): FakeLocalStorage => {
         getItem: (key) => map.get(key) ?? null,
         removeItem: (key) => {
             map.delete(key);
-        },
+        }
     } satisfies FakeLocalStorage;
 };
 
@@ -37,12 +37,12 @@ const defineBrowserEnvironment = (storage: FakeLocalStorage, crypto: CryptoLike)
         configurable: true,
         value: {
             localStorage: storage,
-            crypto,
-        },
+            crypto
+        }
     });
     Object.defineProperty(globalThis, "crypto", {
         configurable: true,
-        value: crypto,
+        value: crypto
     });
 };
 
@@ -71,7 +71,7 @@ describe("auth/session", () => {
             Uint8Array.from([0xea, 0x60]),
             Uint8Array.from([0x00, 0x2a]),
             Uint8Array.from({ length: 16 }, (_, index) => index),
-            Uint8Array.from({ length: 12 }, (_, index) => index + 16),
+            Uint8Array.from({ length: 12 }, (_, index) => index + 16)
         ];
 
         const cryptoMock: CryptoLike = {
@@ -109,8 +109,8 @@ describe("auth/session", () => {
                 sign: async () => new ArrayBuffer(0),
                 unwrapKey: async () => ({}),
                 verify: async () => true,
-                wrapKey: async () => new ArrayBuffer(0),
-            },
+                wrapKey: async () => new ArrayBuffer(0)
+            }
         } as Crypto;
 
         defineBrowserEnvironment(storage, cryptoMock);
@@ -120,12 +120,12 @@ describe("auth/session", () => {
             beingName: "Being 123",
             signing: {
                 privateKey: "sign-private",
-                publicKey: "sign-public",
+                publicKey: "sign-public"
             },
             encryption: {
                 privateKey: "enc-private",
-                publicKey: "enc-public",
-            },
+                publicKey: "enc-public"
+            }
         };
 
         importCounter += 1;
@@ -178,8 +178,8 @@ describe("auth/session", () => {
                 sign: async () => new ArrayBuffer(0),
                 unwrapKey: async () => ({}),
                 verify: async () => true,
-                wrapKey: async () => new ArrayBuffer(0),
-            },
+                wrapKey: async () => new ArrayBuffer(0)
+            }
         } as Crypto;
 
         defineBrowserEnvironment(storage, cryptoMock);
@@ -200,9 +200,9 @@ describe("auth/session", () => {
                     ...storage,
                     setItem: storage.setItem.bind(storage),
                     getItem: storage.getItem.bind(storage),
-                    removeItem: storage.removeItem.bind(storage),
-                },
-            },
+                    removeItem: storage.removeItem.bind(storage)
+                }
+            }
         });
 
         const cryptoMock: CryptoLike = {
@@ -235,8 +235,8 @@ describe("auth/session", () => {
                 sign: async () => new ArrayBuffer(0),
                 unwrapKey: async () => ({}),
                 verify: async () => true,
-                wrapKey: async () => new ArrayBuffer(0),
-            },
+                wrapKey: async () => new ArrayBuffer(0)
+            }
         } as Crypto;
 
         defineBrowserEnvironment(storage, cryptoMock);
@@ -248,7 +248,7 @@ describe("auth/session", () => {
             beingId: "being-42",
             beingName: "Being 42",
             signing: { publicKey: "sign-public", privateKey: "sign-private" },
-            encryption: { publicKey: "enc-public", privateKey: "enc-private" },
+            encryption: { publicKey: "enc-public", privateKey: "enc-private" }
         };
 
         const { pin, record } = await session.createBeingSession(bundle);
@@ -262,12 +262,12 @@ describe("auth/session", () => {
         const storage = {
             setItem() {
                 throw new Error("denied");
-            },
+            }
         };
 
         Object.defineProperty(globalThis, "window", {
             configurable: true,
-            value: { localStorage: storage },
+            value: { localStorage: storage }
         });
 
         importCounter += 1;
@@ -276,7 +276,7 @@ describe("auth/session", () => {
         const record: BeingCredentialBundle = {
             beingId: "being-1",
             signing: { publicKey: "sign-public", privateKey: "sign-private" },
-            encryption: { publicKey: "enc-public", privateKey: "enc-private" },
+            encryption: { publicKey: "enc-public", privateKey: "enc-private" }
         } as unknown as BeingCredentialBundle;
 
         await assert.rejects(async () => {
@@ -287,7 +287,7 @@ describe("auth/session", () => {
                     id: "being-1",
                     name: "Being",
                     signingPublicKey: "sign-public",
-                    encryptionPublicKey: "enc-public",
+                    encryptionPublicKey: "enc-public"
                 },
                 encryptedBundle: {
                     algorithm: "AES-GCM",
@@ -296,8 +296,8 @@ describe("auth/session", () => {
                     salt: "salt",
                     iterations: 1,
                     hash: "SHA-256",
-                    keyLength: 256,
-                },
+                    keyLength: 256
+                }
             });
         }, /Failed to persist session/);
     });

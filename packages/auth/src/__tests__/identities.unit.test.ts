@@ -13,10 +13,10 @@ describe("auth/identities", () => {
                     generateCalls.push(options);
                     return {
                         publicKey: `public-${options.curve}`,
-                        privateKey: `private-${options.curve}`,
+                        privateKey: `private-${options.curve}`
                     };
-                },
-            },
+                }
+            }
         });
 
         const identities = await import(`${moduleSpecifier}?case=${Date.now()}`);
@@ -30,45 +30,45 @@ describe("auth/identities", () => {
                 type: "ecc",
                 curve: "ed25519",
                 userIDs: [{ name: "root.solar-being-signing" }],
-                format: "armored",
+                format: "armored"
             },
             {
                 type: "ecc",
                 curve: "curve25519",
                 userIDs: [{ name: "root.solar-being-encryption" }],
-                format: "armored",
+                format: "armored"
             },
             {
                 type: "ecc",
                 curve: "ed25519",
                 userIDs: [{ name: "root.solar-being-signing" }],
-                format: "armored",
+                format: "armored"
             },
             {
                 type: "ecc",
                 curve: "curve25519",
                 userIDs: [{ name: "root.solar-being-encryption" }],
-                format: "armored",
-            },
+                format: "armored"
+            }
         ]);
 
         assert.deepEqual(signing, {
             publicKey: "public-ed25519",
-            privateKey: "private-ed25519",
+            privateKey: "private-ed25519"
         });
         assert.deepEqual(encryption, {
             publicKey: "public-curve25519",
-            privateKey: "private-curve25519",
+            privateKey: "private-curve25519"
         });
         assert.deepEqual(material, {
             signing: {
                 publicKey: "public-ed25519",
-                privateKey: "private-ed25519",
+                privateKey: "private-ed25519"
             },
             encryption: {
                 publicKey: "public-curve25519",
-                privateKey: "private-curve25519",
-            },
+                privateKey: "private-curve25519"
+            }
         });
 
         mock.restoreAll();

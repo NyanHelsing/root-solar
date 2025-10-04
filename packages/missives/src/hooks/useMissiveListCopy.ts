@@ -8,7 +8,7 @@ import type { TagOption } from "../utils/tagFilterUtils.ts";
 export const useMissiveListCopy = (
     activeTag: TagOption | undefined,
     sentimentFilterSlug: string | null,
-    normalizedSentiment: string | null,
+    normalizedSentiment: string | null
 ): MissiveListCopy => {
     const sentimentLabel = useMemo(() => {
         if (!normalizedSentiment) {
@@ -22,9 +22,9 @@ export const useMissiveListCopy = (
             createMissiveListCopy({
                 tag: activeTag,
                 sentimentSlug: sentimentFilterSlug ?? undefined,
-                sentimentLabel,
+                sentimentLabel
             }),
-        [activeTag, sentimentFilterSlug, sentimentLabel],
+        [activeTag, sentimentFilterSlug, sentimentLabel]
     );
 };
 

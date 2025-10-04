@@ -17,8 +17,8 @@ const createTestContext = (options?: {
         db: {
             select,
             create,
-            query,
-        },
+            query
+        }
     } as unknown as Context;
 
     return { ctx, select, create, query };
@@ -38,7 +38,7 @@ describe("comment entity", () => {
                 authorDisplayName: "Being A",
                 body: "Root",
                 createdAt: "2024-01-01T00:00:00.000Z",
-                parentCommentId: null,
+                parentCommentId: null
             },
             {
                 id: "comment:child",
@@ -47,7 +47,7 @@ describe("comment entity", () => {
                 authorDisplayName: "Being B",
                 body: "Child",
                 createdAt: "2024-01-01T01:00:00.000Z",
-                parentCommentId: "comment:root",
+                parentCommentId: "comment:root"
             },
             {
                 id: "comment:other",
@@ -56,8 +56,8 @@ describe("comment entity", () => {
                 authorDisplayName: "Other",
                 body: "Should be filtered",
                 createdAt: "2024-01-02T00:00:00.000Z",
-                parentCommentId: null,
-            },
+                parentCommentId: null
+            }
         ];
         const { ctx, select, query } = createTestContext({ records });
         const { createCommentModel } = await import("../entity.ts");
@@ -83,7 +83,7 @@ describe("comment entity", () => {
             authorDisplayName: "Being X",
             body: "Child",
             createdAt: "2024-02-01T00:00:00.000Z",
-            parentCommentId: new RecordId("comment", "missing"),
+            parentCommentId: new RecordId("comment", "missing")
         };
         const { ctx, select } = createTestContext();
         select.mock.mockImplementation(async () => scalarRecord);
@@ -108,7 +108,7 @@ describe("comment entity", () => {
             parentCommentId: "comment:parent",
             authorBeingId: "being-1",
             authorDisplayName: "Author",
-            body: "Hello world",
+            body: "Hello world"
         });
 
         assert.equal(typeof result.id, "string");
@@ -123,7 +123,7 @@ describe("comment entity", () => {
         const [createCall] = create.mock.calls;
         const [createRef, createdPayload] = createCall.arguments as [
             unknown,
-            Record<string, unknown>,
+            Record<string, unknown>
         ];
         assert.equal(String(createRef).startsWith("comment:"), true);
         assert.equal(createdPayload.axiomId, "axiom:123");
@@ -138,7 +138,7 @@ describe("comment entity", () => {
             axiomId: "axiom:123",
             authorBeingId: "being-1",
             authorDisplayName: "Author",
-            body: "Root level",
+            body: "Root level"
         });
 
         assert.equal(result.parentCommentId, null);
@@ -155,7 +155,7 @@ describe("comment entity", () => {
             axiomId: "axiom-raw",
             authorBeingId: "being-raw",
             authorDisplayName: "Raw",
-            body: "Body",
+            body: "Body"
         });
         assert.ok(result.axiomId.startsWith("axiom:"));
         assert.equal(result.parentCommentId, null);

@@ -34,7 +34,7 @@ const PageSection = ({
 
     const mergedStyle = {
         ...styleOverrides,
-        ...(style as CSSProperties | undefined),
+        ...(style as CSSProperties | undefined)
     } as CSSProperties;
 
     const classes = [styles.section, className].filter(Boolean).join(" ");
@@ -44,9 +44,9 @@ const PageSection = ({
         {
             className: classes,
             style: mergedStyle,
-            ...rest,
+            ...rest
         },
-        children,
+        children
     );
 };
 

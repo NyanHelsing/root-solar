@@ -24,7 +24,7 @@ export const setActiveSentimentTagAtom = atom(null, (get, set, slug: string | nu
     set(activeSentimentAtom, {
         id: nextId,
         slug: nextSlug,
-        filter: current.filter,
+        filter: current.filter
     });
 });
 

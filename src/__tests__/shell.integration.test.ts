@@ -16,7 +16,7 @@ test.describe("root shell app", () => {
         const main = page.getByRole("main");
         await expect(main).toBeVisible();
         await expect(
-            main.getByRole("heading", { name: "Life shares a common root." }),
+            main.getByRole("heading", { name: "Life shares a common root." })
         ).toBeVisible();
     });
 

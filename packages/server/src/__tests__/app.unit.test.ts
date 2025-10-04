@@ -14,7 +14,7 @@ class MockSocket extends Duplex {
     override _write(
         chunk: Buffer,
         _encoding: BufferEncoding,
-        callback: (error?: Error | null) => void,
+        callback: (error?: Error | null) => void
     ) {
         this.chunks.push(Buffer.from(chunk));
         callback();
@@ -49,7 +49,7 @@ const performRequest = async (app: Application, method: string, path: string) =>
 
     return {
         status: response.statusCode,
-        body,
+        body
     } as const;
 };
 

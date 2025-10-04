@@ -40,7 +40,7 @@ const RootSolarHeader = ({
     tone = "surface",
     session,
     loginHref = "/auth",
-    actions,
+    actions
 }: RootSolarHeaderProps) => {
     const navContent =
         navLinks && navLinks.length > 0 ? (
@@ -58,7 +58,7 @@ const RootSolarHeader = ({
                                     color: active ? "rgba(59, 130, 246, 0.9)" : undefined,
                                     textDecorationColor: active
                                         ? "rgba(59, 130, 246, 0.9)"
-                                        : undefined,
+                                        : undefined
                                 }}
                             >
                                 {link.label}
@@ -79,7 +79,7 @@ const RootSolarHeader = ({
             style={{
                 gap: "0.5rem",
                 textDecoration: "none",
-                color: "var(--flare-text)",
+                color: "var(--flare-text)"
             }}
             aria-label={`Open profile for ${session.name}`}
         >
@@ -94,7 +94,7 @@ const RootSolarHeader = ({
                     alignItems: "center",
                     justifyContent: "center",
                     fontWeight: 600,
-                    color: "rgba(37, 99, 235, 1)",
+                    color: "rgba(37, 99, 235, 1)"
                 }}
             >
                 {sessionInitial}

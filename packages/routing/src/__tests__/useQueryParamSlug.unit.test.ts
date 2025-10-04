@@ -25,11 +25,11 @@ type QueryParamSlugProbeProps = {
 const QueryParamSlugProbe = ({
     slugKey,
     nextValue = null,
-    defaultValue,
+    defaultValue
 }: QueryParamSlugProbeProps) => {
     const { value, setValue } = useQueryParamSlug({
         key: slugKey,
-        defaultValue,
+        defaultValue
     });
     const location = useLocation();
 
@@ -45,16 +45,16 @@ const QueryParamSlugProbe = ({
                 "data-testid": "apply",
                 onClick: () => {
                     setValue(nextValue ?? null);
-                },
+                }
             },
-            "apply",
-        ),
+            "apply"
+        )
     );
 };
 
 const renderWithProviders = (
     ui: ReactNode,
-    { store = createStore(), initialEntries = ["/"], route = "/" }: RenderOptions = {},
+    { store = createStore(), initialEntries = ["/"], route = "/" }: RenderOptions = {}
 ) => {
     const Wrapper = ({ children }: { children: ReactNode }) =>
         createElement(
@@ -66,14 +66,14 @@ const renderWithProviders = (
                 createElement(
                     Routes,
                     null,
-                    createElement(Route, { path: route, element: children }),
-                ),
-            ),
+                    createElement(Route, { path: route, element: children })
+                )
+            )
         );
 
     return {
         store,
-        ...render(ui, { wrapper: Wrapper }),
+        ...render(ui, { wrapper: Wrapper })
     };
 };
 
@@ -89,7 +89,7 @@ describe("useQueryParamSlug", () => {
         renderWithProviders(createElement(QueryParamSlugProbe, { slugKey: "slug" }), {
             store,
             initialEntries: ["/tags?slug=Tag:Solar"],
-            route: "/tags",
+            route: "/tags"
         });
 
         assert.equal(screen.getByTestId("value").textContent, "solar");
@@ -103,13 +103,13 @@ describe("useQueryParamSlug", () => {
         renderWithProviders(
             createElement(QueryParamSlugProbe, {
                 slugKey: "slug",
-                defaultValue: "fallback",
+                defaultValue: "fallback"
             }),
             {
                 store,
                 initialEntries: ["/tags?slug=%20%20%20"],
-                route: "/tags",
-            },
+                route: "/tags"
+            }
         );
 
         assert.equal(screen.getByTestId("value").textContent, "fallback");
@@ -119,12 +119,12 @@ describe("useQueryParamSlug", () => {
         renderWithProviders(
             createElement(QueryParamSlugProbe, {
                 slugKey: "slug",
-                defaultValue: "fallback",
+                defaultValue: "fallback"
             }),
             {
                 initialEntries: ["/tags"],
-                route: "/tags",
-            },
+                route: "/tags"
+            }
         );
 
         assert.equal(screen.getByTestId("value").textContent, "fallback");
@@ -137,13 +137,13 @@ describe("useQueryParamSlug", () => {
         const { rerender } = renderWithProviders(
             createElement(QueryParamSlugProbe, {
                 slugKey: "slug",
-                nextValue: "SolarWind",
+                nextValue: "SolarWind"
             }),
             {
                 store,
                 initialEntries: ["/tags?slug=Tag:Solar"],
-                route: "/tags",
-            },
+                route: "/tags"
+            }
         );
 
         fireEvent.click(screen.getByTestId("apply"));
@@ -155,8 +155,8 @@ describe("useQueryParamSlug", () => {
         rerender(
             createElement(QueryParamSlugProbe, {
                 slugKey: "slug",
-                nextValue: "   ",
-            }),
+                nextValue: "   "
+            })
         );
         fireEvent.click(screen.getByTestId("apply"));
 
@@ -167,8 +167,8 @@ describe("useQueryParamSlug", () => {
         rerender(
             createElement(QueryParamSlugProbe, {
                 slugKey: "slug",
-                nextValue: null,
-            }),
+                nextValue: null
+            })
         );
         fireEvent.click(screen.getByTestId("apply"));
 

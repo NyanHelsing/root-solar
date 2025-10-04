@@ -8,7 +8,7 @@ describe("missives/listUtils", () => {
     it("provides specialized copy for the axiomatic sentiment view", () => {
         const copy = createMissiveListCopy({
             sentimentSlug: SENTIMENT_TAG_SLUG,
-            sentimentLabel: "Axiomatic",
+            sentimentLabel: "Axiomatic"
         });
 
         assert.equal(copy.title, "Axiomatic Alignment");
@@ -18,20 +18,20 @@ describe("missives/listUtils", () => {
 
     it("derives sentiment labels when none are supplied", () => {
         const copy = createMissiveListCopy({
-            sentimentSlug: "resonant-weight",
+            sentimentSlug: "resonant-weight"
         });
 
         assert.equal(copy.title, "Resonant Weight Sentiments");
         assert.equal(
             copy.description,
-            "Missives filtered by participants' resonant weight sentiment weights.",
+            "Missives filtered by participants' resonant weight sentiment weights."
         );
         assert.equal(copy.emptyLabel, "No missives have resonant weight weights yet.");
     });
 
     it("uses the active tag label when filtering by tag", () => {
         const copy = createMissiveListCopy({
-            tag: { slug: "coordination", label: "Coordination" },
+            tag: { slug: "coordination", label: "Coordination" }
         });
 
         assert.equal(copy.title, "Missives: Coordination");

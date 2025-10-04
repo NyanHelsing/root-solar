@@ -7,7 +7,7 @@ export type ShellRouteComponent = ComponentType;
 
 export const shellRouteConfig = {
     path: "/auth",
-    Component: AuthRoute as ShellRouteComponent,
+    Component: AuthRoute as ShellRouteComponent
 } as const;
 
 export const AuthApp = () => <AuthRoute />;

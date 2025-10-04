@@ -15,7 +15,7 @@ type DiscussionSectionProps = {
 export const DiscussionSection = ({
     labels,
     comments,
-    onSubmitComment,
+    onSubmitComment
 }: DiscussionSectionProps) => {
     const [isDiscussionVisible, setIsDiscussionVisible] = useState(true);
     const [isPosting, setIsPosting] = useState(false);
@@ -31,12 +31,12 @@ export const DiscussionSection = ({
                 setIsPosting(false);
             }
         },
-        [onSubmitComment],
+        [onSubmitComment]
     );
 
     const handleReply = useCallback(
         (parentId: string, body: string) => onSubmitComment(body, parentId),
-        [onSubmitComment],
+        [onSubmitComment]
     );
 
     return (

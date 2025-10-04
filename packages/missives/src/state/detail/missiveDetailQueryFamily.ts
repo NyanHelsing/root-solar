@@ -11,8 +11,8 @@ export const missiveDetailQueryFamily = atomFamily((missiveId: string) =>
             const { id: beingId } = get(beingAtom);
             return { axiomId: missiveId, beingId };
         },
-        { disabledOutput: null },
-    ),
+        { disabledOutput: null }
+    )
 );
 
 export default missiveDetailQueryFamily;

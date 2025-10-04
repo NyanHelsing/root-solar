@@ -11,12 +11,12 @@ const encryptedPayloadSchema = z.object({
     salt: z.string(),
     iterations: z.number().int().positive(),
     hash: z.string(),
-    keyLength: z.number().int().positive(),
+    keyLength: z.number().int().positive()
 });
 
 const keyPairSchema = z.object({
     publicKey: z.string(),
-    privateKey: z.string(),
+    privateKey: z.string()
 });
 
 const credentialSchema = z.object({
@@ -25,16 +25,16 @@ const credentialSchema = z.object({
     createdAt: z.string(),
     being: z.object({
         id: z.string(),
-        name: z.string().optional(),
+        name: z.string().optional()
     }),
     signing: z.object({
         publicKey: z.string(),
-        encryptedKeyPair: encryptedPayloadSchema,
+        encryptedKeyPair: encryptedPayloadSchema
     }),
     encryption: z.object({
         publicKey: z.string(),
-        encryptedKeyPair: encryptedPayloadSchema,
-    }),
+        encryptedKeyPair: encryptedPayloadSchema
+    })
 });
 
 export type BeingCredentialFile = z.infer<typeof credentialSchema>;
@@ -43,7 +43,7 @@ const credentialBundleSchema = z.object({
     beingId: z.string(),
     beingName: z.string().optional(),
     signing: keyPairSchema,
-    encryption: keyPairSchema,
+    encryption: keyPairSchema
 });
 
 const encodeKeyPair = (keyPair: KeyPair): Uint8Array => utf8ToBytes(JSON.stringify(keyPair));
@@ -61,7 +61,7 @@ const nowIsoString = (): string => new Date().toISOString();
 
 export const createBeingCredentialFile = async (
     bundle: BeingCredentialBundle,
-    password: string,
+    password: string
 ): Promise<BeingCredentialFile> => {
     const signingPayload = await encryptWithPassword(encodeKeyPair(bundle.signing), password);
     const encryptionPayload = await encryptWithPassword(encodeKeyPair(bundle.encryption), password);
@@ -72,27 +72,27 @@ export const createBeingCredentialFile = async (
         createdAt: nowIsoString(),
         being: {
             id: bundle.beingId,
-            name: bundle.beingName,
+            name: bundle.beingName
         },
         signing: {
             publicKey: bundle.signing.publicKey,
-            encryptedKeyPair: signingPayload,
+            encryptedKeyPair: signingPayload
         },
         encryption: {
             publicKey: bundle.encryption.publicKey,
-            encryptedKeyPair: encryptionPayload,
-        },
+            encryptedKeyPair: encryptionPayload
+        }
     } satisfies BeingCredentialFile;
 };
 
 export const createBeingCredentialBundle = (
     being: { id: string; name?: string },
-    keyMaterial: BeingKeyMaterial,
+    keyMaterial: BeingKeyMaterial
 ): BeingCredentialBundle => ({
     beingId: being.id,
     beingName: being.name,
     signing: keyMaterial.signing,
-    encryption: keyMaterial.encryption,
+    encryption: keyMaterial.encryption
 });
 
 export const parseBeingCredentialFile = (input: unknown): BeingCredentialFile =>
@@ -106,24 +106,24 @@ export const deserializeBeingCredentialFile = (serialized: string): BeingCredent
 
 export const decryptBeingCredentialFile = async (
     credentialFile: BeingCredentialFile,
-    password: string,
+    password: string
 ): Promise<BeingCredentialBundle> => ({
     beingId: credentialFile.being.id,
     beingName: credentialFile.being.name,
     signing: decodeKeyPair(await decryptToUtf8(credentialFile.signing.encryptedKeyPair, password)),
     encryption: decodeKeyPair(
-        await decryptToUtf8(credentialFile.encryption.encryptedKeyPair, password),
-    ),
+        await decryptToUtf8(credentialFile.encryption.encryptedKeyPair, password)
+    )
 });
 
 export const serializeBeingCredentialFile = (
     credentialFile: BeingCredentialFile,
-    spacing = 2,
+    spacing = 2
 ): string => JSON.stringify(credentialFile, null, spacing);
 
 export const credentialBundleToKeyMaterial = (bundle: BeingCredentialBundle): BeingKeyMaterial => ({
     signing: bundle.signing,
-    encryption: bundle.encryption,
+    encryption: bundle.encryption
 });
 
 export const credentialFileToDataUrl = (credentialFile: BeingCredentialFile): string => {

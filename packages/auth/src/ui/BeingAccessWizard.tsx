@@ -8,11 +8,11 @@ import type {
     BeingRegistrationCompleteOutput,
     BeingRegistrationProfile,
     BeingRegistrationStartInput,
-    BeingRegistrationStartOutput,
+    BeingRegistrationStartOutput
 } from "../procedures/being-registration.ts";
 import {
     beingRegistrationCompleteInputSchema,
-    beingRegistrationStartInputSchema,
+    beingRegistrationStartInputSchema
 } from "../procedures/being-registration.ts";
 import type { AuthRequest, IdpChallenge } from "../handshake/index.ts";
 import { createAuthRequest, createChallengeResponse } from "../handshake/index.ts";
@@ -20,7 +20,7 @@ import { generateBeingKeyMaterial, type BeingKeyMaterial } from "../identities.t
 import {
     createBeingCredentialBundle,
     createBeingCredentialFile,
-    serializeBeingCredentialFile,
+    serializeBeingCredentialFile
 } from "../credentials.ts";
 import BeingLogin from "./BeingLogin.tsx";
 import { beingSessionAtom } from "../session-atoms.ts";
@@ -28,10 +28,10 @@ import type { BeingSessionRecord } from "../session.ts";
 
 export type BeingRegistrationComponentProps<BeingRecord extends BeingRegistrationProfile> = {
     startRegistration: (
-        input: BeingRegistrationStartInput,
+        input: BeingRegistrationStartInput
     ) => Promise<BeingRegistrationStartOutput>;
     completeRegistration: (
-        input: BeingRegistrationCompleteInput,
+        input: BeingRegistrationCompleteInput
     ) => Promise<BeingRegistrationCompleteOutput<BeingRecord>>;
 };
 
@@ -57,7 +57,7 @@ const REGISTRATION_STEPS = [
     { key: "register", label: "Create being" },
     { key: "download", label: "Save credential" },
     { key: "verify", label: "Verify credential" },
-    { key: "session", label: "Session ready" },
+    { key: "session", label: "Session ready" }
 ] as const;
 
 type RegistrationStepKey = (typeof REGISTRATION_STEPS)[number]["key"];
@@ -72,7 +72,7 @@ const formatPassphraseHint = (beingName?: string | null) =>
 
 export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>({
     startRegistration,
-    completeRegistration,
+    completeRegistration
 }: BeingRegistrationComponentProps<BeingRecord>) => {
     const sessionRecord = useAtomValue(beingSessionAtom);
 
@@ -133,27 +133,27 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
                 setStatus("startingChallenge");
                 beingRegistrationStartInputSchema.parse({
                     name: trimmedName,
-                    request: authRequest,
+                    request: authRequest
                 });
                 const startResult = await startRegistration({
                     name: trimmedName,
-                    request: authRequest,
+                    request: authRequest
                 } satisfies BeingRegistrationStartInput);
 
                 setStatus("respondingToChallenge");
                 const response = await createChallengeResponse(startResult.challenge, keyMaterial);
                 beingRegistrationCompleteInputSchema.parse({
-                    response,
+                    response
                 });
                 const completion = await completeRegistration({
-                    response,
+                    response
                 } satisfies BeingRegistrationCompleteInput);
 
                 setSnapshot({
                     being: completion.being,
                     keyMaterial,
                     challenge: startResult.challenge,
-                    authRequest,
+                    authRequest
                 });
                 setStatus("completed");
                 setStage("download");
@@ -169,7 +169,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
                 setStatus("error");
             }
         },
-        [completeRegistration, name, startRegistration],
+        [completeRegistration, name, startRegistration]
     );
 
     const isBusy = useMemo(
@@ -178,7 +178,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
             status === "creatingRequest" ||
             status === "startingChallenge" ||
             status === "respondingToChallenge",
-        [status],
+        [status]
     );
 
     const credentialFileName = useMemo(
@@ -186,7 +186,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
             snapshot
                 ? `root-solar-being-${snapshot.being.id}.credential.json`
                 : "root-solar-being-credentials.json",
-        [snapshot],
+        [snapshot]
     );
 
     const handleCredentialDownload = useCallback(async () => {
@@ -214,14 +214,14 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
             const bundle = createBeingCredentialBundle(
                 {
                     id: snapshot.being.id,
-                    name: snapshot.being.name,
+                    name: snapshot.being.name
                 },
-                snapshot.keyMaterial,
+                snapshot.keyMaterial
             );
             const credentialFile = await createBeingCredentialFile(bundle, credentialPassword);
             const serialized = serializeBeingCredentialFile(credentialFile);
             const blob = new Blob([serialized], {
-                type: "application/json",
+                type: "application/json"
             });
             const url = URL.createObjectURL(blob);
             const anchor = document.createElement("a");
@@ -277,7 +277,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
             setSessionPin(pin);
             setStage("session");
         },
-        [],
+        []
     );
 
     const handleVerificationComplete = useCallback(
@@ -286,7 +286,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
             setStage("session");
             setSnapshot(null);
         },
-        [],
+        []
     );
 
     const handleNavigateToAxioms = useCallback(() => {
@@ -302,7 +302,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
         const displayName = sessionRecord.being.name?.trim() || sessionRecord.being.id;
         return {
             id: sessionRecord.being.id,
-            name: displayName,
+            name: displayName
         } as const;
     }, [sessionRecord]);
 
@@ -534,7 +534,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
                                     borderRadius: "0.75rem",
                                     padding: "1.5rem",
                                     background: "rgba(34, 197, 94, 0.12)",
-                                    border: "1px solid rgba(34, 197, 94, 0.32)",
+                                    border: "1px solid rgba(34, 197, 94, 0.32)"
                                 }}
                             >
                                 <span>This session PIN authorizes sensitive actions:</span>
@@ -543,7 +543,7 @@ export const BeingAccessWizard = <BeingRecord extends BeingRegistrationProfile>(
                                         fontSize: "2.5rem",
                                         fontWeight: 700,
                                         letterSpacing: "0.2rem",
-                                        textAlign: "center",
+                                        textAlign: "center"
                                     }}
                                     aria-label="Session PIN"
                                 >

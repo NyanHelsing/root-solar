@@ -11,7 +11,7 @@ import {
     DEFAULT_SNB_MOUNT,
     resolveAssetPrefix,
     resolveDistSubdir,
-    resolveMountPath,
+    resolveMountPath
 } from "../../config/mfePaths.ts";
 
 const workspaceSingleton = () => ({ singleton: true });
@@ -29,10 +29,10 @@ export default defineConfig({
         pluginModuleFederation({
             name: "snb",
             exposes: {
-                "./App": "./apps/snb/src/App.tsx",
+                "./App": "./apps/snb/src/App.tsx"
             },
             manifest: {
-                fileName: "mf-manifest.json",
+                fileName: "mf-manifest.json"
             },
             shared: {
                 react: { singleton: true },
@@ -49,18 +49,18 @@ export default defineConfig({
                 "@root-solar/routing": workspaceSingleton(),
                 "@root-solar/layout": workspaceSingleton(),
                 "@root-solar/observability": workspaceSingleton(),
-                "react-icons": { singleton: true },
-            },
-        }),
+                "react-icons": { singleton: true }
+            }
+        })
     ],
     server: {
         port: 3101,
-        strictPort: true,
+        strictPort: true
     },
     source: {
         entry: {
-            index: "./apps/snb/src/index.ts",
-        },
+            index: "./apps/snb/src/index.ts"
+        }
     },
     output: {
         distPath: {
@@ -74,8 +74,8 @@ export default defineConfig({
             font: "font",
             media: "media",
             assets: "assets",
-            wasm: "wasm",
+            wasm: "wasm"
         },
-        assetPrefix: snbAssetPrefix,
-    },
+        assetPrefix: snbAssetPrefix
+    }
 });

@@ -5,7 +5,7 @@ import type { Context } from "../../../context.ts";
 import { nanoid } from "nanoid";
 
 const beingLogger = createAppLogger("persistence:being", {
-    tags: ["persistence", "being"],
+    tags: ["persistence", "being"]
 });
 
 export type BeingRecord = {
@@ -38,13 +38,13 @@ export type BeingModel = ReturnType<typeof createBeingModel>;
 export const createBeingModel = (ctx: Context) => {
     const normalise = ({ id, ...rest }: StoredBeingRecord): BeingRecord => ({
         id: typeof id === "string" ? id : id.toString(),
-        ...rest,
+        ...rest
     });
 
     return {
         async list() {
             beingLogger.debug("Listing beings", {
-                tags: ["query"],
+                tags: ["query"]
             });
             const records = await ctx.db.select<StoredBeingRecord>(TABLE);
             const sorted = (records ?? [])
@@ -52,23 +52,23 @@ export const createBeingModel = (ctx: Context) => {
                 .sort((a, b) => a.name.localeCompare(b.name));
             beingLogger.debug("Beings listed", {
                 count: sorted.length,
-                tags: ["query"],
+                tags: ["query"]
             });
             return sorted;
         },
         async get(id: string) {
             beingLogger.debug("Fetching being", {
                 id,
-                tags: ["query"],
+                tags: ["query"]
             });
             const record = await ctx.db.select<StoredBeingRecord>(
-                new StringRecordId(`${TABLE}:${id}`),
+                new StringRecordId(`${TABLE}:${id}`)
             );
             const stored = unwrapSingle(record);
             if (!stored) {
                 beingLogger.debug("Being not found", {
                     id,
-                    tags: ["query"],
+                    tags: ["query"]
                 });
                 return null;
             }
@@ -79,16 +79,16 @@ export const createBeingModel = (ctx: Context) => {
             beingLogger.debug("Creating being", {
                 id,
                 name: input.name,
-                tags: ["mutation", "create"],
+                tags: ["mutation", "create"]
             });
             const being = await ctx.db.upsert<StoredBeingRecord>(new RecordId(TABLE, id), {
                 ...input,
-                id,
+                id
             } satisfies StoredBeingRecord);
             beingLogger.info("Being created", {
                 id,
                 name: being.name,
-                tags: ["mutation", "create"],
+                tags: ["mutation", "create"]
             });
             return normalise(being);
         },
@@ -96,22 +96,22 @@ export const createBeingModel = (ctx: Context) => {
             beingLogger.debug("Upserting being", {
                 id: input.id,
                 name: input.name,
-                tags: ["mutation", "upsert"],
+                tags: ["mutation", "upsert"]
             });
             const record = await ctx.db.upsert<StoredBeingRecord>(new RecordId(TABLE, input.id), {
                 ...input,
-                id: input.id,
+                id: input.id
             } satisfies StoredBeingRecord);
             const stored = unwrapSingle(record);
             if (!stored) {
                 beingLogger.warn("Being upsert returned empty", {
                     id: input.id,
-                    tags: ["mutation", "upsert"],
+                    tags: ["mutation", "upsert"]
                 });
                 return null;
             }
             return normalise(stored);
-        },
+        }
     } satisfies {
         list: () => Promise<BeingRecord[]>;
         get: (id: string) => Promise<BeingRecord | null>;

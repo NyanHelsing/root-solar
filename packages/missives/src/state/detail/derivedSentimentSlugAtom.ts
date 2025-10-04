@@ -15,14 +15,14 @@ const derivedSentimentSlugFamily = atomFamily((key: string) =>
             return SENTIMENT_TAG_SLUG;
         }
         return null;
-    }),
+    })
 );
 
 const toKey = (tagSlug?: string, sentiment?: string) => `${tagSlug ?? ""}|${sentiment ?? ""}`;
 
 export const useDerivedSentimentSlug = ({
     tagSlug,
-    sentiment,
+    sentiment
 }: {
     tagSlug?: string;
     sentiment?: string;

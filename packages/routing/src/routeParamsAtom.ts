@@ -41,7 +41,7 @@ export const routeParamsAtom = atom(
         }
         console.debug("[routing] setRouteParams", { current, next });
         set(baseRouteParamsAtom, next);
-    },
+    }
 );
 
 export const setRouteParamsAtom = atom(null, (_get, set, params: RouteParams) => {

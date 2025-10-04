@@ -25,9 +25,9 @@ export const buildMissiveSentimentPayloadAtom = atom<
             subjectTable: "missive",
             tagId,
             weight: resolvedWeight,
-            ...(maxWeight !== undefined ? { maxWeight } : {}),
+            ...(maxWeight !== undefined ? { maxWeight } : {})
         },
-        resolvedWeight,
+        resolvedWeight
     } satisfies SentimentMutationContext;
 });
 

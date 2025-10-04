@@ -22,7 +22,7 @@ const controlStyles: CSSProperties = {
     borderRadius: "0.75rem",
     border: "1px solid var(--rs-border-strong, #d0d4dd)",
     background: "var(--flare-surface, #fff)",
-    color: "inherit",
+    color: "inherit"
 };
 
 const MissiveListHeader = ({
@@ -33,7 +33,7 @@ const MissiveListHeader = ({
     tagOptions,
     onFilterChange,
     showViewAllLink,
-    onCreate,
+    onCreate
 }: MissiveListHeaderProps) => (
     <FlareStack as="header" gap="sm">
         <h1 className="rs-heading-xl">{copy.title}</h1>

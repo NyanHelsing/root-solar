@@ -13,13 +13,13 @@ import {
     type SentimentModel,
     createBeingRegistrationStore,
     createCommentModel,
-    type CommentModel,
+    type CommentModel
 } from "./persistence/entities/index.ts";
 import { getDb } from "./persistence/db.ts";
 import type { BeingRegistrationStore } from "@root-solar/auth/procedures";
 
 const apiContextLogger = createAppLogger("api:context", {
-    tags: ["api", "context"],
+    tags: ["api", "context"]
 });
 
 export type ContextFactories = {
@@ -37,7 +37,7 @@ const defaultFactories: ContextFactories = {
     createBeingModel,
     createSentimentModel,
     createCommentModel,
-    createBeingRegistrationStore,
+    createBeingRegistrationStore
 };
 
 export class Context {
@@ -52,7 +52,7 @@ export class Context {
 
     constructor({
         db,
-        factories = defaultFactories,
+        factories = defaultFactories
     }: {
         db: Awaited<ReturnType<typeof getDb>>;
         factories?: ContextFactories;
@@ -66,7 +66,7 @@ export class Context {
         this.comments = factories.createCommentModel(this);
         this.authRegistrations = factories.createBeingRegistrationStore(this);
         apiContextLogger.debug("API context constructed", {
-            tags: ["startup"],
+            tags: ["startup"]
         });
     }
 }
@@ -78,27 +78,27 @@ type CreateContextDependencies = {
 
 const defaultDependencies: CreateContextDependencies = {
     getDb,
-    factories: defaultFactories,
+    factories: defaultFactories
 };
 
 export const createContext = async (
     _opts: CreateExpressContextOptions,
-    dependencies: Partial<CreateContextDependencies> = {},
+    dependencies: Partial<CreateContextDependencies> = {}
 ) => {
     apiContextLogger.debug("Creating API context", {
-        tags: ["startup"],
+        tags: ["startup"]
     });
     const resolvedDependencies = {
         ...defaultDependencies,
         ...dependencies,
         factories: {
             ...defaultDependencies.factories,
-            ...(dependencies.factories ?? {}),
-        },
+            ...(dependencies.factories ?? {})
+        }
     } as CreateContextDependencies;
     const db = await resolvedDependencies.getDb();
     apiContextLogger.debug("Database handle ready for API context", {
-        tags: ["startup"],
+        tags: ["startup"]
     });
     return new Context({ db, factories: resolvedDependencies.factories });
 };

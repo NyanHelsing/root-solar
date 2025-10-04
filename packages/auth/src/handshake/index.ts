@@ -1,7 +1,7 @@
 export {
     AUTHENTICATION_CONTEXT,
     CHALLENGE_ID_LENGTH,
-    CHALLENGE_NONCE_LENGTH,
+    CHALLENGE_NONCE_LENGTH
 } from "./constants.ts";
 export type {
     AuthIntent,
@@ -12,7 +12,7 @@ export type {
     IdpChallengeRecord,
     ChallengeResponse,
     BeingKeyMaterial,
-    KeyPair,
+    KeyPair
 } from "./types.ts";
 export { normalizeIntent } from "./normalize-intent.ts";
 export { buildAuthMessage } from "./build-auth-message.ts";

@@ -14,12 +14,12 @@ import {
     DEFAULT_AUTH_DIST_SUBDIR,
     DEFAULT_AUTH_MOUNT,
     resolveDistSubdir,
-    resolveMountPath,
+    resolveMountPath
 } from "../../../../config/mfePaths.ts";
 import type { FrontendLifecycle } from "./types.ts";
 
 const prodFrontendLogger = createAppLogger("server:frontend:prod", {
-    tags: ["server", "frontend", "prod"],
+    tags: ["server", "frontend", "prod"]
 });
 
 const SSR_ENTRY_CANDIDATES = [
@@ -28,7 +28,7 @@ const SSR_ENTRY_CANDIDATES = [
     "server/index.mjs",
     "server/index.js",
     "entry-server.mjs",
-    "entry-server.js",
+    "entry-server.js"
 ] as const;
 
 const ROOT_DIR = process.env.ROOT_SOLAR_ROOT
@@ -54,7 +54,7 @@ const fileExists = async (filepath: string) => {
     } catch {
         prodFrontendLogger.debug("File missing", {
             filepath,
-            tags: ["fs"],
+            tags: ["fs"]
         });
         return false;
     }
@@ -84,7 +84,7 @@ const inferRenderer = async (): Promise<SsrRenderer | null> => {
             prodFrontendLogger.info("SSR renderer located", {
                 candidate,
                 exportName: "render",
-                tags: ["startup", "ssr"],
+                tags: ["startup", "ssr"]
             });
             return (options) => module.render(options);
         }
@@ -92,18 +92,18 @@ const inferRenderer = async (): Promise<SsrRenderer | null> => {
             prodFrontendLogger.info("SSR renderer located", {
                 candidate,
                 exportName: "default",
-                tags: ["startup", "ssr"],
+                tags: ["startup", "ssr"]
             });
             return (options) => module.default(options);
         }
         prodFrontendLogger.debug("SSR candidate missing callable export", {
             candidate,
-            tags: ["startup", "ssr"],
+            tags: ["startup", "ssr"]
         });
     }
 
     prodFrontendLogger.warn("No SSR renderer discovered", {
-        tags: ["startup", "ssr"],
+        tags: ["startup", "ssr"]
     });
     return null;
 };
@@ -123,7 +123,7 @@ const createRequestHandler = (template: string, renderer: SsrRenderer | null) =>
             prodFrontendLogger.debug("Handling SSR request", {
                 url: req.originalUrl,
                 hasRenderer: Boolean(renderer),
-                tags: ["request", "ssr"],
+                tags: ["request", "ssr"]
             });
             if (renderer) {
                 const result = await renderer({ request: req, url: req.originalUrl });
@@ -136,7 +136,7 @@ const createRequestHandler = (template: string, renderer: SsrRenderer | null) =>
                 prodFrontendLogger.debug("SSR response rendered", {
                     url: req.originalUrl,
                     status: result.status ?? 200,
-                    tags: ["request", "ssr"],
+                    tags: ["request", "ssr"]
                 });
                 return;
             }
@@ -145,12 +145,12 @@ const createRequestHandler = (template: string, renderer: SsrRenderer | null) =>
             res.status(200).send(template);
             prodFrontendLogger.debug("SSR fallback template served", {
                 url: req.originalUrl,
-                tags: ["request", "ssr"],
+                tags: ["request", "ssr"]
             });
         } catch (error) {
             prodFrontendLogger.error("SSR request handling failed", error, {
                 url: req.originalUrl,
-                tags: ["request", "ssr"],
+                tags: ["request", "ssr"]
             });
             next(error);
         }
@@ -162,7 +162,7 @@ const mountStaticIfPresent = async (app: Application, mountPath: string, directo
         prodFrontendLogger.debug("Static directory missing; skipping mount", {
             mountPath,
             directory,
-            tags: ["startup", "frontend"],
+            tags: ["startup", "frontend"]
         });
         return;
     }
@@ -170,7 +170,7 @@ const mountStaticIfPresent = async (app: Application, mountPath: string, directo
     prodFrontendLogger.debug("Attaching static middleware", {
         mountPath,
         directory,
-        tags: ["startup", "frontend"],
+        tags: ["startup", "frontend"]
     });
     app.use(mountPath, express.static(directory, { index: false }));
 };
@@ -183,7 +183,7 @@ const resolveTemplatePath = async (): Promise<string> => {
         return SHELL_TEMPLATE_FALLBACK;
     }
     throw new Error(
-        `Unable to locate an HTML template under dist/. Expected ${PRIMARY_TEMPLATE} or ${SHELL_TEMPLATE_FALLBACK}. Run "pnpm run build" before starting in production mode.`,
+        `Unable to locate an HTML template under dist/. Expected ${PRIMARY_TEMPLATE} or ${SHELL_TEMPLATE_FALLBACK}. Run "pnpm run build" before starting in production mode.`
     );
 };
 
@@ -195,12 +195,12 @@ export const setupProdFrontend = async (app: Application): Promise<FrontendLifec
     prodFrontendLogger.info("Configuring production frontend", {
         distDir: shellDist,
         templatePath,
-        tags: ["startup", "frontend"],
+        tags: ["startup", "frontend"]
     });
     const template = await readFile(templatePath, "utf-8");
     prodFrontendLogger.debug("Production template loaded", {
         length: template.length,
-        tags: ["startup", "frontend"],
+        tags: ["startup", "frontend"]
     });
     const renderer = await inferRenderer();
 
@@ -215,7 +215,7 @@ export const setupProdFrontend = async (app: Application): Promise<FrontendLifec
     const authMount = resolveMountPath(process.env.AUTH_REMOTE_PATH, DEFAULT_AUTH_MOUNT);
     const authDistSubdir = resolveDistSubdir(
         process.env.AUTH_DIST_SUBDIR,
-        DEFAULT_AUTH_DIST_SUBDIR,
+        DEFAULT_AUTH_DIST_SUBDIR
     );
     const authDist = path.join(DIST_ROOT, authDistSubdir);
     await mountStaticIfPresent(app, authMount, authDist);
@@ -226,8 +226,8 @@ export const setupProdFrontend = async (app: Application): Promise<FrontendLifec
         close: async () => {
             // no resources to clean up for the static renderer
             prodFrontendLogger.debug("Production frontend close invoked", {
-                tags: ["shutdown", "frontend"],
+                tags: ["shutdown", "frontend"]
             });
-        },
+        }
     } satisfies FrontendLifecycle;
 };

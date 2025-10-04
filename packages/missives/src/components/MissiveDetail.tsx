@@ -4,7 +4,7 @@ import {
     useState,
     type CSSProperties,
     type FormEvent,
-    type ReactElement,
+    type ReactElement
 } from "react";
 import { useLocation, useNavigate } from "react-router";
 
@@ -19,13 +19,13 @@ import {
     useAddActiveMissiveTag,
     useRemoveActiveMissiveTag,
     useAddActiveMissiveComment,
-    useResolvedMissiveLabels,
+    useResolvedMissiveLabels
 } from "../state/detail/index.ts";
 import {
     useCreateMissive,
     useLoadMissiveDetail,
     useLoadMissives,
-    useUpdateMissive,
+    useUpdateMissive
 } from "../hooks/useMissiveActions.ts";
 import DiscussionSection from "./missive-detail/DiscussionSection.tsx";
 
@@ -61,7 +61,7 @@ const textareaStyles: CSSProperties = {
     font: "inherit",
     color: "inherit",
     background: "var(--flare-surface, #fff)",
-    resize: "vertical",
+    resize: "vertical"
 };
 
 const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): ReactElement => {
@@ -96,7 +96,7 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
 
     const handleSubmitComment = useCallback(
         (body: string, parentCommentId?: string) => addComment(body, parentCommentId),
-        [addComment],
+        [addComment]
     );
 
     useEffect(() => {
@@ -122,7 +122,7 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
             }
             await removeTag(slug);
         },
-        [removeTag],
+        [removeTag]
     );
 
     const handleAddDraftTag = useCallback(
@@ -136,11 +136,11 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
                 {
                     id: `draft:${slug}`,
                     slug,
-                    label: labelFromSlug(slug),
-                },
+                    label: labelFromSlug(slug)
+                }
             ]);
         },
-        [draftTags],
+        [draftTags]
     );
 
     const handleRemoveDraftTag = useCallback((tag: TagSummary) => {
@@ -174,7 +174,7 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
                 const created = await createMissive({
                     title: trimmedTitle,
                     details: trimmedDetails.length > 0 ? trimmedDetails : undefined,
-                    tagSlugs: draftTags.map((tag) => tag.slug),
+                    tagSlugs: draftTags.map((tag) => tag.slug)
                 });
 
                 await loadMissives();
@@ -183,9 +183,9 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
                 navigate(
                     {
                         pathname: `${resolvedBasePath}/${created.id}`,
-                        search: location.search || undefined,
+                        search: location.search || undefined
                     },
-                    { replace: true },
+                    { replace: true }
                 );
 
                 setTitle("");
@@ -198,7 +198,7 @@ const MissiveDetail = ({ tagSlug, sentiment, basePath }: MissiveDetailProps): Re
                 await updateMissive({
                     missiveId: activeMissiveId,
                     title: trimmedTitle,
-                    details: trimmedDetails.length > 0 ? trimmedDetails : undefined,
+                    details: trimmedDetails.length > 0 ? trimmedDetails : undefined
                 });
 
                 await loadMissives();
