@@ -6,13 +6,13 @@ import RootSolarFooter, { type RootSolarFooterProps } from "./RootSolarFooter.ts
 import RootSolarHeader, {
     type RootSolarHeaderProps,
     type RootSolarNavLink,
-    type RootSolarSession,
+    type RootSolarSession
 } from "./RootSolarHeader.tsx";
 
 const DEFAULT_NAV_LINKS: RootSolarNavLink[] = [
     { href: "/missives", label: "Missives" },
     { href: "/axioms", label: "Axioms" },
-    { href: "/tags", label: "Tags" },
+    { href: "/tags", label: "Tags" }
 ];
 
 export interface ShellLayoutProps {
@@ -40,7 +40,7 @@ export const ShellLayout = ({
     mainMaxWidth = "72rem",
     mainPaddingBlock = "3rem",
     session,
-    loginHref,
+    loginHref
 }: ShellLayoutProps) => {
     return (
         <FlareStack
@@ -48,7 +48,7 @@ export const ShellLayout = ({
             fullWidth
             style={{
                 minHeight: "100vh",
-                background: "var(--flare-body-background)",
+                background: "var(--flare-body-background)"
             }}
         >
             <RootSolarHeader

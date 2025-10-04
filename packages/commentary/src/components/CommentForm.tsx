@@ -17,7 +17,7 @@ export const CommentForm = ({
     submitLabel = "Post comment",
     placeholder = "Share your perspective…",
     autoFocus = false,
-    busy = false,
+    busy = false
 }: CommentFormProps) => {
     const [draft, setDraft] = useState("");
     const [localError, setLocalError] = useState<string | null>(null);
@@ -79,7 +79,7 @@ export const CommentForm = ({
                         borderRadius: "0.75rem",
                         border: "1px solid var(--rs-border-strong, #d0d4dd)",
                         font: "inherit",
-                        resize: "vertical",
+                        resize: "vertical"
                     }}
                 />
                 {localError ? (

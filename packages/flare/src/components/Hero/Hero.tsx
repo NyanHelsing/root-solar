@@ -35,14 +35,14 @@ const Hero = ({
         tone !== "brand" ? styles[`hero--${tone}`] : undefined,
         alignment === "start" ? styles["hero--align-start"] : styles["hero--align-center"],
         !children ? styles["hero--no-gap"] : undefined,
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");
 
     const innerClasses = [
         styles.hero__inner,
-        alignment === "center" ? styles["hero__inner--center"] : styles["hero__inner--start"],
+        alignment === "center" ? styles["hero__inner--center"] : styles["hero__inner--start"]
     ]
         .filter(Boolean)
         .join(" ");
@@ -50,15 +50,15 @@ const Hero = ({
     const styleOverrides: CSSProperties = {
         ...(backgroundImage
             ? ({
-                  "--flare-hero-background-image": `url(${backgroundImage})`,
+                  "--flare-hero-background-image": `url(${backgroundImage})`
               } as CSSProperties)
             : {}),
         ...(overlay ? ({ "--flare-hero-overlay": overlay } as CSSProperties) : {}),
         ...(imageOpacity !== undefined
             ? ({
-                  "--flare-hero-image-opacity": imageOpacity.toString(),
+                  "--flare-hero-image-opacity": imageOpacity.toString()
               } as CSSProperties)
-            : {}),
+            : {})
     };
 
     const style = Object.keys(styleOverrides).length > 0 ? styleOverrides : undefined;

@@ -8,23 +8,23 @@ export { activeMissiveIdAtom, useActiveMissiveId } from "./activeMissiveIdAtom.t
 export { missiveDetailViewAtom, useMissiveDetailView } from "./missiveDetailViewAtom.ts";
 export {
     commitActiveMissiveSentimentAtom,
-    useCommitActiveMissiveSentiment,
+    useCommitActiveMissiveSentiment
 } from "./commitActiveMissiveSentimentAtom.ts";
 export {
     addActiveMissiveCommentAtom,
-    useAddActiveMissiveComment,
+    useAddActiveMissiveComment
 } from "./addActiveMissiveCommentAtom.ts";
 export {
     addActiveMissiveTagAtom,
-    useAddActiveMissiveTag,
+    useAddActiveMissiveTag
 } from "./addActiveMissiveTagAtom.ts";
 export {
     removeActiveMissiveTagAtom,
-    useRemoveActiveMissiveTag,
+    useRemoveActiveMissiveTag
 } from "./removeActiveMissiveTagAtom.ts";
 export {
     refreshActiveMissiveDetailAtom,
-    useRefreshActiveMissiveDetail,
+    useRefreshActiveMissiveDetail
 } from "./refreshActiveMissiveDetailAtom.ts";
 export { useDerivedSentimentSlug } from "./derivedSentimentSlugAtom.ts";
 export { useResolvedMissiveLabels } from "./resolvedMissiveLabelsAtom.ts";

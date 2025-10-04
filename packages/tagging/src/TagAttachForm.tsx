@@ -29,7 +29,7 @@ const TagAttachForm = ({
     disabled = false,
     disabledReason = null,
     className,
-    onSuccess,
+    onSuccess
 }: TagAttachFormProps): ReactElement => {
     const generatedId = useId();
     const fieldId = inputId ?? `${generatedId}-tag-input`;

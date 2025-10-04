@@ -13,7 +13,8 @@
         "formatter": {
             "semicolons": "always",
             "quoteStyle": "double",
-            "jsxQuoteStyle": "double"
+            "jsxQuoteStyle": "double",
+            "trailingCommas": "none"
         }
     },
     "organizeImports": {

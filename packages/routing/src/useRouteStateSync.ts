@@ -24,7 +24,7 @@ export const useRouteStateSync = (): void => {
         console.debug("[routing] useRouteStateSync", {
             pathname: location.pathname,
             params,
-            query: queryRecord,
+            query: queryRecord
         });
         setRouteParams(params);
         setRoutePath(location.pathname);
@@ -35,7 +35,7 @@ export const useRouteStateSync = (): void => {
         searchParams,
         setRouteParams,
         setRoutePath,
-        setRouteQueryParams,
+        setRouteQueryParams
     ]);
 };
 

@@ -8,7 +8,7 @@ const isReadableStream = (value: unknown): value is ReadableStream<string> =>
         value &&
             typeof value === "object" &&
             "getReader" in value &&
-            typeof (value as { getReader: () => unknown }).getReader === "function",
+            typeof (value as { getReader: () => unknown }).getReader === "function"
     );
 
 const isNodeReadable = (value: unknown): value is Readable =>
@@ -16,7 +16,7 @@ const isNodeReadable = (value: unknown): value is Readable =>
         value &&
             typeof value === "object" &&
             "pipe" in value &&
-            typeof (value as { pipe: unknown }).pipe === "function",
+            typeof (value as { pipe: unknown }).pipe === "function"
     );
 
 const readWebStream = async (stream: ReadableStream<string>): Promise<string> => {
@@ -46,7 +46,7 @@ const readNodeStream = (stream: Readable): Promise<string> =>
     });
 
 export const resolveArmoredString = async (
-    output: string | Uint8Array | openpgp.WebStream<string>,
+    output: string | Uint8Array | openpgp.WebStream<string>
 ): Promise<string> => {
     if (typeof output === "string") {
         return output;

@@ -23,7 +23,7 @@ const createSessionRecord = (overrides: SessionOverrides = {}): BeingSessionReco
             name: "Ada",
             signingPublicKey: "sign-public",
             encryptionPublicKey: "enc-public",
-            ...(beingOverrides ?? {}),
+            ...(beingOverrides ?? {})
         },
         encryptedBundle: {
             algorithm: "AES-GCM",
@@ -33,9 +33,9 @@ const createSessionRecord = (overrides: SessionOverrides = {}): BeingSessionReco
             iterations: 1000,
             hash: "SHA-256",
             keyLength: 256,
-            ...(bundleOverrides ?? {}),
+            ...(bundleOverrides ?? {})
         },
-        ...rest,
+        ...rest
     };
 };
 
@@ -44,13 +44,13 @@ describe("missives/buildMissiveSentimentPayloadAtom", () => {
         const store = createStore();
         store.set(beingSessionAtom, {
             type: "set",
-            record: createSessionRecord(),
+            record: createSessionRecord()
         });
 
         const context = store.set(buildMissiveSentimentPayloadAtom, {
             missiveId: "missive-1",
             tagId: `tag:${SENTIMENT_TAG_SLUG}`,
-            weight: 125.4,
+            weight: 125.4
         });
 
         assert.equal(context.resolvedWeight, MAX_SENTIMENT_WEIGHT);
@@ -67,13 +67,13 @@ describe("missives/buildMissiveSentimentPayloadAtom", () => {
         store.set(activeSentimentAtom, {
             id: "tag:coordination",
             slug: "coordination",
-            filter: null,
+            filter: null
         });
 
         const context = store.set(buildMissiveSentimentPayloadAtom, {
             missiveId: "missive-42",
             tagId: "tag:resonance",
-            weight: -12.7,
+            weight: -12.7
         });
 
         assert.equal(context.resolvedWeight, 0);

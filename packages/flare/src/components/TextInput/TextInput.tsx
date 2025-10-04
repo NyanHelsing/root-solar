@@ -8,7 +8,7 @@ export interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function TextInput(
     { invalid = false, size = "md", className, ...props },
-    ref,
+    ref
 ) {
     const sizeClass =
         size !== "md" ? styles[`input--${size}` as "input--compact" | "input--numeric"] : undefined;

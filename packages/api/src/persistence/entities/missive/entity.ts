@@ -7,7 +7,7 @@ import type { Context } from "../../../context.ts";
 import type { TagRecord } from "../index.ts";
 
 const missiveLogger = createAppLogger("persistence:missive", {
-    tags: ["persistence", "missive"],
+    tags: ["persistence", "missive"]
 });
 
 export type MissiveRecord = {
@@ -51,7 +51,7 @@ const MAX_CREATE_ATTEMPTS = 5;
 const normaliseRecord = (record: StoredMissiveRecord): StoredMissiveRecord => ({
     ...record,
     id: typeof record.id === "string" ? record.id : record.id.toString(),
-    tags: record.tags?.map((tag) => (typeof tag === "string" ? tag : tag.toString())),
+    tags: record.tags?.map((tag) => (typeof tag === "string" ? tag : tag.toString()))
 });
 
 const collectTagIds = (records: StoredMissiveRecord[]) => {
@@ -72,7 +72,7 @@ const collectTagIds = (records: StoredMissiveRecord[]) => {
 
 const toMissiveRecord = (
     record: StoredMissiveRecord,
-    tagLookup: Map<string, TagRecord>,
+    tagLookup: Map<string, TagRecord>
 ): MissiveRecord => {
     const tagIds = record.tags ?? [];
     const tags = tagIds
@@ -82,7 +82,7 @@ const toMissiveRecord = (
         id: typeof record.id === "string" ? record.id : record.id.toString(),
         title: record.title,
         details: record.details,
-        tags,
+        tags
     } satisfies MissiveRecord;
 };
 
@@ -91,24 +91,24 @@ const KNOWN_TAG_DEFINITIONS = new Map(
         {
             slug: "sentimental",
             label: "Sentimental",
-            tags: ["tag:sentimental"],
+            tags: ["tag:sentimental"]
         },
         {
             slug: "priority",
             label: "Priority",
-            tags: ["tag:sentimental"],
+            tags: ["tag:sentimental"]
         },
         {
             slug: "axiomatic",
             label: "Axiomatic",
-            tags: ["tag:sentimental"],
+            tags: ["tag:sentimental"]
         },
         {
             slug: "axiom",
             label: "Axiom",
-            tags: ["tag:sentimental"],
-        },
-    ].map((definition) => [definition.slug, definition] as const),
+            tags: ["tag:sentimental"]
+        }
+    ].map((definition) => [definition.slug, definition] as const)
 );
 
 const stripTagPrefix = (value: string) =>
@@ -142,7 +142,7 @@ const ensureTagsExist = async (ctx: Context, tagInputs?: string[]) => {
     if (resolvedSlugs.length === 0) {
         missiveLogger.debug("No valid tag slugs provided", {
             provided: tagInputs,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
         return [] as string[];
     }
@@ -158,8 +158,8 @@ const ensureTagsExist = async (ctx: Context, tagInputs?: string[]) => {
             known ?? {
                 slug,
                 label: labelFromSlug(slug),
-                tags: ["tag:sentimental"],
-            },
+                tags: ["tag:sentimental"]
+            }
         );
     }
 
@@ -172,7 +172,7 @@ const ensureTagsExist = async (ctx: Context, tagInputs?: string[]) => {
             if (!tagId) {
                 missiveLogger.warn("Unable to resolve ensured tag id", {
                     slug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
             }
             return tagId;
@@ -196,7 +196,7 @@ export const createMissiveModel = (ctx: Context) => {
     return {
         async list(options?: { sentimentSlug?: string }) {
             missiveLogger.debug("Listing missives", {
-                tags: ["query"],
+                tags: ["query"]
             });
             const records = await ctx.db.select<StoredMissiveRecord>(TABLE);
             const normalized = (records ?? []).map(normaliseRecord);
@@ -211,20 +211,20 @@ export const createMissiveModel = (ctx: Context) => {
                 const legacyAliases =
                     slug === "axiomatic" ? new Set(["axiomatic", "axiom"]) : new Set([slug]);
                 return hydrated.filter((record) =>
-                    record.tags.some((tag) => legacyAliases.has(tag.slug)),
+                    record.tags.some((tag) => legacyAliases.has(tag.slug))
                 );
             })();
             filtered.sort((a, b) => a.title.localeCompare(b.title));
             missiveLogger.debug("Missives listed", {
                 count: filtered.length,
-                tags: ["query"],
+                tags: ["query"]
             });
             return filtered;
         },
         async get(id: string) {
             missiveLogger.debug("Fetching missive", {
                 id,
-                tags: ["query"],
+                tags: ["query"]
             });
             const recordId = toMissiveRecordId(id);
             const record = await ctx.db.select<StoredMissiveRecord>(recordId);
@@ -232,7 +232,7 @@ export const createMissiveModel = (ctx: Context) => {
             if (!stored) {
                 missiveLogger.debug("Missive not found", {
                     id,
-                    tags: ["query"],
+                    tags: ["query"]
                 });
                 return null;
             }
@@ -241,7 +241,7 @@ export const createMissiveModel = (ctx: Context) => {
             if (result) {
                 missiveLogger.debug("Missive fetched", {
                     id: result.id,
-                    tags: ["query"],
+                    tags: ["query"]
                 });
             }
             return result;
@@ -260,14 +260,14 @@ export const createMissiveModel = (ctx: Context) => {
                     missiveLogger.debug("Creating missive", {
                         attempt,
                         title: input.title,
-                        tags: ["mutation", "create"],
+                        tags: ["mutation", "create"]
                     });
                     const recordId = new RecordId(TABLE, id);
                     const record = await ctx.db.create<StoredMissiveRecord>(recordId, {
                         id: recordId,
                         title: input.title,
                         details: input.details,
-                        tags: tagIds,
+                        tags: tagIds
                     });
                     const stored = unwrapSingle(record);
                     if (!stored) {
@@ -278,20 +278,20 @@ export const createMissiveModel = (ctx: Context) => {
                     missiveLogger.info("Missive created", {
                         id,
                         title: input.title,
-                        tags: ["mutation", "create"],
+                        tags: ["mutation", "create"]
                     });
                     return created;
                 } catch (error) {
                     if (isDuplicateRecordError(error)) {
                         missiveLogger.warn("Duplicate missive id detected; retrying", {
                             attempt,
-                            tags: ["mutation", "create"],
+                            tags: ["mutation", "create"]
                         });
                         continue;
                     }
                     missiveLogger.error("Failed to create missive", error, {
                         title: input.title,
-                        tags: ["mutation", "create"],
+                        tags: ["mutation", "create"]
                     });
                     throw error;
                 }
@@ -299,7 +299,7 @@ export const createMissiveModel = (ctx: Context) => {
 
             missiveLogger.error("Exhausted attempts to create missive", {
                 title: input.title,
-                tags: ["mutation", "create"],
+                tags: ["mutation", "create"]
             });
             throw new Error("Unable to allocate unique id for new missive");
         },
@@ -307,7 +307,7 @@ export const createMissiveModel = (ctx: Context) => {
             const { missiveId, title, details } = input;
             missiveLogger.debug("Updating missive", {
                 missiveId,
-                tags: ["mutation", "update"],
+                tags: ["mutation", "update"]
             });
 
             const recordId = toMissiveRecordId(missiveId);
@@ -316,13 +316,13 @@ export const createMissiveModel = (ctx: Context) => {
             if (!stored) {
                 missiveLogger.debug("Missive not found when updating", {
                     missiveId,
-                    tags: ["mutation", "update"],
+                    tags: ["mutation", "update"]
                 });
                 return null;
             }
 
             const updatePayload: Partial<StoredMissiveRecord> = {
-                title,
+                title
             };
             if (typeof details !== "undefined") {
                 updatePayload.details = details;
@@ -334,7 +334,7 @@ export const createMissiveModel = (ctx: Context) => {
             const reloaded = unwrapSingle(refreshedRecord) ?? {
                 ...stored,
                 title,
-                details,
+                details
             };
 
             const hydrated = await hydrateRecords([normaliseRecord(reloaded)]);
@@ -342,7 +342,7 @@ export const createMissiveModel = (ctx: Context) => {
             if (result) {
                 missiveLogger.info("Missive updated", {
                     missiveId: result.id,
-                    tags: ["mutation", "update"],
+                    tags: ["mutation", "update"]
                 });
             }
             return result;
@@ -353,7 +353,7 @@ export const createMissiveModel = (ctx: Context) => {
                 missiveLogger.debug("Skipped adding invalid tag slug", {
                     missiveId,
                     providedSlug: tagSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return null;
             }
@@ -365,7 +365,7 @@ export const createMissiveModel = (ctx: Context) => {
             if (!stored) {
                 missiveLogger.debug("Missive not found when adding tag", {
                     missiveId,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return null;
             }
@@ -376,7 +376,7 @@ export const createMissiveModel = (ctx: Context) => {
                 missiveLogger.warn("Failed to ensure tag for missive", {
                     missiveId,
                     slug: resolvedSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 const hydrated = await hydrateRecords([normalizedRecord]);
                 return hydrated[0] ?? null;
@@ -388,7 +388,7 @@ export const createMissiveModel = (ctx: Context) => {
                     missiveId,
                     tagId: ensuredTagId,
                     slug: resolvedSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 const hydrated = await hydrateRecords([normalizedRecord]);
                 return hydrated[0] ?? null;
@@ -401,11 +401,11 @@ export const createMissiveModel = (ctx: Context) => {
                 missiveId,
                 tagId: ensuredTagId,
                 slug: resolvedSlug,
-                tags: ["mutation", "tag"],
+                tags: ["mutation", "tag"]
             });
 
             await ctx.db.merge(recordId, {
-                tags: nextTagIds,
+                tags: nextTagIds
             });
 
             const refreshedRecord = await ctx.db.select<StoredMissiveRecord>(recordId);
@@ -414,7 +414,7 @@ export const createMissiveModel = (ctx: Context) => {
                 missiveLogger.warn("Reload after tag append returned empty record", {
                     missiveId,
                     tagId: ensuredTagId,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
             }
             const storedUpdated =
@@ -425,7 +425,7 @@ export const createMissiveModel = (ctx: Context) => {
                         typeof normalizedRecord.id === "string"
                             ? normalizedRecord.id
                             : normalizedRecord.id.toString(),
-                    tags: nextTagIds,
+                    tags: nextTagIds
                 } satisfies StoredMissiveRecord);
 
             const hydrated = await hydrateRecords([normaliseRecord(storedUpdated)]);
@@ -435,7 +435,7 @@ export const createMissiveModel = (ctx: Context) => {
                     missiveId: result.id,
                     tagId: ensuredTagId,
                     slug: resolvedSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
             }
             return result;
@@ -446,7 +446,7 @@ export const createMissiveModel = (ctx: Context) => {
                 missiveLogger.debug("Skipped removing invalid tag slug", {
                     missiveId,
                     providedSlug: tagSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return null;
             }
@@ -457,7 +457,7 @@ export const createMissiveModel = (ctx: Context) => {
             if (!stored) {
                 missiveLogger.debug("Missive not found when removing tag", {
                     missiveId,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 return null;
             }
@@ -470,7 +470,7 @@ export const createMissiveModel = (ctx: Context) => {
                 missiveLogger.debug("Tag not present on missive", {
                     missiveId,
                     slug: resolvedSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
                 const hydrated = await hydrateRecords([normalizedRecord]);
                 return hydrated[0] ?? null;
@@ -482,11 +482,11 @@ export const createMissiveModel = (ctx: Context) => {
             missiveLogger.debug("Removing tag from missive", {
                 missiveId,
                 slug: resolvedSlug,
-                tags: ["mutation", "tag"],
+                tags: ["mutation", "tag"]
             });
 
             await ctx.db.merge(recordId, {
-                tags: nextTagIds,
+                tags: nextTagIds
             });
 
             const refreshedRecord = await ctx.db.select<StoredMissiveRecord>(recordId);
@@ -495,7 +495,7 @@ export const createMissiveModel = (ctx: Context) => {
                 reloaded ??
                 ({
                     ...normalizedRecord,
-                    tags: nextTagIds,
+                    tags: nextTagIds
                 } satisfies StoredMissiveRecord);
 
             const hydrated = await hydrateRecords([normaliseRecord(storedUpdated)]);
@@ -504,11 +504,11 @@ export const createMissiveModel = (ctx: Context) => {
                 missiveLogger.info("Tag removed from missive", {
                     missiveId: result.id,
                     slug: resolvedSlug,
-                    tags: ["mutation", "tag"],
+                    tags: ["mutation", "tag"]
                 });
             }
             return result;
-        },
+        }
     } satisfies {
         list: (options?: { sentimentSlug?: string }) => Promise<MissiveRecord[]>;
         get: (id: string) => Promise<MissiveRecord | null>;

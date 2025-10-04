@@ -36,7 +36,7 @@ export const test = base.extend<Fixtures>({
 
             return page.locator("[data-component-root]");
         });
-    },
+    }
 });
 
 export { expect } from "@playwright/test";

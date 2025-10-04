@@ -10,12 +10,12 @@ export { createSentimentModel } from "./sentiment/entity.ts";
 export type {
     SentimentAllocation,
     SentimentModel,
-    SentimentRecord,
+    SentimentRecord
 } from "./sentiment/entity.ts";
 export { createBeingRegistrationStore } from "./auth/being-registration.ts";
 export { createCommentModel } from "./comment/entity.ts";
 export type {
     CommentModel,
     CommentRecord,
-    CommentTreeNode,
+    CommentTreeNode
 } from "./comment/entity.ts";

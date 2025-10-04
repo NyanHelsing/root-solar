@@ -3,7 +3,7 @@ export {
     PIN_LENGTH,
     RANDOM_RANGE,
     MAX_PIN,
-    ACCEPT_BOUND,
+    ACCEPT_BOUND
 } from "./constants.ts";
 export { beingSessionSchema, encryptedPayloadSchema, type BeingSessionRecord } from "./schema.ts";
 export { isBrowserEnvironment } from "./is-browser-environment.ts";

@@ -6,7 +6,7 @@ export const formatTimestamp = (value: string): string => {
     }
     return date.toLocaleString(undefined, {
         dateStyle: "medium",
-        timeStyle: "short",
+        timeStyle: "short"
     });
 };
 

@@ -11,7 +11,7 @@ export type MissiveDetailErrorFallbackProps = {
 export const MissiveDetailErrorFallback = ({
     labels,
     error,
-    onRetry,
+    onRetry
 }: MissiveDetailErrorFallbackProps) => (
     <FlareStack gap="md">
         <p role="alert" className="rs-text-soft">

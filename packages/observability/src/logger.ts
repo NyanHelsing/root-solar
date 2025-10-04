@@ -7,7 +7,7 @@ const toDefinedEntries = (metadata: Record<string, unknown>) =>
 
 const applyMetadata = (
     setter: (key: string, value: unknown) => void,
-    metadata: Record<string, unknown>,
+    metadata: Record<string, unknown>
 ) => {
     for (const [key, value] of toDefinedEntries(metadata)) {
         setter(key, value);
@@ -21,14 +21,14 @@ export interface InitializeObservabilityOptions {
 
 export const initializeObservability = ({
     level = LogLevel.INFO,
-    metadata = {},
+    metadata = {}
 }: InitializeObservabilityOptions = {}): LogLevelType => {
     Logger.setGlobalLevel(level);
 
     applyMetadata(Logger.setGlobalMetadata, {
         app: APP_NAMESPACE,
         logLevel: LogLevel.getName(level),
-        ...metadata,
+        ...metadata
     });
 
     return level;
@@ -41,7 +41,7 @@ export interface CreateLoggerOptions {
 
 export const createAppLogger = (
     context: string,
-    { tags, metadata = {} }: CreateLoggerOptions = {},
+    { tags, metadata = {} }: CreateLoggerOptions = {}
 ) => {
     const scopedContext = context.startsWith(APP_NAMESPACE)
         ? context
@@ -50,7 +50,7 @@ export const createAppLogger = (
 
     applyMetadata((key, value) => logger.setMetadata(key, value), {
         ...(tags?.length ? { tags } : {}),
-        ...metadata,
+        ...metadata
     });
 
     return logger;
@@ -65,7 +65,7 @@ const levelByName: Record<string, LogLevelType> = {
     INFO: LogLevel.INFO,
     WARN: LogLevel.WARN,
     ERROR: LogLevel.ERROR,
-    ALWAYS: LogLevel.ALWAYS,
+    ALWAYS: LogLevel.ALWAYS
 };
 
 export const parseLogLevel = (value?: string) => levelByName[value?.trim().toUpperCase() ?? ""];

@@ -5,7 +5,7 @@ import {
     LogLevel,
     createAppLogger,
     initializeObservability,
-    parseLogLevel,
+    parseLogLevel
 } from "@root-solar/observability";
 
 import type { RouteErrorBoundaryProps } from "./RouteErrorBoundary.ts";
@@ -30,7 +30,7 @@ export const bootstrapShellApp = ({
     rootElementId = "root",
     loggerTags = ["client", "bootstrap"],
     routeFallback,
-    routerProvider,
+    routerProvider
 }: BootstrapShellAppOptions) => {
     const environment = process.env.NODE_ENV ?? "development";
     const desiredLevel =
@@ -41,22 +41,22 @@ export const bootstrapShellApp = ({
         level: desiredLevel,
         metadata: {
             environment,
-            platform: typeof window === "undefined" ? "unknown" : "browser",
-        },
+            platform: typeof window === "undefined" ? "unknown" : "browser"
+        }
     });
 
     const clientBootstrapLogger = createAppLogger("client:bootstrap", {
-        tags: loggerTags,
+        tags: loggerTags
     });
 
     clientBootstrapLogger.info("Rendering shell host", {
-        logLevel: LogLevel.getName(resolvedLevel),
+        logLevel: LogLevel.getName(resolvedLevel)
     });
 
     const rootElement = document.getElementById(rootElementId);
     if (!rootElement) {
         clientBootstrapLogger.error("Root element not found", {
-            tags: loggerTags,
+            tags: loggerTags
         });
         throw new Error(`Unable to locate #${rootElementId} element for rendering`);
     }
@@ -66,16 +66,16 @@ export const bootstrapShellApp = ({
             <ShellRouter routeFallback={routeFallback} routerProvider={routerProvider}>
                 {routes}
             </ShellRouter>
-        </Suspense>,
+        </Suspense>
     );
 
     clientBootstrapLogger.info("Shell host rendered", {
-        tags: loggerTags,
+        tags: loggerTags
     });
 
     return {
         logger: clientBootstrapLogger,
-        logLevel: resolvedLevel,
+        logLevel: resolvedLevel
     };
 };
 

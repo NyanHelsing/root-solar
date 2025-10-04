@@ -6,7 +6,7 @@ import type { BeingSessionRecord } from "./schema.ts";
 
 export const createBeingSessionRecord = async (
     bundle: BeingCredentialBundle,
-    pin: string,
+    pin: string
 ): Promise<BeingSessionRecord> => {
     const encryptedBundle = await encryptWithPassword(encodeBundle(bundle), pin);
     return {
@@ -16,9 +16,9 @@ export const createBeingSessionRecord = async (
             id: bundle.beingId,
             name: bundle.beingName,
             signingPublicKey: bundle.signing.publicKey,
-            encryptionPublicKey: bundle.encryption.publicKey,
+            encryptionPublicKey: bundle.encryption.publicKey
         },
-        encryptedBundle,
+        encryptedBundle
     } satisfies BeingSessionRecord;
 };
 

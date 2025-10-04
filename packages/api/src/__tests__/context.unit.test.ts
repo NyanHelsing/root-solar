@@ -6,7 +6,7 @@ import type {
     CommentModel,
     MissiveModel,
     SentimentModel,
-    TagModel,
+    TagModel
 } from "../persistence/entities/index.ts";
 import type { BeingRegistrationStore } from "@root-solar/auth/procedures";
 import type { ContextFactories } from "../context.ts";
@@ -35,13 +35,13 @@ describe("api/context", () => {
             createCommentModel: createStub<CommentModel>("comments", "comment"),
             createBeingRegistrationStore: createStub<BeingRegistrationStore>(
                 "registrations",
-                "registration",
-            ),
+                "registration"
+            )
         } satisfies ContextFactories;
 
         const instance = await contextModule.createContext({} as never, {
             getDb: async () => dbHandle,
-            factories: stubFactories,
+            factories: stubFactories
         });
 
         assert.equal(instance.db, dbHandle);
@@ -49,7 +49,7 @@ describe("api/context", () => {
         assert.equal((instance.comments as unknown as { type: string }).type, "comment");
         assert.equal(
             (instance.authRegistrations as unknown as { type: string }).type,
-            "registration",
+            "registration"
         );
         assert.equal(factories.length >= 5, true);
         for (const entry of factories) {
@@ -58,7 +58,7 @@ describe("api/context", () => {
 
         const manual = new contextModule.Context({
             db: dbHandle,
-            factories: stubFactories,
+            factories: stubFactories
         });
         assert.equal(manual.db, dbHandle);
     });

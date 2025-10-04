@@ -11,7 +11,7 @@ type PasswordKeyDerivationParams = {
 const DEFAULT_PARAMS: PasswordKeyDerivationParams = {
     iterations: 200_000,
     hash: "SHA-256",
-    keyLength: 256,
+    keyLength: 256
 };
 
 const AES_GCM_IV_LENGTH = 12;
@@ -20,14 +20,14 @@ const SALT_LENGTH = 16;
 const importPasswordKey = async (password: string) => {
     const subtle = getSubtleCrypto();
     return subtle.importKey("raw", ensureArrayBufferView(utf8ToBytes(password)), "PBKDF2", false, [
-        "deriveKey",
+        "deriveKey"
     ]);
 };
 
 const deriveEncryptionKey = async (
     passwordKey: CryptoKey,
     salt: Uint8Array,
-    params: PasswordKeyDerivationParams,
+    params: PasswordKeyDerivationParams
 ) => {
     const subtle = getSubtleCrypto();
     return subtle.deriveKey(
@@ -35,15 +35,15 @@ const deriveEncryptionKey = async (
             name: "PBKDF2",
             salt: ensureArrayBufferView(salt),
             iterations: params.iterations,
-            hash: params.hash,
+            hash: params.hash
         },
         passwordKey,
         {
             name: "AES-GCM",
-            length: params.keyLength,
+            length: params.keyLength
         },
         false,
-        ["encrypt", "decrypt"],
+        ["encrypt", "decrypt"]
     );
 };
 
@@ -76,7 +76,7 @@ const ensureUint8Array = (input: Uint8Array | string): Uint8Array<ArrayBuffer> =
 export const encryptWithPassword = async (
     plaintext: Uint8Array | string,
     password: string,
-    options: Partial<PasswordKeyDerivationParams> = {},
+    options: Partial<PasswordKeyDerivationParams> = {}
 ): Promise<EncryptedPayload> => {
     const params = { ...DEFAULT_PARAMS, ...options } satisfies PasswordKeyDerivationParams;
     const salt = getRandomBytes(SALT_LENGTH);
@@ -87,7 +87,7 @@ export const encryptWithPassword = async (
     const ciphertextBuffer = await subtle.encrypt(
         { name: "AES-GCM", iv: ensureArrayBufferView(iv) },
         encryptionKey,
-        ensureUint8Array(plaintext),
+        ensureUint8Array(plaintext)
     );
     const ciphertext = toBase64(arrayBufferToUint8Array(ciphertextBuffer));
 
@@ -98,13 +98,13 @@ export const encryptWithPassword = async (
         salt: toBase64(salt),
         iterations: params.iterations,
         hash: params.hash,
-        keyLength: params.keyLength,
+        keyLength: params.keyLength
     };
 };
 
 export const decryptWithPassword = async (
     payload: EncryptedPayload,
-    password: string,
+    password: string
 ): Promise<Uint8Array> => {
     const salt = ensureArrayBufferView(fromBase64(payload.salt));
     const iv = ensureArrayBufferView(fromBase64(payload.iv));
@@ -112,7 +112,7 @@ export const decryptWithPassword = async (
     const params: PasswordKeyDerivationParams = {
         iterations: payload.iterations,
         hash: payload.hash,
-        keyLength: payload.keyLength,
+        keyLength: payload.keyLength
     };
     const passwordKey = await importPasswordKey(password);
     const encryptionKey = await deriveEncryptionKey(passwordKey, salt, params);
@@ -120,7 +120,7 @@ export const decryptWithPassword = async (
     const plaintextBuffer = await subtle.decrypt(
         { name: "AES-GCM", iv },
         encryptionKey,
-        ciphertext,
+        ciphertext
     );
     return arrayBufferToUint8Array(plaintextBuffer);
 };

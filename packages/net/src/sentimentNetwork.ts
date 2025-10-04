@@ -11,11 +11,11 @@ import type {
     SentimentNetwork,
     SentimentNetworkOptions,
     SentimentRequest,
-    SentimentResponse,
+    SentimentResponse
 } from "./types.ts";
 
 const defaultLogger = createAppLogger("network:sentiment", {
-    tags: ["network", "sentiment"],
+    tags: ["network", "sentiment"]
 });
 
 type StreamHandler = Parameters<Libp2p["handle"]>[1];
@@ -26,7 +26,7 @@ export const createSentimentNetwork = async ({
     libp2p,
     getSentiment,
     protocol = SENTIMENT_PROTOCOL,
-    logger = defaultLogger,
+    logger = defaultLogger
 }: SentimentNetworkOptions): Promise<SentimentNetwork> => {
     const handler: StreamHandler = async ({ stream }) => {
         let recordId: string | undefined;
@@ -39,7 +39,7 @@ export const createSentimentNetwork = async ({
             recordId = request.recordId;
             logger.debug("Processing sentiment request", {
                 recordId,
-                tags: ["sentiment", "handler"],
+                tags: ["sentiment", "handler"]
             });
             const fraction = await getSentiment(recordId);
             const response: SentimentResponse = fraction
@@ -50,24 +50,24 @@ export const createSentimentNetwork = async ({
             logger.debug("Sentiment response written", {
                 recordId,
                 status: response.status,
-                tags: ["sentiment", "handler"],
+                tags: ["sentiment", "handler"]
             });
         } catch (error) {
             logger.error("Sentiment handler error", error, {
                 recordId,
-                tags: ["sentiment", "handler"],
+                tags: ["sentiment", "handler"]
             });
             const response: SentimentResponse = {
                 status: "error",
                 message: error instanceof Error ? error.message : "Unknown sentiment error",
-                recordId,
+                recordId
             };
             try {
                 await writeJson(stream, response, logger);
             } catch (innerError) {
                 logger.error("Failed to reply with sentiment error", innerError, {
                     recordId,
-                    tags: ["sentiment", "handler"],
+                    tags: ["sentiment", "handler"]
                 });
             }
         } finally {
@@ -79,7 +79,7 @@ export const createSentimentNetwork = async ({
 
     const querySentiment = async (
         peerId: PeerId,
-        recordId: string,
+        recordId: string
     ): Promise<SentimentFraction | null> => {
         if (!recordId) {
             throw new Error("recordId must be provided");
@@ -88,7 +88,7 @@ export const createSentimentNetwork = async ({
         logger.debug("Dialing peer for sentiment", {
             peerId: peerId.toString(),
             recordId,
-            tags: ["sentiment", "client"],
+            tags: ["sentiment", "client"]
         });
         const dialResult = await libp2p.dialProtocol(peerId, protocol);
         const stream = (dialResult as { stream?: Stream }).stream ?? (dialResult as Stream);
@@ -97,7 +97,7 @@ export const createSentimentNetwork = async ({
             logger.debug("Sentiment query sent", {
                 peerId: peerId.toString(),
                 recordId,
-                tags: ["sentiment", "client"],
+                tags: ["sentiment", "client"]
             });
             const payload = await readJson<unknown>(stream);
             if (!isSentimentResponse(payload)) {
@@ -112,7 +112,7 @@ export const createSentimentNetwork = async ({
                     peerId: peerId.toString(),
                     recordId,
                     fraction: payload.fraction,
-                    tags: ["sentiment", "client"],
+                    tags: ["sentiment", "client"]
                 });
                 return payload.fraction;
             }
@@ -121,7 +121,7 @@ export const createSentimentNetwork = async ({
                 logger.debug("Sentiment record not found", {
                     peerId: peerId.toString(),
                     recordId,
-                    tags: ["sentiment", "client"],
+                    tags: ["sentiment", "client"]
                 });
                 return null;
             }
@@ -134,7 +134,7 @@ export const createSentimentNetwork = async ({
             logger.error("Sentiment query failed", error, {
                 peerId: peerId.toString(),
                 recordId,
-                tags: ["sentiment", "client"],
+                tags: ["sentiment", "client"]
             });
             throw error;
         } finally {
@@ -145,18 +145,18 @@ export const createSentimentNetwork = async ({
     const close = async () => {
         logger.debug("Unregistering sentiment protocol handler", {
             protocol,
-            tags: ["sentiment"],
+            tags: ["sentiment"]
         });
         await libp2p.unhandle(protocol);
         logger.info("Sentiment protocol handler unregistered", {
             protocol,
-            tags: ["sentiment"],
+            tags: ["sentiment"]
         });
     };
 
     logger.info("Sentiment protocol handler registered", {
         protocol,
-        tags: ["sentiment"],
+        tags: ["sentiment"]
     });
 
     return { protocol, querySentiment, close };

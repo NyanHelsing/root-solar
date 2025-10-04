@@ -21,7 +21,7 @@ const StatusIndicator = ({
     const indicatorClasses = [
         styles.indicator,
         tone ? styles[`indicator--${tone}`] : undefined,
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");

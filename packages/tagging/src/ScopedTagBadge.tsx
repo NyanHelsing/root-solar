@@ -29,7 +29,7 @@ const ScopedTagBadgeComponent = ({
     parent,
     tag,
     tone,
-    className,
+    className
 }: ScopedTagBadgeProps): ReactElement => (
     <FlareScopedPill
         scopeLabel={slugLabel(parent)}

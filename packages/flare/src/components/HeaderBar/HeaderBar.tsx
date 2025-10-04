@@ -25,7 +25,7 @@ const HeaderBar = ({
     const headerClasses = [
         styles.header,
         tone === "surface" ? styles["header--surface"] : undefined,
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");

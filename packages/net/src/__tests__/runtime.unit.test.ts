@@ -7,7 +7,7 @@ import {
     getSentimentNetwork,
     getSentimentNetworkStatus,
     registerSentimentNetwork,
-    setSentimentNetworkStatus,
+    setSentimentNetworkStatus
 } from "../runtime.ts";
 
 type StatusListener = (status: SentimentNetworkStatus) => void;
@@ -32,7 +32,7 @@ const createSentimentNetworkStub = (initialStatus: SentimentNetworkStatus) => {
             return () => {
                 listeners = listeners.filter((candidate) => candidate !== listener);
             };
-        },
+        }
     };
 
     return {
@@ -45,7 +45,7 @@ const createSentimentNetworkStub = (initialStatus: SentimentNetworkStatus) => {
         },
         listenerCount() {
             return listeners.length;
-        },
+        }
     };
 };
 
@@ -58,7 +58,7 @@ describe("net/runtime", () => {
         const initialStatus: SentimentNetworkStatus = {
             state: "ready",
             peerId: "peer-id",
-            protocol: "test-protocol",
+            protocol: "test-protocol"
         };
         const stub = createSentimentNetworkStub(initialStatus);
 
@@ -68,7 +68,7 @@ describe("net/runtime", () => {
 
         const nextStatus: SentimentNetworkStatus = {
             state: "error",
-            message: "boom",
+            message: "boom"
         };
         stub.emit(nextStatus);
         assert.deepEqual(getSentimentNetworkStatus(), nextStatus);
@@ -78,7 +78,7 @@ describe("net/runtime", () => {
         const stub = createSentimentNetworkStub({
             state: "ready",
             peerId: "peer-id",
-            protocol: "test-protocol",
+            protocol: "test-protocol"
         });
         registerSentimentNetwork(stub.network);
         assert.equal(stub.listenerCount(), 1);
@@ -93,7 +93,7 @@ describe("net/runtime", () => {
         stub.emit({
             state: "ready",
             peerId: "peer-id",
-            protocol: "test-protocol",
+            protocol: "test-protocol"
         });
         assert.deepEqual(getSentimentNetworkStatus(), { state: "offline" });
     });
@@ -104,7 +104,7 @@ describe("net/runtime", () => {
             async querySentiment() {
                 return null;
             },
-            async close() {},
+            async close() {}
         };
 
         registerSentimentNetwork(minimalNetwork);
@@ -121,7 +121,7 @@ describe("net/runtime", () => {
         setSentimentNetworkStatus({ state: "ready", peerId: "manual" });
         assert.deepEqual(getSentimentNetworkStatus(), {
             state: "ready",
-            peerId: "manual",
+            peerId: "manual"
         });
         clearSentimentNetwork();
         assert.deepEqual(getSentimentNetworkStatus(), { state: "offline" });

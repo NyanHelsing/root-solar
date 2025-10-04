@@ -5,7 +5,7 @@ import type { Context } from "../../../context.ts";
 import type { TagRecord } from "../index.ts";
 
 const sentimentLogger = createAppLogger("persistence:sentiment", {
-    tags: ["persistence", "sentiment"],
+    tags: ["persistence", "sentiment"]
 });
 
 const SENTIMENT_TABLE = "sentiment" as const;
@@ -36,8 +36,7 @@ const toSentimentRecord = (record: RawSentimentRecord): SentimentRecord => ({
     ...record,
     id: typeof record.id === "string" ? record.id : record.id.toString(),
     beingId: typeof record.beingId === "string" ? record.beingId : record.beingId.toString(),
-    subjectId:
-        typeof record.subjectId === "string" ? record.subjectId : record.subjectId.toString(),
+    subjectId: typeof record.subjectId === "string" ? record.subjectId : record.subjectId.toString()
 });
 
 const unwrapSingle = <T>(value: T | T[] | null): T | null => {
@@ -55,14 +54,14 @@ const selectSentiments = async (
     {
         beingId,
         tagId,
-        subjectTable = "missive",
-    }: { beingId: string; tagId?: string; subjectTable?: string },
+        subjectTable = "missive"
+    }: { beingId: string; tagId?: string; subjectTable?: string }
 ) => {
     sentimentLogger.debug("Selecting sentiments", {
         beingId,
         tagId,
         subjectTable,
-        tags: ["query"],
+        tags: ["query"]
     });
     const statement = tagId
         ? "SELECT * FROM type::table($table) WHERE beingId = $beingId AND tagId = $tagId AND subjectTable = $subjectTable"
@@ -71,7 +70,7 @@ const selectSentiments = async (
     const params: Record<string, unknown> = {
         table: SENTIMENT_TABLE,
         beingId,
-        subjectTable,
+        subjectTable
     } satisfies Record<string, unknown>;
     if (tagId) {
         params.tagId = tagId;
@@ -85,7 +84,7 @@ const selectSentiments = async (
             tagId,
             subjectTable,
             status: "EMPTY_RESULT",
-            tags: ["query"],
+            tags: ["query"]
         });
         return [] as SentimentRecord[];
     }
@@ -102,7 +101,7 @@ const selectSentiments = async (
                     tagId,
                     subjectTable,
                     status,
-                    tags: ["query"],
+                    tags: ["query"]
                 });
                 return null;
             }
@@ -114,7 +113,7 @@ const selectSentiments = async (
                 beingId,
                 tagId,
                 subjectTable,
-                tags: ["query"],
+                tags: ["query"]
             });
             return null;
         }
@@ -122,7 +121,7 @@ const selectSentiments = async (
             beingId,
             tagId,
             subjectTable,
-            tags: ["query"],
+            tags: ["query"]
         });
         return null;
     };
@@ -138,7 +137,7 @@ const selectSentiments = async (
         tagId,
         subjectTable,
         count: mapped.length,
-        tags: ["query"],
+        tags: ["query"]
     });
     return mapped;
 };
@@ -149,7 +148,7 @@ const ensureBeingExists = async (ctx: Context, beingId: string) => {
     if (!being) {
         sentimentLogger.warn("Being missing during sentiment operation; creating", {
             beingId,
-            tags: ["mutation", "being"],
+            tags: ["mutation", "being"]
         });
         return await ctx.beings.create({ name: "superuser" });
     }
@@ -165,7 +164,7 @@ const ensureTagExists = async (ctx: Context, tagId: string) => {
     const created = await ctx.tags.upsert({
         slug,
         label,
-        tags: ["tag:sentimental"],
+        tags: ["tag:sentimental"]
     });
     if (!created) {
         throw new Error(`Failed to ensure tag ${tagId} exists`);
@@ -181,7 +180,7 @@ const assertInteger = (value: number, field: string) => {
 
 const hydrateSentiments = async (
     ctx: Context,
-    records: SentimentRecord[],
+    records: SentimentRecord[]
 ): Promise<SentimentAllocation[]> => {
     if (records.length === 0) {
         return [];
@@ -195,8 +194,8 @@ const hydrateSentiments = async (
                 ...record,
                 tag: lookup.get(record.tagId),
                 totalWeightForTag: 0,
-                ratio: 0,
-            }) satisfies SentimentAllocation,
+                ratio: 0
+            }) satisfies SentimentAllocation
     );
 };
 
@@ -210,7 +209,7 @@ export const createSentimentModel = (ctx: Context) => {
             subjectTable = "missive",
             tagId,
             weight,
-            maxWeight,
+            maxWeight
         }: {
             beingId: string;
             subjectId: string;
@@ -226,7 +225,7 @@ export const createSentimentModel = (ctx: Context) => {
                 tagId,
                 weight,
                 maxWeight,
-                tags: ["mutation", "upsert"],
+                tags: ["mutation", "upsert"]
             });
 
             assertInteger(weight, "weight");
@@ -247,7 +246,7 @@ export const createSentimentModel = (ctx: Context) => {
             const existingForTag = await selectSentiments(ctx, {
                 beingId,
                 tagId,
-                subjectTable,
+                subjectTable
             });
             const otherWeightTotal = existingForTag.reduce((total, record) => {
                 if (record.id === sentimentId) {
@@ -259,7 +258,7 @@ export const createSentimentModel = (ctx: Context) => {
 
             if (maxWeight !== undefined && newTotalWeight > maxWeight) {
                 throw new Error(
-                    `Sentiment tag ${tagId} for being ${beingId} exceeds allocation of ${maxWeight} (attempted ${newTotalWeight})`,
+                    `Sentiment tag ${tagId} for being ${beingId} exceeds allocation of ${maxWeight} (attempted ${newTotalWeight})`
                 );
             }
 
@@ -269,7 +268,7 @@ export const createSentimentModel = (ctx: Context) => {
                     subjectId,
                     subjectTable,
                     tagId,
-                    tags: ["mutation", "upsert"],
+                    tags: ["mutation", "upsert"]
                 });
                 await ctx.db.delete(new RecordId(SENTIMENT_TABLE, sentimentId));
                 sentimentLogger.info("Sentiment removed due to zero weight", {
@@ -277,7 +276,7 @@ export const createSentimentModel = (ctx: Context) => {
                     subjectId,
                     subjectTable,
                     tagId,
-                    tags: ["mutation", "upsert"],
+                    tags: ["mutation", "upsert"]
                 });
                 return null;
             }
@@ -290,8 +289,8 @@ export const createSentimentModel = (ctx: Context) => {
                     subjectId,
                     subjectTable,
                     tagId,
-                    weight,
-                },
+                    weight
+                }
             );
             const stored = unwrapSingle(record);
             if (!stored) {
@@ -300,7 +299,7 @@ export const createSentimentModel = (ctx: Context) => {
                     subjectId,
                     subjectTable,
                     tagId,
-                    tags: ["mutation", "upsert"],
+                    tags: ["mutation", "upsert"]
                 });
                 return null;
             }
@@ -323,7 +322,7 @@ export const createSentimentModel = (ctx: Context) => {
                 tagId,
                 weight,
                 totalWeightForTag: newTotalWeight,
-                tags: ["mutation", "upsert"],
+                tags: ["mutation", "upsert"]
             });
             return allocation;
         },
@@ -333,13 +332,13 @@ export const createSentimentModel = (ctx: Context) => {
                 beingId,
                 tagId: options?.tagId,
                 subjectTable,
-                tags: ["query"],
+                tags: ["query"]
             });
 
             const sentiments = await selectSentiments(ctx, {
                 beingId,
                 tagId: options?.tagId,
-                subjectTable,
+                subjectTable
             });
 
             if (sentiments.length === 0) {
@@ -347,7 +346,7 @@ export const createSentimentModel = (ctx: Context) => {
                     beingId,
                     tagId: options?.tagId,
                     subjectTable,
-                    tags: ["query"],
+                    tags: ["query"]
                 });
                 return [] as SentimentAllocation[];
             }
@@ -367,7 +366,7 @@ export const createSentimentModel = (ctx: Context) => {
                 return {
                     ...sentiment,
                     totalWeightForTag,
-                    ratio,
+                    ratio
                 } satisfies SentimentAllocation;
             });
 
@@ -376,7 +375,7 @@ export const createSentimentModel = (ctx: Context) => {
                 count: allocations.length,
                 tagId: options?.tagId,
                 subjectTable,
-                tags: ["query"],
+                tags: ["query"]
             });
             return allocations;
         },
@@ -384,7 +383,7 @@ export const createSentimentModel = (ctx: Context) => {
             beingId,
             subjectId,
             subjectTable = "missive",
-            tagId,
+            tagId
         }: {
             beingId: string;
             subjectId: string;
@@ -396,19 +395,19 @@ export const createSentimentModel = (ctx: Context) => {
                 subjectId,
                 subjectTable,
                 tagId,
-                tags: ["mutation", "remove"],
+                tags: ["mutation", "remove"]
             });
             await ctx.db.delete(
-                new RecordId(SENTIMENT_TABLE, `${beingId}:${tagId}:${subjectTable}:${subjectId}`),
+                new RecordId(SENTIMENT_TABLE, `${beingId}:${tagId}:${subjectTable}:${subjectId}`)
             );
             sentimentLogger.info("Sentiment removed", {
                 beingId,
                 subjectId,
                 subjectTable,
                 tagId,
-                tags: ["mutation", "remove"],
+                tags: ["mutation", "remove"]
             });
-        },
+        }
     } satisfies {
         upsert: (input: {
             beingId: string;
@@ -420,7 +419,7 @@ export const createSentimentModel = (ctx: Context) => {
         }) => Promise<SentimentAllocation | null>;
         listForBeing: (
             beingId: string,
-            options?: { tagId?: string; subjectTable?: string },
+            options?: { tagId?: string; subjectTable?: string }
         ) => Promise<SentimentAllocation[]>;
         remove: (input: {
             beingId: string;

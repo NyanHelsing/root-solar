@@ -17,7 +17,7 @@ describe("observability", () => {
 
             const level = initializeObservability({
                 level: LogLevel.DEBUG,
-                metadata: { region: "test" },
+                metadata: { region: "test" }
             });
 
             assert.equal(level, LogLevel.DEBUG);
@@ -28,7 +28,7 @@ describe("observability", () => {
 
             const logger = createAppLogger("api", {
                 tags: ["test", "logger"],
-                metadata: { component: "unit" },
+                metadata: { component: "unit" }
             });
 
             assert.equal(logger.context, "root-solar:api");

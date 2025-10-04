@@ -10,7 +10,7 @@ import { BEING_KEY_MATERIAL, IDP_SIGNING_KEY_PAIR } from "./fixtures/pgp-keys.ts
 
 const createVerifiedAuthRequest = async () => {
     const request = await createAuthRequest(BEING_KEY_MATERIAL, {
-        intent: "coordinate",
+        intent: "coordinate"
     });
     return await verifyAuthRequest(request.payload);
 };
@@ -19,7 +19,7 @@ describe("createChallengeResponse", () => {
     it("creates a challenge response for a valid challenge", async () => {
         const verifiedRequest = await createVerifiedAuthRequest();
         const { challenge, record } = await createIdpChallenge(verifiedRequest, {
-            idpSigningKeyPair: IDP_SIGNING_KEY_PAIR,
+            idpSigningKeyPair: IDP_SIGNING_KEY_PAIR
         });
 
         const response = await createChallengeResponse(challenge, BEING_KEY_MATERIAL);
@@ -34,18 +34,18 @@ describe("createChallengeResponse", () => {
     it("throws when the IDP signature cannot be verified", async () => {
         const verifiedRequest = await createVerifiedAuthRequest();
         const { challenge } = await createIdpChallenge(verifiedRequest, {
-            idpSigningKeyPair: IDP_SIGNING_KEY_PAIR,
+            idpSigningKeyPair: IDP_SIGNING_KEY_PAIR
         });
 
         await assert.rejects(
             createChallengeResponse(
                 {
                     ...challenge,
-                    idpSigningPublicKey: BEING_KEY_MATERIAL.signing.publicKey,
+                    idpSigningPublicKey: BEING_KEY_MATERIAL.signing.publicKey
                 },
-                BEING_KEY_MATERIAL,
+                BEING_KEY_MATERIAL
             ),
-            /(Unable to verify IDP challenge signature|Could not find signing key)/,
+            /(Unable to verify IDP challenge signature|Could not find signing key)/
         );
     });
 });

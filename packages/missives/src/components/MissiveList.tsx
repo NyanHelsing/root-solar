@@ -21,7 +21,7 @@ const MissiveList = ({
     onSentimentChanged,
     basePath,
     showViewAllLink,
-    onCreateMissive,
+    onCreateMissive
 }: MissiveListProps) => {
     const {
         copy,
@@ -35,7 +35,7 @@ const MissiveList = ({
         handleFilterChange,
         sentimentFilterSlug,
         activeSentimentTagId,
-        isSentimentCapped,
+        isSentimentCapped
     } = useMissiveListController({ sentiment });
 
     const onFilterChange = useCallback(
@@ -50,7 +50,7 @@ const MissiveList = ({
                 onSentimentChanged?.(null);
             }
         },
-        [handleFilterChange, onSentimentChanged, basePath],
+        [handleFilterChange, onSentimentChanged, basePath]
     );
 
     return (

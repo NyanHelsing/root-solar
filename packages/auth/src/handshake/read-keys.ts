@@ -6,5 +6,5 @@ export const readPublicKey = async (armoredKey: string) => openpgp.readKey({ arm
 
 export default {
     readPrivateKey,
-    readPublicKey,
+    readPublicKey
 };

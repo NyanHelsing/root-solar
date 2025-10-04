@@ -14,8 +14,8 @@ describe("api/router", () => {
             namedExports: {
                 getNetworkStatus() {
                     return { state: "ready" };
-                },
-            },
+                }
+            }
         });
 
         await mock.module("@root-solar/auth/procedures", {
@@ -30,10 +30,10 @@ describe("api/router", () => {
                         async complete(input: unknown) {
                             completeCalls.push(input);
                             return { success: true };
-                        },
+                        }
                     };
-                },
-            },
+                }
+            }
         });
 
         const tagsList = [{ id: "tag:axiom", slug: "axiom", label: "Axiom" }];
@@ -46,7 +46,7 @@ describe("api/router", () => {
                 subjectTable: "missive",
                 tagId: "tag:axiom",
                 weight: 1,
-                maxWeight: 5,
+                maxWeight: 5
             },
             {
                 id: "sentiment-2",
@@ -55,8 +55,8 @@ describe("api/router", () => {
                 subjectTable: "missive",
                 tagId: "tag:axiom",
                 weight: 2,
-                maxWeight: 5,
-            },
+                maxWeight: 5
+            }
         ];
 
         const createdMissives: unknown[] = [];
@@ -74,7 +74,7 @@ describe("api/router", () => {
                 async list(params: { sentimentSlug?: string }) {
                     return [
                         { id: "missive:1", title: "First" },
-                        { id: "missive:2", title: "Second" },
+                        { id: "missive:2", title: "Second" }
                     ].map((record) => ({ ...record, sentiment: params?.sentimentSlug }));
                 },
                 async get(id: string) {
@@ -104,9 +104,9 @@ describe("api/router", () => {
                             {
                                 id: `tag:${input.tagSlug}`,
                                 slug: input.tagSlug,
-                                label: input.tagSlug,
-                            },
-                        ],
+                                label: input.tagSlug
+                            }
+                        ]
                     };
                 },
                 async removeTag(input: { missiveId: string; tagSlug: string }) {
@@ -114,23 +114,23 @@ describe("api/router", () => {
                     return {
                         id: input.missiveId,
                         title: `Axiom ${input.missiveId}`,
-                        tags: [],
+                        tags: []
                     };
-                },
+                }
             },
             tags: {
                 async list() {
                     return tagsList;
                 },
                 async ensureMany(
-                    definitions: Array<{ slug: string; label: string; tags?: string[] }>,
+                    definitions: Array<{ slug: string; label: string; tags?: string[] }>
                 ) {
                     ensuredTagDefinitions.push(...definitions);
                     return definitions.map((definition) => ({
                         id: `tag:${definition.slug}`,
                         slug: definition.slug,
                         label: definition.label,
-                        tags: definition.tags,
+                        tags: definition.tags
                     }));
                 },
                 async addParent(input: { tagId: string; parentTagSlug: string }) {
@@ -145,9 +145,9 @@ describe("api/router", () => {
                         id: normalizedId,
                         slug,
                         label: slug,
-                        tags: [`tag:${input.parentTagSlug}`],
+                        tags: [`tag:${input.parentTagSlug}`]
                     };
-                },
+                }
             },
             comments: {
                 async listForAxiom() {
@@ -156,7 +156,7 @@ describe("api/router", () => {
                 async create(input: unknown) {
                     createdComments.push(input);
                     return { id: "comment:new", ...(input as Record<string, unknown>) };
-                },
+                }
             },
             sentiments: {
                 async listForBeing(beingId: string, options: unknown) {
@@ -169,20 +169,20 @@ describe("api/router", () => {
                 },
                 async remove(input: unknown) {
                     removedSentiments.push(input);
-                },
+                }
             },
             beings: {
                 async create(input: unknown) {
                     return { id: "being:new", ...(input as Record<string, unknown>) };
-                },
+                }
             },
             authRegistrations: {
                 async persistChallenge() {},
                 async loadChallenge() {
                     return null;
                 },
-                async completeChallenge() {},
-            },
+                async completeChallenge() {}
+            }
         };
 
         const routerModule = await import(`${moduleSpecifier}?case=${Date.now()}-router`);
@@ -204,13 +204,13 @@ describe("api/router", () => {
         await caller.createMissive({
             title: "Missive title",
             details: "Details",
-            tagSlugs: ["axiom"],
+            tagSlugs: ["axiom"]
         });
 
         await caller.createAxiom({
             title: "Axiom title",
             details: "Details",
-            tagSlugs: ["axiom"],
+            tagSlugs: ["axiom"]
         });
 
         assert.equal(createdMissives.length, 2);
@@ -218,12 +218,12 @@ describe("api/router", () => {
         await caller.updateMissive({
             missiveId: "missive:1",
             title: "Updated title",
-            details: "Updated details",
+            details: "Updated details"
         });
         assert.deepEqual(updatedMissives.at(-1), {
             missiveId: "missive:1",
             title: "Updated title",
-            details: "Updated details",
+            details: "Updated details"
         });
 
         await caller.addMissiveTag({ missiveId: "missive:1", tagSlug: "focus" });
@@ -242,7 +242,7 @@ describe("api/router", () => {
             beingId: "being-1",
             subjectId: "missive:1",
             tagId: "tag:axiom",
-            weight: 2,
+            weight: 2
         });
         assert.deepEqual(upsertedSentiments[0], {
             beingId: "being-1",
@@ -250,7 +250,7 @@ describe("api/router", () => {
             subjectTable: "missive",
             tagId: "tag:axiom",
             weight: 2,
-            maxWeight: undefined,
+            maxWeight: undefined
         });
 
         await caller.listSentimentsForBeing({ beingId: "being-1" });
@@ -262,14 +262,14 @@ describe("api/router", () => {
             beingId: "being-1",
             options: {
                 tagId: undefined,
-                subjectTable: "missive",
-            },
+                subjectTable: "missive"
+            }
         });
 
         await caller.removeSentiment({
             beingId: "being-1",
             subjectId: "missive:1",
-            tagId: "tag:axiom",
+            tagId: "tag:axiom"
         });
         assert.equal(removedSentiments.length, 1);
 
@@ -277,7 +277,7 @@ describe("api/router", () => {
             axiomId: "missive:1",
             authorBeingId: "being-2",
             authorDisplayName: "Being Two",
-            body: "Thought",
+            body: "Thought"
         });
         assert.equal(createdComments.length, 1);
 
@@ -286,9 +286,9 @@ describe("api/router", () => {
                 axiomId: "missive:missing",
                 authorBeingId: "being-2",
                 authorDisplayName: "Being Two",
-                body: "Thought",
+                body: "Thought"
             }),
-            (error) => error instanceof TRPCError && error.code === "NOT_FOUND",
+            (error) => error instanceof TRPCError && error.code === "NOT_FOUND"
         );
 
         await caller.startBeingRegistration({
@@ -297,17 +297,17 @@ describe("api/router", () => {
                 payload: {
                     signingPublicKey: "sign",
                     encryptionPublicKey: "enc",
-                    signature: "sig",
+                    signature: "sig"
                 },
-                message: "message",
-            },
+                message: "message"
+            }
         });
 
         await caller.completeBeingRegistration({
             response: {
                 challengeId: "challenge-1",
-                signature: "sig",
-            },
+                signature: "sig"
+            }
         });
 
         assert.equal(startCalls.length, 1);

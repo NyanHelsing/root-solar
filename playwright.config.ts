@@ -12,20 +12,20 @@ export default defineConfig({
     use: {
         baseURL: BASE_URL,
         trace: "on-first-retry",
-        headless: true,
+        headless: true
     },
     webServer: {
         command: "pnpm rsbuild dev --host 127.0.0.1 --port 4173",
         url: BASE_URL,
         timeout: 120000,
-        reuseExistingServer: !process.env.CI,
+        reuseExistingServer: !process.env.CI
     },
     projects: [
         {
             name: "chromium",
             use: {
-                ...devices["Desktop Chrome"],
-            },
-        },
-    ],
+                ...devices["Desktop Chrome"]
+            }
+        }
+    ]
 });

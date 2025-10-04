@@ -4,7 +4,7 @@ test.describe("root.solar homepage", () => {
     test("renders the hero headline", async ({ page }) => {
         await page.goto("/");
         await expect(
-            page.getByRole("heading", { name: "Life shares a common root." }),
+            page.getByRole("heading", { name: "Life shares a common root." })
         ).toBeVisible();
     });
 

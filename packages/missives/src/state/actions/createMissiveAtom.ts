@@ -12,7 +12,7 @@ export const createMissiveAtom = atom<null, [MissiveCreationInput], Promise<Miss
     async (_get, set, input) => {
         const record = await set(createMissiveMutationAtom, [input]);
         return record;
-    },
+    }
 );
 
 export default createMissiveAtom;

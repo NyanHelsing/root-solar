@@ -16,7 +16,7 @@ export const updateMissiveSentimentAtom = atom<null, [MissiveSentimentInput], Pr
         set(sentimentsQueryAtom);
         set(detailQueryAtomFactory(input.missiveId));
         return resolvedWeight;
-    },
+    }
 );
 
 export default updateMissiveSentimentAtom;

@@ -6,25 +6,25 @@ import { readPublicKey } from "./read-keys.ts";
 import type { AuthRequestPayload, VerifiedAuthRequest } from "./types.ts";
 
 export const verifyAuthRequest = async (
-    payload: AuthRequestPayload,
+    payload: AuthRequestPayload
 ): Promise<VerifiedAuthRequest> => {
     const intentBytes = payload.intent ? fromBase64(payload.intent) : undefined;
     const messageBytes = buildAuthMessage(
         payload.signingPublicKey,
         payload.encryptionPublicKey,
-        intentBytes,
+        intentBytes
     );
 
     const message = await openpgp.createMessage({ binary: messageBytes });
     const signature = await openpgp.readSignature({
-        armoredSignature: payload.signature,
+        armoredSignature: payload.signature
     });
     const verificationKey = await readPublicKey(payload.signingPublicKey);
 
     const verificationResult = await openpgp.verify({
         message,
         signature,
-        verificationKeys: verificationKey,
+        verificationKeys: verificationKey
     });
 
     const [firstSignature] = verificationResult.signatures;
@@ -32,7 +32,7 @@ export const verifyAuthRequest = async (
         await firstSignature.verified;
     } catch (error) {
         throw new Error("Invalid authentication request signature", {
-            cause: error,
+            cause: error
         });
     }
 
@@ -40,7 +40,7 @@ export const verifyAuthRequest = async (
         signingPublicKey: payload.signingPublicKey,
         encryptionPublicKey: payload.encryptionPublicKey,
         intent: intentBytes,
-        message: messageBytes,
+        message: messageBytes
     } satisfies VerifiedAuthRequest;
 };
 

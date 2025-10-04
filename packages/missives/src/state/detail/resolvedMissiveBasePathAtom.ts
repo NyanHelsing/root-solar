@@ -14,7 +14,7 @@ const resolvedMissiveBasePathFamily = atomFamily((input: ResolvedBasePathInput) 
     atom<string>((get) => {
         const routePath = get(routePathAtom);
         return resolveBasePath(input.basePath ?? routePath, input.tagSlug);
-    }),
+    })
 );
 
 export const useResolvedMissiveBasePath = (input: ResolvedBasePathInput) =>

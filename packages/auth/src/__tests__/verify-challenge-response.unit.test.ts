@@ -8,14 +8,14 @@ import { BEING_SIGNING_PRIVATE_KEY, BEING_SIGNING_PUBLIC_KEY } from "./fixtures/
 
 const createSignedChallengeResponse = async (challengeId: string, nonceBase64: string) => {
     const message = await openpgp.createMessage({
-        text: buildChallengeMessageText(challengeId, nonceBase64),
+        text: buildChallengeMessageText(challengeId, nonceBase64)
     });
     const signingKey = await openpgp.readPrivateKey({ armoredKey: BEING_SIGNING_PRIVATE_KEY });
     return await openpgp.sign({
         message,
         detached: true,
         signingKeys: signingKey,
-        format: "armored",
+        format: "armored"
     });
 };
 
@@ -28,15 +28,15 @@ describe("verifyChallengeResponse", () => {
         const result = await verifyChallengeResponse(
             {
                 challengeId,
-                signature,
+                signature
             },
             {
                 challengeId,
                 nonce: nonceBase64,
                 idpSigningKeyPair: { publicKey: "idp", privateKey: "idp" },
                 beingSigningPublicKey: BEING_SIGNING_PUBLIC_KEY,
-                beingEncryptionPublicKey: "enc",
-            },
+                beingEncryptionPublicKey: "enc"
+            }
         );
 
         assert.equal(result, true);
@@ -49,15 +49,15 @@ describe("verifyChallengeResponse", () => {
         const result = await verifyChallengeResponse(
             {
                 challengeId,
-                signature: "invalid-signature",
+                signature: "invalid-signature"
             },
             {
                 challengeId,
                 nonce: nonceBase64,
                 idpSigningKeyPair: { publicKey: "idp", privateKey: "idp" },
                 beingSigningPublicKey: BEING_SIGNING_PUBLIC_KEY,
-                beingEncryptionPublicKey: "enc",
-            },
+                beingEncryptionPublicKey: "enc"
+            }
         );
 
         assert.equal(result, false);
@@ -70,15 +70,15 @@ describe("verifyChallengeResponse", () => {
         const result = await verifyChallengeResponse(
             {
                 challengeId: "other",
-                signature,
+                signature
             },
             {
                 challengeId: "challenge-1",
                 nonce: nonceBase64,
                 idpSigningKeyPair: { publicKey: "idp", privateKey: "idp" },
                 beingSigningPublicKey: BEING_SIGNING_PUBLIC_KEY,
-                beingEncryptionPublicKey: "enc",
-            },
+                beingEncryptionPublicKey: "enc"
+            }
         );
 
         assert.equal(result, false);

@@ -15,7 +15,7 @@ type LoadStatus = {
 
 const initialStatus: LoadStatus = {
     isLoading: false,
-    error: null,
+    error: null
 };
 
 const normaliseParentLabel = (tagId: string) => (tagId.startsWith("tag:") ? tagId.slice(4) : tagId);
@@ -45,7 +45,7 @@ const TagList = () => {
             }
             setStatus({
                 isLoading: false,
-                error: error instanceof Error ? error.message : "Unknown error",
+                error: error instanceof Error ? error.message : "Unknown error"
             });
         }
     }, [fetchTags]);
@@ -71,11 +71,11 @@ const TagList = () => {
                     return {
                         id: parentId,
                         slug,
-                        label: labelFromSlug(slug),
+                        label: labelFromSlug(slug)
                     };
-                }),
+                })
             })),
-        [tags],
+        [tags]
     );
 
     const handleAddParentTag = useCallback(
@@ -83,7 +83,7 @@ const TagList = () => {
             await client.addTagTag.mutate({ tagId, tagSlug: parentSlug });
             await hydrate();
         },
-        [hydrate],
+        [hydrate]
     );
 
     return (

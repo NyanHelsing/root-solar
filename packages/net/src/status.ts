@@ -9,13 +9,13 @@ export type NetworkStatus =
 let currentStatus: NetworkStatus = { state: "offline" };
 
 const networkStatusLogger = createAppLogger("network:status", {
-    tags: ["network", "status"],
+    tags: ["network", "status"]
 });
 
 export const setNetworkStatus = (status: NetworkStatus) => {
     currentStatus = status;
     networkStatusLogger.info("Network status updated", {
-        status,
+        status
     });
 };
 

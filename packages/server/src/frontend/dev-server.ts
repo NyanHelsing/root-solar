@@ -9,12 +9,12 @@ import {
     DEFAULT_SHELL_MOUNT,
     DEFAULT_SNB_MOUNT,
     DEFAULT_AUTH_MOUNT,
-    resolveMountPath,
+    resolveMountPath
 } from "../../../../config/mfePaths.ts";
 import type { FrontendLifecycle } from "./types.ts";
 
 const devFrontendLogger = createAppLogger("server:frontend:dev", {
-    tags: ["server", "frontend", "dev"],
+    tags: ["server", "frontend", "dev"]
 });
 
 const ROOT_DIR = process.env.ROOT_SOLAR_ROOT
@@ -69,7 +69,7 @@ const loadRsbuildConfigs = async (): Promise<LoadedConfigs> => {
         authConfig,
         shellMountPath,
         snbMountPath,
-        authMountPath,
+        authMountPath
     };
 };
 
@@ -94,7 +94,7 @@ const shouldServeShellHtml = (
     req: Request,
     shellMount: string,
     authMount: string,
-    snbMount: string,
+    snbMount: string
 ) => {
     if (req.method !== "GET" && req.method !== "HEAD") {
         return false;
@@ -122,59 +122,59 @@ export const setupDevFrontend = async (app: Application): Promise<FrontendLifecy
     const { shellConfig, snbConfig, authConfig, shellMountPath, snbMountPath, authMountPath } =
         await loadRsbuildConfigs();
     devFrontendLogger.debug("Loaded rsbuild configs for dev server", {
-        tags: ["startup"],
+        tags: ["startup"]
     });
     const shellEntryName = resolveEntryName(shellConfig);
     devFrontendLogger.debug("Resolved shell entry name", {
         entry: shellEntryName,
-        tags: ["startup", "frontend", "shell"],
+        tags: ["startup", "frontend", "shell"]
     });
     const shellRsbuild = await createRsbuild({
         rsbuildConfig: mergeRsbuildConfig(shellConfig, {
             server: {
-                middlewareMode: true,
+                middlewareMode: true
             },
             dev: {
                 client: {
-                    path: "/rsbuild-hmr",
-                },
-            },
+                    path: "/rsbuild-hmr"
+                }
+            }
         }),
-        loadEnv: true,
+        loadEnv: true
     });
 
     const snbRsbuild = await createRsbuild({
         rsbuildConfig: mergeRsbuildConfig(snbConfig, {
             server: {
-                middlewareMode: true,
+                middlewareMode: true
             },
             dev: {
                 assetPrefix: snbMountPath,
                 client: {
-                    path: buildHmrPath(snbMountPath),
-                },
-            },
+                    path: buildHmrPath(snbMountPath)
+                }
+            }
         }),
-        loadEnv: true,
+        loadEnv: true
     });
 
     const authRsbuild = await createRsbuild({
         rsbuildConfig: mergeRsbuildConfig(authConfig, {
             server: {
-                middlewareMode: true,
+                middlewareMode: true
             },
             dev: {
                 assetPrefix: authMountPath,
                 client: {
-                    path: buildHmrPath(authMountPath),
-                },
-            },
+                    path: buildHmrPath(authMountPath)
+                }
+            }
         }),
-        loadEnv: true,
+        loadEnv: true
     });
 
     devFrontendLogger.info("Creating rsbuild middleware for shell host", {
-        tags: ["startup", "frontend", "shell"],
+        tags: ["startup", "frontend", "shell"]
     });
 
     const snbDevServer = await snbRsbuild.createDevServer();
@@ -187,7 +187,7 @@ export const setupDevFrontend = async (app: Application): Promise<FrontendLifecy
         | undefined;
     if (!shellEnvironment) {
         devFrontendLogger.warn("Shell environment unavailable; SPA fallback disabled", {
-            tags: ["startup", "frontend", "shell"],
+            tags: ["startup", "frontend", "shell"]
         });
     }
 
@@ -207,7 +207,7 @@ export const setupDevFrontend = async (app: Application): Promise<FrontendLifecy
         } catch (error) {
             devFrontendLogger.error("Failed to render shell HTML", error, {
                 tags: ["runtime", "frontend", "shell"],
-                path: req.originalUrl,
+                path: req.originalUrl
             });
             next(error);
         }
@@ -216,18 +216,18 @@ export const setupDevFrontend = async (app: Application): Promise<FrontendLifecy
     app.use(snbMountPath, snbDevServer.middlewares);
     devFrontendLogger.info("SNB remote middleware attached", {
         tags: ["startup", "frontend", "snb"],
-        mountPath: snbMountPath,
+        mountPath: snbMountPath
     });
 
     app.use(authMountPath, authDevServer.middlewares);
     devFrontendLogger.info("Auth remote middleware attached", {
         tags: ["startup", "frontend", "auth"],
-        mountPath: authMountPath,
+        mountPath: authMountPath
     });
 
     app.use(shellDevServer.middlewares);
     devFrontendLogger.info("Shell host middleware attached", {
-        tags: ["startup", "frontend", "shell"],
+        tags: ["startup", "frontend", "shell"]
     });
 
     app.use((req, res, next) => {
@@ -241,7 +241,7 @@ export const setupDevFrontend = async (app: Application): Promise<FrontendLifecy
     return {
         afterServerStart: async (server) => {
             devFrontendLogger.debug("Binding dev server to HTTP listener", {
-                tags: ["startup"],
+                tags: ["startup"]
             });
             shellDevServer.connectWebSocket({ server });
             snbDevServer.connectWebSocket({ server });
@@ -249,7 +249,7 @@ export const setupDevFrontend = async (app: Application): Promise<FrontendLifecy
             await Promise.all([
                 shellDevServer.afterListen(),
                 snbDevServer.afterListen(),
-                authDevServer.afterListen(),
+                authDevServer.afterListen()
             ]);
             resolveShellReady?.();
             shellDevServer.printUrls();
@@ -260,22 +260,22 @@ export const setupDevFrontend = async (app: Application): Promise<FrontendLifecy
                 mounts: {
                     shell: "/",
                     snb: snbMountPath,
-                    auth: authMountPath,
-                },
+                    auth: authMountPath
+                }
             });
         },
         close: async () => {
             devFrontendLogger.debug("Closing dev server", {
-                tags: ["shutdown"],
+                tags: ["shutdown"]
             });
             await Promise.all([
                 shellDevServer.close(),
                 snbDevServer.close(),
-                authDevServer.close(),
+                authDevServer.close()
             ]);
             devFrontendLogger.info("Dev server closed", {
-                tags: ["shutdown"],
+                tags: ["shutdown"]
             });
-        },
+        }
     } satisfies FrontendLifecycle;
 };

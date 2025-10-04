@@ -17,7 +17,7 @@ const createStorage = () => {
         },
         removeItem(key) {
             map.delete(key);
-        },
+        }
     };
 };
 
@@ -38,7 +38,7 @@ describe("auth/beings", () => {
         const storage = createStorage();
         Object.defineProperty(window, "localStorage", {
             configurable: true,
-            value: storage,
+            value: storage
         });
 
         const beings = await import("../beings.ts");
@@ -54,7 +54,7 @@ describe("auth/beings", () => {
         const storage = createStorage();
         Object.defineProperty(window, "localStorage", {
             configurable: true,
-            value: storage,
+            value: storage
         });
 
         const sessionRecord = {
@@ -64,7 +64,7 @@ describe("auth/beings", () => {
                 id: "being-42",
                 name: "  Being Forty Two  ",
                 signingPublicKey: "sign",
-                encryptionPublicKey: "enc",
+                encryptionPublicKey: "enc"
             },
             encryptedBundle: {
                 algorithm: "AES-GCM",
@@ -73,8 +73,8 @@ describe("auth/beings", () => {
                 salt: "salt",
                 iterations: 1,
                 hash: "SHA-256",
-                keyLength: 256,
-            },
+                keyLength: 256
+            }
         };
 
         storage.setItem(STORAGE_KEY, JSON.stringify(sessionRecord));
@@ -85,7 +85,7 @@ describe("auth/beings", () => {
         const store = createStore();
         store.set(sessionAtoms.beingSessionAtom, {
             type: "set",
-            record: sessionRecord,
+            record: sessionRecord
         });
 
         const being = store.get(beings.beingAtom);
@@ -102,7 +102,7 @@ describe("auth/beings", () => {
                 id: "being-99",
                 name: "  Oracle  ",
                 signingPublicKey: "sign",
-                encryptionPublicKey: "enc",
+                encryptionPublicKey: "enc"
             },
             encryptedBundle: {
                 algorithm: "AES-GCM",
@@ -111,15 +111,15 @@ describe("auth/beings", () => {
                 salt: "salt",
                 iterations: 1,
                 hash: "SHA-256",
-                keyLength: 256,
-            },
+                keyLength: 256
+            }
         };
 
         storage.setItem(STORAGE_KEY, JSON.stringify(sessionRecord));
 
         Object.defineProperty(window, "localStorage", {
             configurable: true,
-            value: storage,
+            value: storage
         });
 
         const beings = await import(`../beings.ts?test=${Date.now()}-stored`);
@@ -132,7 +132,7 @@ describe("auth/beings", () => {
     it("logs a warning when stored session resolution fails", async () => {
         Object.defineProperty(window, "localStorage", {
             configurable: true,
-            value: {},
+            value: {}
         });
 
         const sessionModule = await import("../session.ts");
@@ -142,8 +142,8 @@ describe("auth/beings", () => {
                 ...sessionModule,
                 loadBeingSessionRecord() {
                     throw new Error("load failure");
-                },
-            },
+                }
+            }
         });
 
         const warn = mock.method(console, "warn");
@@ -161,11 +161,11 @@ describe("auth/beings", () => {
             getItem() {
                 throw new Error("failure");
             },
-            removeItem() {},
+            removeItem() {}
         };
         Object.defineProperty(window, "localStorage", {
             configurable: true,
-            value: storage,
+            value: storage
         });
 
         const beings = await import(`../beings.ts?test=${Date.now()}-error`);

@@ -7,7 +7,7 @@ export const encryptedPayloadSchema = z.object({
     salt: z.string(),
     iterations: z.number().int().positive(),
     hash: z.string(),
-    keyLength: z.number().int().positive(),
+    keyLength: z.number().int().positive()
 });
 
 export const beingSessionSchema = z.object({
@@ -17,9 +17,9 @@ export const beingSessionSchema = z.object({
         id: z.string(),
         name: z.string().optional(),
         signingPublicKey: z.string(),
-        encryptionPublicKey: z.string(),
+        encryptionPublicKey: z.string()
     }),
-    encryptedBundle: encryptedPayloadSchema,
+    encryptedBundle: encryptedPayloadSchema
 });
 
 export type BeingSessionRecord = z.infer<typeof beingSessionSchema>;

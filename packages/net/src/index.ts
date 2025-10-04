@@ -7,17 +7,17 @@ export type {
     SentimentProvider,
     SentimentNetworkOptions,
     SentimentNetworkStatus,
-    SentimentNetwork,
+    SentimentNetwork
 } from "./types.ts";
 export {
     getSentimentNetwork,
     getSentimentNetworkStatus,
     registerSentimentNetwork,
     clearSentimentNetwork,
-    setSentimentNetworkStatus,
+    setSentimentNetworkStatus
 } from "./runtime.ts";
 export {
     getNetworkStatus,
-    setNetworkStatus,
+    setNetworkStatus
 } from "./status.ts";
 export type { NetworkStatus } from "./status.ts";

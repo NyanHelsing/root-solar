@@ -14,7 +14,7 @@ export const refreshNetworkStatusAtom = atom(null, async (_get, set) => {
     } catch (error) {
         set(networkStatusAtom, {
             state: "error",
-            message: error instanceof Error ? error.message : "Unable to load network status",
+            message: error instanceof Error ? error.message : "Unable to load network status"
         });
     }
 });

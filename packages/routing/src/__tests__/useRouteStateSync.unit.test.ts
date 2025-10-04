@@ -32,21 +32,21 @@ describe("useRouteStateSync", () => {
                         null,
                         createElement(Route, {
                             path: "/missives/:id",
-                            element: createElement(SyncBoundary, null, children),
-                        }),
-                    ),
-                ),
+                            element: createElement(SyncBoundary, null, children)
+                        })
+                    )
+                )
             );
 
         const { unmount } = render(createElement("span", null, "child"), {
-            wrapper: Wrapper,
+            wrapper: Wrapper
         });
 
         assert.deepEqual(store.get(routeParamsAtom), { id: "42" });
         assert.equal(store.get(routePathAtom), "/missives/42");
         assert.deepEqual(store.get(routeQueryParamsAtom), {
             tag: "solar",
-            view: "grid",
+            view: "grid"
         });
 
         unmount();

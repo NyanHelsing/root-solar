@@ -3,7 +3,7 @@ import { atom } from "jotai";
 import {
     clearBeingSessionRecord,
     loadBeingSessionRecord,
-    type BeingSessionRecord,
+    type BeingSessionRecord
 } from "./session.ts";
 
 const resolveInitialSession = (): BeingSessionRecord | null => {
@@ -28,7 +28,7 @@ export const beingSessionAtom = atom<BeingSessionRecord | null, [BeingSessionAct
         }
         clearBeingSessionRecord();
         set(baseSessionAtom, null);
-    },
+    }
 );
 
 export const beingSessionSummaryAtom = atom((get) => {
@@ -39,6 +39,6 @@ export const beingSessionSummaryAtom = atom((get) => {
     const displayName = session.being.name?.trim() || session.being.id;
     return {
         beingId: session.being.id,
-        displayName,
+        displayName
     } as const;
 });

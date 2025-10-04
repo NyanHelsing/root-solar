@@ -17,16 +17,16 @@ describe("auth/webcrypto", () => {
     it("returns the global crypto reference", () => {
         const cryptoMock = {
             subtle: {
-                encrypt: async () => new ArrayBuffer(0),
+                encrypt: async () => new ArrayBuffer(0)
             },
             getRandomValues(array: Uint8Array) {
                 return array;
-            },
+            }
         } as unknown as Crypto;
 
         Object.defineProperty(globalThis, "crypto", {
             configurable: true,
-            value: cryptoMock,
+            value: cryptoMock
         });
 
         assert.equal(getWebCrypto(), cryptoMock);
@@ -36,7 +36,7 @@ describe("auth/webcrypto", () => {
     it("throws when crypto is missing", () => {
         Object.defineProperty(globalThis, "crypto", {
             configurable: true,
-            value: undefined,
+            value: undefined
         });
         assert.throws(() => getWebCrypto(), /global crypto missing/);
     });
@@ -47,8 +47,8 @@ describe("auth/webcrypto", () => {
             value: {
                 getRandomValues(array: Uint8Array) {
                     return array;
-                },
-            } as unknown as Crypto,
+                }
+            } as unknown as Crypto
         });
 
         assert.throws(() => getSubtleCrypto(), /subtle crypto missing/);

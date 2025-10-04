@@ -1,7 +1,7 @@
 export {
     beingRegistrationStartInputSchema,
     beingRegistrationCompleteInputSchema,
-    createBeingRegistrationHandlers,
+    createBeingRegistrationHandlers
 } from "./being-registration.ts";
 export type {
     BeingRegistrationStartInput,
@@ -12,5 +12,5 @@ export type {
     BeingRegistrationDependencies,
     BeingRegistrationStore,
     BeingRegistrationChallengeRecord,
-    BeingRegistrationProfile,
+    BeingRegistrationProfile
 } from "./being-registration.ts";

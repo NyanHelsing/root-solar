@@ -26,22 +26,22 @@ const defaultLocalStorage = {
     },
     removeItem: () => {
         throw new Error("unexpected removeItem call");
-    },
+    }
 };
 
 const setWindow = (overrides: Partial<WritableWindow>) => {
     Object.defineProperty(window, "localStorage", {
         configurable: true,
-        value: overrides.localStorage ?? defaultLocalStorage,
+        value: overrides.localStorage ?? defaultLocalStorage
     });
     if (overrides.crypto) {
         Object.defineProperty(window, "crypto", {
             configurable: true,
-            value: overrides.crypto,
+            value: overrides.crypto
         });
         Object.defineProperty(globalThis, "crypto", {
             configurable: true,
-            value: overrides.crypto,
+            value: overrides.crypto
         });
     }
 };
@@ -80,15 +80,15 @@ describe("auth/session edge cases", { concurrency: false }, () => {
                     }
                     (array as Uint8Array).set(next);
                     return array;
-                },
-            },
+                }
+            }
         });
         const session = await loadSessionModule();
         assert.equal(session.generateSessionPin(), "0042");
         if (originalCrypto) {
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
-                value: originalCrypto,
+                value: originalCrypto
             });
         } else {
             Reflect.deleteProperty(globalThis, "crypto");
@@ -112,7 +112,7 @@ describe("auth/session edge cases", { concurrency: false }, () => {
                         id: "being-1",
                         name: "Being",
                         signingPublicKey: "sign",
-                        encryptionPublicKey: "enc",
+                        encryptionPublicKey: "enc"
                     },
                     encryptedBundle: {
                         algorithm: "AES-GCM",
@@ -121,10 +121,10 @@ describe("auth/session edge cases", { concurrency: false }, () => {
                         salt: "salt",
                         iterations: 1,
                         hash: "SHA-256",
-                        keyLength: 256,
-                    },
+                        keyLength: 256
+                    }
                 }),
-            /Failed to persist session to local storage/,
+            /Failed to persist session to local storage/
         );
         setupDom();
     });
@@ -144,8 +144,8 @@ describe("auth/session edge cases", { concurrency: false }, () => {
                 },
                 removeItem: () => {
                     /* clear succeeds */
-                },
-            },
+                }
+            }
         });
 
         const session = await loadSessionModule();
@@ -164,8 +164,8 @@ describe("auth/session edge cases", { concurrency: false }, () => {
                 },
                 removeItem: () => {
                     throw new Error("remove failure");
-                },
-            },
+                }
+            }
         });
 
         const session = await loadSessionModule();
@@ -184,8 +184,8 @@ describe("auth/session edge cases", { concurrency: false }, () => {
                 },
                 removeItem: () => {
                     throw new Error("clear failure");
-                },
-            },
+                }
+            }
         });
 
         const session = await loadSessionModule();

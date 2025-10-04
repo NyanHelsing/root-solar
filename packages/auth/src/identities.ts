@@ -12,13 +12,13 @@ export type BeingKeyMaterial = {
 
 const generateKeyPair = async (
     curve: "ed25519" | "curve25519",
-    userName: string,
+    userName: string
 ): Promise<KeyPair> => {
     const { privateKey, publicKey } = await openpgp.generateKey({
         type: "ecc",
         curve,
         userIDs: [{ name: userName }],
-        format: "armored",
+        format: "armored"
     });
 
     return { publicKey, privateKey };
@@ -32,5 +32,5 @@ export const generateEncryptionKeyPair = async (): Promise<KeyPair> =>
 
 export const generateBeingKeyMaterial = async (): Promise<BeingKeyMaterial> => ({
     signing: await generateSigningKeyPair(),
-    encryption: await generateEncryptionKeyPair(),
+    encryption: await generateEncryptionKeyPair()
 });

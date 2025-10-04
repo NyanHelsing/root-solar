@@ -5,7 +5,7 @@ import {
     useFilteredMissives,
     useMissiveTagOptions,
     useSelectedMissiveTag,
-    useSetSelectedMissiveTag,
+    useSetSelectedMissiveTag
 } from "../state/list/index.ts";
 
 export const useMissiveTagFilter = (): {
@@ -26,7 +26,7 @@ export const useMissiveTagFilter = (): {
         tagOptions,
         selectedTag,
         setSelectedTag,
-        activeTagDescriptor,
+        activeTagDescriptor
     } as const;
 };
 

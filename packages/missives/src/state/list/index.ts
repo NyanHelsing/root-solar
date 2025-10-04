@@ -14,7 +14,7 @@ export { toErrorMessage } from "./toErrorMessage.ts";
 export {
     missiveTagSelectionAtom,
     useSelectedMissiveTag,
-    useSetSelectedMissiveTag,
+    useSetSelectedMissiveTag
 } from "./missiveTagSelectionAtom.ts";
 export { missiveTagOptionsAtom, useMissiveTagOptions } from "./missiveTagOptionsAtom.ts";
 export { activeTagDescriptorAtom, useActiveTagDescriptor } from "./activeTagDescriptorAtom.ts";

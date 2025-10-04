@@ -37,7 +37,7 @@ export interface SentimentNetwork {
     close: () => Promise<void>;
     getStatus?: () => SentimentNetworkStatus;
     onStatusChange?: (
-        listener: (status: SentimentNetworkStatus) => void,
+        listener: (status: SentimentNetworkStatus) => void
     ) => (() => void) | undefined;
 }
 

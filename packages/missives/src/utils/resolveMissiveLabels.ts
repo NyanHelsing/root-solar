@@ -13,14 +13,14 @@ export const resolveMissiveLabels = (tagSlug?: string): MissiveLabels => {
         return {
             singular: "axiom",
             plural: "axioms",
-            capitalized: "Axiom",
+            capitalized: "Axiom"
         } satisfies MissiveLabels;
     }
     const singular = tagSlug ?? "missive";
     return {
         singular,
         plural: pluralize(singular),
-        capitalized: capitalize(singular),
+        capitalized: capitalize(singular)
     } satisfies MissiveLabels;
 };
 

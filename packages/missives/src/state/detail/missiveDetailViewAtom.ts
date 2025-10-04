@@ -21,7 +21,7 @@ export const missiveDetailViewAtom = atom((get): MissiveDetailView => {
             missiveId: null,
             record: null,
             sentiments: [],
-            comments: [],
+            comments: []
         } satisfies MissiveDetailView;
     }
 
@@ -32,7 +32,7 @@ export const missiveDetailViewAtom = atom((get): MissiveDetailView => {
         missiveId,
         record,
         sentiments: detail?.sentiments ?? [],
-        comments: detail?.comments ?? [],
+        comments: detail?.comments ?? []
     } satisfies MissiveDetailView;
 });
 

@@ -11,7 +11,7 @@ export const sentimentsQueryAtom = trpc.listSentimentsForBeing.atomWithQuery((ge
     const being = get(beingAtom);
     return {
         beingId: being.id,
-        subjectTable: "missive",
+        subjectTable: "missive"
     } satisfies ListSentimentsInput;
 });
 

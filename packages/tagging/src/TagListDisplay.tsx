@@ -19,7 +19,7 @@ const TagListDisplayComponent = ({
     gap = "sm",
     className,
     emptyLabel,
-    onRemove,
+    onRemove
 }: TagListDisplayProps): ReactElement | null => {
     if (tags.length === 0) {
         if (emptyLabel === null) {

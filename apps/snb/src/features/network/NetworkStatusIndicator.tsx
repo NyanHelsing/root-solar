@@ -32,7 +32,7 @@ const toneByState: Record<NetworkStatus["state"], StatusIndicatorTone> = {
     ready: "success",
     starting: "info",
     error: "danger",
-    offline: "muted",
+    offline: "muted"
 };
 
 export default function NetworkStatusIndicator() {

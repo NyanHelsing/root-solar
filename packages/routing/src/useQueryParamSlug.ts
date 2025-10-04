@@ -33,7 +33,7 @@ const defaultNormalize: NormalizeFn = (value) => {
 const createQueryParamSlugAtom = (
     key: string,
     normalize: NormalizeFn,
-    defaultValue: string | null | undefined,
+    defaultValue: string | null | undefined
 ): WritableAtom<string | null, [string | null], void> =>
     atom<string | null, [string | null], void>(
         (get) => {
@@ -46,18 +46,18 @@ const createQueryParamSlugAtom = (
         },
         (_get, set, next) => {
             set(setRouteQueryParamAtom, { key, value: next });
-        },
+        }
     );
 
 export const useQueryParamSlug = ({
     key,
     defaultValue = null,
     normalize = defaultNormalize,
-    replace = true,
+    replace = true
 }: UseQueryParamSlugOptions): UseQueryParamSlugResult => {
     const slugAtom = useMemo(
         () => createQueryParamSlugAtom(key, normalize, defaultValue),
-        [defaultValue, key, normalize],
+        [defaultValue, key, normalize]
     );
     const [normalizedValue, commitValue] = useAtom(slugAtom);
     const navigate = useNavigate();
@@ -78,17 +78,17 @@ export const useQueryParamSlug = ({
             navigate(
                 {
                     pathname: location.pathname,
-                    search: search.length > 0 ? `?${search}` : undefined,
+                    search: search.length > 0 ? `?${search}` : undefined
                 },
-                { replace },
+                { replace }
             );
         },
-        [key, location.pathname, location.search, navigate, replace, commitValue],
+        [key, location.pathname, location.search, navigate, replace, commitValue]
     );
 
     return {
         value: normalizedValue,
-        setValue,
+        setValue
     };
 };
 

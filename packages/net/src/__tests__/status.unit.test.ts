@@ -12,7 +12,7 @@ describe("net/status", () => {
         const nextStatus = {
             state: "ready" as const,
             protocol: "proto",
-            peerId: "peer",
+            peerId: "peer"
         };
 
         setNetworkStatus(nextStatus);

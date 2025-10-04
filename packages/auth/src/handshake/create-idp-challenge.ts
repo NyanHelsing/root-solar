@@ -15,7 +15,7 @@ export const createIdpChallenge = async (
         idpSigningKeyPair?: KeyPair;
         nonceLength?: number;
         challengeId?: string;
-    } = {},
+    } = {}
 ): Promise<{ challenge: IdpChallenge; record: IdpChallengeRecord }> => {
     const idpSigningKeyPair = options.idpSigningKeyPair ?? (await generateSigningKeyPair());
 
@@ -33,23 +33,23 @@ export const createIdpChallenge = async (
             message,
             encryptionKeys: encryptionKey,
             signingKeys: signingKey,
-            format: "armored",
-        }),
+            format: "armored"
+        })
     );
 
     return {
         challenge: {
             challengeId,
             encryptedNonce,
-            idpSigningPublicKey: idpSigningKeyPair.publicKey,
+            idpSigningPublicKey: idpSigningKeyPair.publicKey
         },
         record: {
             challengeId,
             nonce: nonceBase64,
             idpSigningKeyPair,
             beingSigningPublicKey: request.signingPublicKey,
-            beingEncryptionPublicKey: request.encryptionPublicKey,
-        },
+            beingEncryptionPublicKey: request.encryptionPublicKey
+        }
     };
 };
 

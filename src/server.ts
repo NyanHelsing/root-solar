@@ -2,7 +2,7 @@ import {
     LogLevel,
     createAppLogger,
     initializeObservability,
-    parseLogLevel,
+    parseLogLevel
 } from "@root-solar/observability";
 import { startServer } from "@root-solar/server";
 
@@ -15,15 +15,15 @@ const resolvedLevel = initializeObservability({
     level: desiredLevel,
     metadata: {
         environment,
-        platform: "node",
-    },
+        platform: "node"
+    }
 });
 const bootstrapLogger = createAppLogger("server:bootstrap", {
-    tags: ["server", "startup"],
+    tags: ["server", "startup"]
 });
 
 bootstrapLogger.info("Starting server bootstrap", {
-    logLevel: LogLevel.getName(resolvedLevel),
+    logLevel: LogLevel.getName(resolvedLevel)
 });
 
 void startServer();

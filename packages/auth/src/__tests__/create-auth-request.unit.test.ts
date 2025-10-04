@@ -12,15 +12,15 @@ import { BEING_KEY_MATERIAL, BEING_SIGNING_PUBLIC_KEY } from "./fixtures/pgp-key
 const verifySignature = async (messageBytes: Uint8Array, signature: string) => {
     const message = await openpgp.createMessage({ binary: messageBytes });
     const signatureObject = await openpgp.readSignature({
-        armoredSignature: signature,
+        armoredSignature: signature
     });
     const verificationKey = await openpgp.readKey({
-        armoredKey: BEING_SIGNING_PUBLIC_KEY,
+        armoredKey: BEING_SIGNING_PUBLIC_KEY
     });
     const { signatures } = await openpgp.verify({
         message,
         signature: signatureObject,
-        verificationKeys: verificationKey,
+        verificationKeys: verificationKey
     });
     const [first] = signatures;
     assert.ok(first, "expected at least one signature");
@@ -35,11 +35,11 @@ describe("createAuthRequest", () => {
         const expectedMessageBytes = buildAuthMessage(
             BEING_KEY_MATERIAL.signing.publicKey,
             BEING_KEY_MATERIAL.encryption.publicKey,
-            intentBytes,
+            intentBytes
         );
 
         const request = await createAuthRequest(BEING_KEY_MATERIAL, {
-            intent,
+            intent
         });
 
         assert.equal(request.payload.signingPublicKey, BEING_KEY_MATERIAL.signing.publicKey);
@@ -53,7 +53,7 @@ describe("createAuthRequest", () => {
         const expectedMessageBytes = buildAuthMessage(
             BEING_KEY_MATERIAL.signing.publicKey,
             BEING_KEY_MATERIAL.encryption.publicKey,
-            undefined,
+            undefined
         );
 
         const request = await createAuthRequest(BEING_KEY_MATERIAL);
@@ -68,11 +68,11 @@ describe("createAuthRequest", () => {
         const expectedMessageBytes = buildAuthMessage(
             BEING_KEY_MATERIAL.signing.publicKey,
             BEING_KEY_MATERIAL.encryption.publicKey,
-            intentBytes,
+            intentBytes
         );
 
         const request = await createAuthRequest(BEING_KEY_MATERIAL, {
-            intent: intentBytes as AuthIntent,
+            intent: intentBytes as AuthIntent
         });
 
         assert.equal(request.payload.intent, toBase64(intentBytes));

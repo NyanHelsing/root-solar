@@ -33,7 +33,7 @@ const BrandMark = ({
 
     const mergedStyle = {
         ...styleOverrides,
-        ...(style as CSSProperties | undefined),
+        ...(style as CSSProperties | undefined)
     } as CSSProperties;
 
     if (label) {

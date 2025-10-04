@@ -6,7 +6,7 @@ import {
     addMissiveCommentAtom,
     updateMissiveSentimentAtom,
     createMissiveAtom,
-    updateMissiveAtom,
+    updateMissiveAtom
 } from "../state/actions/index.ts";
 
 // These wrappers preserve the existing public API surface while atoms move under state/.

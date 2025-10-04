@@ -29,7 +29,7 @@ export type MissiveListControllerState = {
 };
 
 const useMissiveListController = ({
-    sentiment,
+    sentiment
 }: MissiveListControllerProps): MissiveListControllerState => {
     const filterControlId = useId();
 
@@ -44,7 +44,7 @@ const useMissiveListController = ({
         (nextTag: string | null) => {
             setSelectedTag(nextTag);
         },
-        [setSelectedTag],
+        [setSelectedTag]
     );
 
     const copy = useMissiveListCopy(activeTagDescriptor, sentimentFilterSlug, normalizedSentiment);
@@ -61,7 +61,7 @@ const useMissiveListController = ({
         handleFilterChange,
         sentimentFilterSlug,
         activeSentimentTagId,
-        isSentimentCapped,
+        isSentimentCapped
     } satisfies MissiveListControllerState;
 };
 

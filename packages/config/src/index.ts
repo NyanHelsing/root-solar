@@ -46,7 +46,7 @@ export const useConfig = <TConfig = AppConfig>() =>
 
 export const useInitializeConfig = <TConfig extends AppConfig>(
     config: ConfigInput<TConfig>,
-    dependencies: ReadonlyArray<unknown> = [],
+    dependencies: ReadonlyArray<unknown> = []
 ) => {
     const setConfig = useSetAtom(configAtom, { store: configStore });
 

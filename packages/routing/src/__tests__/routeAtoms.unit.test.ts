@@ -10,13 +10,13 @@ import {
     routeParamsAtom,
     setRouteParamsAtom,
     useRouteParams,
-    useSetRouteParams,
+    useSetRouteParams
 } from "../routeParamsAtom.ts";
 import { routePathAtom, useRoutePath, useSetRoutePath } from "../routePathAtom.ts";
 import {
     routeQueryParamsAtom,
     setRouteQueryParamsAtom,
-    setRouteQueryParamAtom,
+    setRouteQueryParamAtom
 } from "../routeQueryParamsAtom.ts";
 
 const withProvider = (store: ReturnType<typeof createStore>, ui: ReactNode) => {
@@ -98,10 +98,10 @@ describe("routing atoms", () => {
                         "data-testid": "set",
                         onClick: () => {
                             setParams({ view: "hooks" });
-                        },
+                        }
                     },
-                    "update",
-                ),
+                    "update"
+                )
             );
         };
 
@@ -129,10 +129,10 @@ describe("routing atoms", () => {
                         "data-testid": "set-path",
                         onClick: () => {
                             setPath("/hooks");
-                        },
+                        }
                     },
-                    "update",
-                ),
+                    "update"
+                )
             );
         };
 

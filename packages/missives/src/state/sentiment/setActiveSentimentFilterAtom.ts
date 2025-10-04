@@ -11,7 +11,7 @@ export const setActiveSentimentFilterAtom = atom(null, (get, set, slug: string |
     }
     set(activeSentimentAtom, {
         ...current,
-        filter: nextFilter,
+        filter: nextFilter
     });
 });
 

@@ -9,7 +9,7 @@ const defaultTag: TagRecord = {
     id: "tag:focus",
     slug: "focus",
     label: "Focus",
-    tags: ["tag:sentimental"],
+    tags: ["tag:sentimental"]
 };
 
 describe("sentiment entity", () => {
@@ -34,22 +34,22 @@ describe("sentiment entity", () => {
                         subjectId: (args[1] as { subjectId: string }).subjectId,
                         subjectTable: (args[1] as { subjectTable: string }).subjectTable,
                         tagId: (args[1] as { tagId: string }).tagId,
-                        weight: (args[1] as { weight: number }).weight,
+                        weight: (args[1] as { weight: number }).weight
                     } satisfies Record<string, unknown>;
                 },
                 delete: async (...args: unknown[]) => {
                     deleteCalls.push(args);
                 },
-                select: async (...args: unknown[]) => selectResponses.shift() ?? null,
+                select: async (...args: unknown[]) => selectResponses.shift() ?? null
             } as unknown as Context["db"],
             tags: {
                 getMany: async () => [defaultTag],
                 get: async () => defaultTag,
-                upsert: async () => defaultTag,
+                upsert: async () => defaultTag
             } as unknown as Context["tags"],
             beings: {
-                create: async () => ({ id: "being-created" }),
-            } as unknown as Context["beings"],
+                create: async () => ({ id: "being-created" })
+            } as unknown as Context["beings"]
         };
 
         return {
@@ -58,7 +58,7 @@ describe("sentiment entity", () => {
             queryCalls,
             upsertCalls,
             deleteCalls,
-            selectResponses,
+            selectResponses
         };
     };
 
@@ -77,7 +77,7 @@ describe("sentiment entity", () => {
                         subjectId: "subject-1",
                         subjectTable: "missive",
                         tagId: "tag:focus",
-                        weight: 3,
+                        weight: 3
                     },
                     {
                         id: "other",
@@ -85,10 +85,10 @@ describe("sentiment entity", () => {
                         subjectId: "subject-2",
                         subjectTable: "missive",
                         tagId: "tag:focus",
-                        weight: 2,
-                    },
-                ],
-            },
+                        weight: 2
+                    }
+                ]
+            }
         ]);
 
         selectResponses.push({ id: new StringRecordId("being:1"), name: "existing" });
@@ -101,7 +101,7 @@ describe("sentiment entity", () => {
             subjectId: "subject-1",
             tagId: "tag:focus",
             weight: 4,
-            maxWeight: 10,
+            maxWeight: 10
         });
 
         assert.ok(allocation);
@@ -125,10 +125,10 @@ describe("sentiment entity", () => {
                         subjectId: "missive:2",
                         subjectTable: "missive",
                         tagId: "tag:focus",
-                        weight: 8,
-                    },
-                ],
-            },
+                        weight: 8
+                    }
+                ]
+            }
         ]);
         const { createSentimentModel } = await import("../entity.ts");
         const model = createSentimentModel(ctx);
@@ -139,9 +139,9 @@ describe("sentiment entity", () => {
                 subjectId: "subject-1",
                 tagId: "tag:focus",
                 weight: 4,
-                maxWeight: 10,
+                maxWeight: 10
             }),
-            /exceeds allocation/,
+            /exceeds allocation/
         );
 
         await assert.rejects(
@@ -149,9 +149,9 @@ describe("sentiment entity", () => {
                 beingId: "being:1",
                 subjectId: "missive:1",
                 tagId: "tag:focus",
-                weight: 1.5,
+                weight: 1.5
             }),
-            /integer/,
+            /integer/
         );
 
         await assert.rejects(
@@ -159,9 +159,9 @@ describe("sentiment entity", () => {
                 beingId: "being:1",
                 subjectId: "missive:1",
                 tagId: "tag:focus",
-                weight: -1,
+                weight: -1
             }),
-            /must be non-negative/,
+            /must be non-negative/
         );
 
         await assert.rejects(
@@ -170,9 +170,9 @@ describe("sentiment entity", () => {
                 subjectId: "subject-1",
                 tagId: "tag:focus",
                 weight: 1,
-                maxWeight: -2,
+                maxWeight: -2
             }),
-            /must be non-negative/,
+            /must be non-negative/
         );
     });
 
@@ -182,8 +182,8 @@ describe("sentiment entity", () => {
         queryResults.push([
             {
                 status: "OK",
-                result: [],
-            },
+                result: []
+            }
         ]);
         const { createSentimentModel } = await import("../entity.ts");
         const model = createSentimentModel(ctx);
@@ -192,7 +192,7 @@ describe("sentiment entity", () => {
             beingId: "being:1",
             subjectId: "subject-1",
             tagId: "tag:focus",
-            weight: 0,
+            weight: 0
         });
 
         assert.equal(result, null);
@@ -207,15 +207,15 @@ describe("sentiment entity", () => {
         queryResults.push([
             {
                 status: "OK",
-                result: [],
-            },
+                result: []
+            }
         ]);
         selectResponses.push(null);
 
         ctx.tags = {
             getMany: async () => [defaultTag],
             get: async () => null,
-            upsert: async () => defaultTag,
+            upsert: async () => defaultTag
         } as unknown as Context["tags"];
 
         const creations: unknown[] = [];
@@ -223,7 +223,7 @@ describe("sentiment entity", () => {
             create: async (input: unknown) => {
                 creations.push(input);
                 return { id: "being:new" };
-            },
+            }
         } as Context["beings"];
 
         const { createSentimentModel } = await import("../entity.ts");
@@ -232,7 +232,7 @@ describe("sentiment entity", () => {
             beingId: "being:missing",
             subjectId: "subject-1",
             tagId: "tag:focus",
-            weight: 2,
+            weight: 2
         });
         assert.ok(allocation);
         assert.equal(creations.length, 1);
@@ -250,7 +250,7 @@ describe("sentiment entity", () => {
                     subjectId: "missive:1",
                     subjectTable: "missive",
                     tagId: "tag:focus",
-                    weight: 3,
+                    weight: 3
                 },
                 {
                     id: "being:1:tag:focus:missive:2",
@@ -258,9 +258,9 @@ describe("sentiment entity", () => {
                     subjectId: "missive:2",
                     subjectTable: "missive",
                     tagId: "tag:focus",
-                    weight: 1,
-                },
-            ],
+                    weight: 1
+                }
+            ]
         ]);
 
         const { createSentimentModel } = await import("../entity.ts");
@@ -276,8 +276,8 @@ describe("sentiment entity", () => {
         const { ctx, queryResults } = helpers;
         queryResults.push([
             {
-                status: "ERR",
-            },
+                status: "ERR"
+            }
         ]);
 
         const { createSentimentModel } = await import("../entity.ts");
@@ -292,8 +292,8 @@ describe("sentiment entity", () => {
         queryResults.push([
             {
                 status: "OK",
-                result: undefined,
-            },
+                result: undefined
+            }
         ]);
         const unexpectedShape = await model.listForBeing("being:1", { subjectTable: "custom" });
         assert.deepEqual(unexpectedShape, []);
@@ -307,7 +307,7 @@ describe("sentiment entity", () => {
         await model.remove({
             beingId: "being:1",
             subjectId: "missive:7",
-            tagId: "tag:focus",
+            tagId: "tag:focus"
         });
         assert.equal(deleteCalls.length, 1);
         const [identifier] = deleteCalls[0] as [RecordId];
@@ -320,13 +320,13 @@ describe("sentiment entity", () => {
         queryResults.push([
             {
                 status: "OK",
-                result: [],
-            },
+                result: []
+            }
         ]);
         selectResponses.push({ id: new StringRecordId("being:fixture") });
         ctx.db = {
             ...ctx.db,
-            upsert: async () => null,
+            upsert: async () => null
         } as Context["db"];
         const { createSentimentModel } = await import("../entity.ts");
         const model = createSentimentModel(ctx);
@@ -334,7 +334,7 @@ describe("sentiment entity", () => {
             beingId: "being:fixture",
             subjectId: "subject-1",
             tagId: "tag:focus",
-            weight: 2,
+            weight: 2
         });
         assert.equal(result, null);
     });
@@ -345,15 +345,15 @@ describe("sentiment entity", () => {
         queryResults.push([
             {
                 status: "OK",
-                result: [],
-            },
+                result: []
+            }
         ]);
         selectResponses.push({ id: new StringRecordId("being:oops") });
 
         ctx.tags = {
             getMany: async () => [defaultTag],
             get: async () => null,
-            upsert: async () => null,
+            upsert: async () => null
         } as unknown as Context["tags"];
 
         const { createSentimentModel } = await import("../entity.ts");
@@ -363,9 +363,9 @@ describe("sentiment entity", () => {
                 beingId: "being:oops",
                 subjectId: "subject-1",
                 tagId: "tag:new",
-                weight: 1,
+                weight: 1
             }),
-            /Failed to ensure tag/,
+            /Failed to ensure tag/
         );
     });
 });

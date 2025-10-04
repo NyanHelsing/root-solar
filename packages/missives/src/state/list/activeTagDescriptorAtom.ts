@@ -17,7 +17,7 @@ export const activeTagDescriptorAtom = atom<TagOption | undefined>((get) => {
     }
     return {
         slug: selectedTag,
-        label: labelFromSlug(selectedTag),
+        label: labelFromSlug(selectedTag)
     } satisfies TagOption;
 });
 

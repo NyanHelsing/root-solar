@@ -30,7 +30,7 @@ export const MissiveDetailContent = ({
     comments,
     record,
     onCommitSentiment,
-    onSubmitComment,
+    onSubmitComment
 }: MissiveDetailContentProps) => (
     <FlareStack gap="lg">
         <FlareStack gap="sm" as="header">

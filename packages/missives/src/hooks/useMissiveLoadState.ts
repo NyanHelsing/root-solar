@@ -1,7 +1,7 @@
 import {
     useMissivesOverview,
     useMissivesListError,
-    useMissivesListLoading,
+    useMissivesListLoading
 } from "../state/list/index.ts";
 
 export const useMissiveLoadState = () => {
@@ -12,7 +12,7 @@ export const useMissiveLoadState = () => {
     return {
         missives,
         isLoading,
-        error,
+        error
     } as const;
 };
 

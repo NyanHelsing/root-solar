@@ -9,14 +9,14 @@ import {
     beingRegistrationStartInputSchema,
     beingRegistrationCompleteInputSchema,
     createBeingRegistrationHandlers,
-    type BeingRegistrationProfile,
+    type BeingRegistrationProfile
 } from "@root-solar/auth/procedures";
 import type { BeingRecord } from "./persistence/entities/being/entity.ts";
 
 export const t = initTRPC.context<Context>().create();
 
 const routerLogger = createAppLogger("api:router", {
-    tags: ["api", "trpc"],
+    tags: ["api", "trpc"]
 });
 
 const loggingMiddleware = t.middleware(async ({ path, type, input, next }) => {
@@ -26,7 +26,7 @@ const loggingMiddleware = t.middleware(async ({ path, type, input, next }) => {
         path,
         type,
         hasInput,
-        tags: ["request", "trpc"],
+        tags: ["request", "trpc"]
     });
     try {
         const result = await next();
@@ -36,14 +36,14 @@ const loggingMiddleware = t.middleware(async ({ path, type, input, next }) => {
                 path,
                 type,
                 durationMs,
-                tags: ["request", "trpc"],
+                tags: ["request", "trpc"]
             });
         } else {
             routerLogger.error("tRPC call failed", result.error, {
                 path,
                 type,
                 durationMs,
-                tags: ["request", "trpc"],
+                tags: ["request", "trpc"]
             });
         }
         return result;
@@ -54,7 +54,7 @@ const loggingMiddleware = t.middleware(async ({ path, type, input, next }) => {
             type,
             hasInput,
             durationMs,
-            tags: ["request", "trpc"],
+            tags: ["request", "trpc"]
         });
         throw error;
     }
@@ -70,20 +70,20 @@ const createBeingRegistrationResolver = (ctx: Context) =>
             signingPublicKey,
             encryptionPublicKey,
             intentBase64,
-            messageBase64,
+            messageBase64
         }) =>
             await ctx.beings.create({
                 name,
                 signingPublicKey,
                 encryptionPublicKey,
                 intentBase64,
-                messageBase64,
-            }),
+                messageBase64
+            })
     });
 
 const listAxiomsInput = z
     .object({
-        sentiment: z.string().min(1).optional(),
+        sentiment: z.string().min(1).optional()
     })
     .optional();
 
@@ -93,30 +93,30 @@ const listTagsOutput = z.array(
         slug: z.string().min(1),
         label: z.string().min(1),
         description: z.string().optional(),
-        tags: z.array(z.string().min(1)).optional(),
-    }),
+        tags: z.array(z.string().min(1)).optional()
+    })
 );
 
 const createMissiveInput = z.object({
     title: z.string().min(5),
     details: z.string().min(5).optional(),
-    tagSlugs: z.array(z.string().min(1)).optional(),
+    tagSlugs: z.array(z.string().min(1)).optional()
 });
 
 const updateMissiveInput = z.object({
     missiveId: z.string().min(1),
     title: z.string().min(5),
-    details: z.string().min(5).optional(),
+    details: z.string().min(5).optional()
 });
 
 const addMissiveTagInput = z.object({
     missiveId: z.string().min(1),
-    tagSlug: z.string().min(1),
+    tagSlug: z.string().min(1)
 });
 
 const addTagTagInput = z.object({
     tagId: z.string().min(1),
-    tagSlug: z.string().min(1),
+    tagSlug: z.string().min(1)
 });
 
 const removeMissiveTagInput = addMissiveTagInput;
@@ -146,7 +146,7 @@ const resolveTagId = (input: string): string | null => {
 
 const getAxiomInput = z.object({
     axiomId: z.string().min(1),
-    beingId: z.string().min(1).optional(),
+    beingId: z.string().min(1).optional()
 });
 
 const sentimentInput = z.object({
@@ -155,20 +155,20 @@ const sentimentInput = z.object({
     subjectTable: z.string().min(1).optional(),
     tagId: z.string().min(1),
     weight: z.number().int().min(0),
-    maxWeight: z.number().int().min(0).optional(),
+    maxWeight: z.number().int().min(0).optional()
 });
 
 const listSentimentsInput = z.object({
     beingId: z.string().min(1),
     tagId: z.string().min(1).optional(),
-    subjectTable: z.string().min(1).optional(),
+    subjectTable: z.string().min(1).optional()
 });
 
 const removeSentimentInput = z.object({
     beingId: z.string().min(1),
     subjectId: z.string().min(1),
     subjectTable: z.string().min(1).optional(),
-    tagId: z.string().min(1),
+    tagId: z.string().min(1)
 });
 
 const createCommentInput = z.object({
@@ -176,7 +176,7 @@ const createCommentInput = z.object({
     parentCommentId: z.string().min(1).optional(),
     authorBeingId: z.string().min(1),
     authorDisplayName: z.string().min(1),
-    body: z.string().min(1),
+    body: z.string().min(1)
 });
 
 export const router = t.router({
@@ -189,7 +189,7 @@ export const router = t.router({
         if (!missive) {
             routerLogger.debug("Missive not found for detail", {
                 id: input.axiomId,
-                tags: ["query"],
+                tags: ["query"]
             });
             return null;
         }
@@ -197,13 +197,13 @@ export const router = t.router({
         const sentiments = input.beingId
             ? (await ctx.sentiments.listForBeing(input.beingId)).filter(
                   (sentiment) =>
-                      sentiment.subjectTable === "missive" && sentiment.subjectId === missive.id,
+                      sentiment.subjectTable === "missive" && sentiment.subjectId === missive.id
               )
             : [];
         return {
             ...missive,
             comments,
-            sentiments,
+            sentiments
         };
     }),
     createMissive: procedure
@@ -219,31 +219,31 @@ export const router = t.router({
         routerLogger.debug("addMissiveTag invoked", {
             missiveId: input.missiveId,
             tagSlug: input.tagSlug,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
         const normalizedSlug = resolveTagSlug(input.tagSlug);
         if (!normalizedSlug) {
             throw new TRPCError({
                 code: "BAD_REQUEST",
-                message: "Provide a valid tag slug.",
+                message: "Provide a valid tag slug."
             });
         }
 
         routerLogger.debug("Normalized tag slug for missive", {
             missiveId: input.missiveId,
             normalizedSlug,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
 
         const updatedMissive = await ctx.missives.addTag({
             missiveId: input.missiveId,
-            tagSlug: normalizedSlug,
+            tagSlug: normalizedSlug
         });
 
         if (!updatedMissive) {
             throw new TRPCError({
                 code: "NOT_FOUND",
-                message: "Missive not found.",
+                message: "Missive not found."
             });
         }
 
@@ -251,7 +251,7 @@ export const router = t.router({
             missiveId: updatedMissive.id,
             ensuredTagSlug: normalizedSlug,
             tagCount: updatedMissive.tags.length,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
 
         return updatedMissive;
@@ -260,14 +260,14 @@ export const router = t.router({
         routerLogger.debug("addTagTag invoked", {
             tagId: input.tagId,
             tagSlug: input.tagSlug,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
 
         const normalizedTagId = resolveTagId(input.tagId);
         if (!normalizedTagId) {
             throw new TRPCError({
                 code: "BAD_REQUEST",
-                message: "Provide a valid tag identifier.",
+                message: "Provide a valid tag identifier."
             });
         }
 
@@ -275,32 +275,32 @@ export const router = t.router({
         if (!normalizedSlug) {
             throw new TRPCError({
                 code: "BAD_REQUEST",
-                message: "Provide a valid tag slug.",
+                message: "Provide a valid tag slug."
             });
         }
 
         routerLogger.debug("Resolved tag tagging payload", {
             targetTagId: normalizedTagId,
             parentTagSlug: normalizedSlug,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
 
         const updatedTag = await ctx.tags.addParent({
             tagId: normalizedTagId,
-            parentTagSlug: normalizedSlug,
+            parentTagSlug: normalizedSlug
         });
 
         if (!updatedTag) {
             throw new TRPCError({
                 code: "NOT_FOUND",
-                message: "Tag not found.",
+                message: "Tag not found."
             });
         }
 
         routerLogger.debug("Tag updated with parent", {
             tagId: updatedTag.id,
             parentCount: updatedTag.tags?.length ?? 0,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
 
         return updatedTag;
@@ -309,25 +309,25 @@ export const router = t.router({
         routerLogger.debug("removeMissiveTag invoked", {
             missiveId: input.missiveId,
             tagSlug: input.tagSlug,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
         const normalizedSlug = resolveTagSlug(input.tagSlug);
         if (!normalizedSlug) {
             throw new TRPCError({
                 code: "BAD_REQUEST",
-                message: "Provide a valid tag slug.",
+                message: "Provide a valid tag slug."
             });
         }
 
         const updatedMissive = await ctx.missives.removeTag({
             missiveId: input.missiveId,
-            tagSlug: normalizedSlug,
+            tagSlug: normalizedSlug
         });
 
         if (!updatedMissive) {
             throw new TRPCError({
                 code: "NOT_FOUND",
-                message: "Missive not found.",
+                message: "Missive not found."
             });
         }
 
@@ -335,7 +335,7 @@ export const router = t.router({
             missiveId: updatedMissive.id,
             removedTagSlug: normalizedSlug,
             tagCount: updatedMissive.tags.length,
-            tags: ["mutation", "tag"],
+            tags: ["mutation", "tag"]
         });
 
         return updatedMissive;
@@ -347,29 +347,29 @@ export const router = t.router({
             subjectTable: input.subjectTable ?? "missive",
             tagId: input.tagId,
             weight: input.weight,
-            maxWeight: input.maxWeight,
-        }),
+            maxWeight: input.maxWeight
+        })
     ),
     listSentimentsForBeing: procedure.input(listSentimentsInput).query(({ input, ctx }) =>
         ctx.sentiments.listForBeing(input.beingId, {
             tagId: input.tagId,
-            subjectTable: input.subjectTable ?? "missive",
-        }),
+            subjectTable: input.subjectTable ?? "missive"
+        })
     ),
     removeSentiment: procedure.input(removeSentimentInput).mutation(({ input, ctx }) =>
         ctx.sentiments.remove({
             beingId: input.beingId,
             subjectId: input.subjectId,
             subjectTable: input.subjectTable ?? "missive",
-            tagId: input.tagId,
-        }),
+            tagId: input.tagId
+        })
     ),
     addAxiomComment: procedure.input(createCommentInput).mutation(async ({ input, ctx }) => {
         const missive = await ctx.missives.get(input.axiomId);
         if (!missive) {
             throw new TRPCError({
                 code: "NOT_FOUND",
-                message: `Missive ${input.axiomId} not found`,
+                message: `Missive ${input.axiomId} not found`
             });
         }
         return await ctx.comments.create({
@@ -377,7 +377,7 @@ export const router = t.router({
             parentCommentId: input.parentCommentId,
             authorBeingId: input.authorBeingId,
             authorDisplayName: input.authorDisplayName,
-            body: input.body,
+            body: input.body
         });
     }),
     startBeingRegistration: procedure
@@ -386,7 +386,7 @@ export const router = t.router({
     completeBeingRegistration: procedure
         .input(beingRegistrationCompleteInputSchema)
         .mutation(({ ctx, input }) => createBeingRegistrationResolver(ctx).complete(input)),
-    networkStatus: procedure.query(() => getNetworkStatus()),
+    networkStatus: procedure.query(() => getNetworkStatus())
 });
 
 export type ApiRouter = typeof router;

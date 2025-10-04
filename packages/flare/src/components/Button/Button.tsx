@@ -12,14 +12,14 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     { variant = "primary", size = "md", fullWidth = false, className, ...props },
-    ref,
+    ref
 ) {
     const classes = [
         styles.button,
         styles[`button--${variant}`],
         size !== "md" ? styles[`button--${size}`] : undefined,
         fullWidth ? styles["button--full"] : undefined,
-        className,
+        className
     ]
         .filter(Boolean)
         .join(" ");

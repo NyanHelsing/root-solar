@@ -12,7 +12,7 @@ import {
     DEFAULT_SNB_MOUNT,
     resolveAssetPrefix,
     resolveBaseUrl,
-    resolveMountPath,
+    resolveMountPath
 } from "../../config/mfePaths.ts";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -34,55 +34,55 @@ export default defineConfig({
             name: "shell",
             remotes: {
                 snb: `snb@${remoteBase}/mf-manifest.json`,
-                auth: `auth@${authRemoteBase}/mf-manifest.json`,
+                auth: `auth@${authRemoteBase}/mf-manifest.json`
             },
             shared: {
                 react: {
-                    singleton: true,
+                    singleton: true
                 },
                 "react-dom": {
-                    singleton: true,
+                    singleton: true
                 },
                 "react/jsx-runtime": {
-                    singleton: true,
+                    singleton: true
                 },
                 "react/jsx-dev-runtime": {
-                    singleton: true,
+                    singleton: true
                 },
                 "react-router": {
-                    singleton: true,
+                    singleton: true
                 },
                 jotai: {
-                    singleton: true,
+                    singleton: true
                 },
                 "jotai-optics": {
-                    singleton: true,
+                    singleton: true
                 },
                 "@root-solar/auth": {
-                    singleton: true,
+                    singleton: true
                 },
                 "@root-solar/missives": {
-                    singleton: true,
+                    singleton: true
                 },
                 "@root-solar/routing": {
-                    singleton: true,
+                    singleton: true
                 },
                 "@root-solar/tagging": {
-                    singleton: true,
+                    singleton: true
                 },
                 "@root-solar/observability": {
-                    singleton: true,
+                    singleton: true
                 },
                 "react-icons": {
-                    singleton: true,
-                },
-            },
-        }),
+                    singleton: true
+                }
+            }
+        })
     ],
     source: {
         entry: {
-            shell: "./apps/shell/src/index.ts",
-        },
+            shell: "./apps/shell/src/index.ts"
+        }
     },
     //server: {
     //  historyApiFallback: {
@@ -105,11 +105,11 @@ export default defineConfig({
             font: "font",
             media: "media",
             assets: "assets",
-            wasm: "wasm",
+            wasm: "wasm"
         },
         assetPrefix: shellAssetPrefix,
         filename: {
-            html: "../index.html",
-        },
-    },
+            html: "../index.html"
+        }
+    }
 });

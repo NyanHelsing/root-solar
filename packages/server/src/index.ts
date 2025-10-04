@@ -10,7 +10,7 @@ import { setupFrontend, type FrontendLifecycle } from "./frontend/index.ts";
 import { createNetwork, shutdownNetwork, type NetworkResources } from "./network.ts";
 
 const serverLogger = createAppLogger("server:lifecycle", {
-    tags: ["server", "lifecycle"],
+    tags: ["server", "lifecycle"]
 });
 
 export interface ShutdownOptions {
@@ -21,7 +21,7 @@ export interface ShutdownOptions {
 export const startServer = async () => {
     setNetworkStatus({ state: "starting" });
     serverLogger.info("Server startup initiated", {
-        tags: ["startup"],
+        tags: ["startup"]
     });
 
     let shuttingDown = false;
@@ -33,7 +33,7 @@ export const startServer = async () => {
         if (shuttingDown) {
             serverLogger.debug("Shutdown already in progress", {
                 reason,
-                tags: ["shutdown"],
+                tags: ["shutdown"]
             });
             return;
         }
@@ -42,21 +42,21 @@ export const startServer = async () => {
         serverLogger.info("Shutdown initiated", {
             reason,
             markOffline: markOffline !== false,
-            tags: ["shutdown"],
+            tags: ["shutdown"]
         });
 
         if (frontend) {
             serverLogger.debug("Closing frontend", {
-                tags: ["shutdown", "frontend"],
+                tags: ["shutdown", "frontend"]
             });
             try {
                 await frontend.close();
                 serverLogger.debug("Frontend closed", {
-                    tags: ["shutdown", "frontend"],
+                    tags: ["shutdown", "frontend"]
                 });
             } catch (error) {
                 serverLogger.error("Failed to stop frontend", error, {
-                    tags: ["shutdown", "frontend"],
+                    tags: ["shutdown", "frontend"]
                 });
             }
             frontend = null;
@@ -64,16 +64,16 @@ export const startServer = async () => {
 
         if (network) {
             serverLogger.debug("Closing network resources", {
-                tags: ["shutdown", "network"],
+                tags: ["shutdown", "network"]
             });
             try {
                 await shutdownNetwork(network);
                 serverLogger.debug("Network resources closed", {
-                    tags: ["shutdown", "network"],
+                    tags: ["shutdown", "network"]
                 });
             } catch (error) {
                 serverLogger.error("Failed to stop network", error, {
-                    tags: ["shutdown", "network"],
+                    tags: ["shutdown", "network"]
                 });
             }
             network = undefined;
@@ -81,7 +81,7 @@ export const startServer = async () => {
 
         if (server?.listening) {
             serverLogger.debug("Closing HTTP server", {
-                tags: ["shutdown", "http"],
+                tags: ["shutdown", "http"]
             });
             await new Promise<void>((resolve) => {
                 server?.close(() => {
@@ -89,7 +89,7 @@ export const startServer = async () => {
                 });
             });
             serverLogger.debug("HTTP server closed", {
-                tags: ["shutdown", "http"],
+                tags: ["shutdown", "http"]
             });
         }
         server = undefined;
@@ -97,35 +97,35 @@ export const startServer = async () => {
         if (markOffline !== false) {
             setNetworkStatus({ state: "offline" });
             serverLogger.info("Server marked offline", {
-                tags: ["shutdown"],
+                tags: ["shutdown"]
             });
         }
 
         serverLogger.info("Shutdown complete", {
             reason,
-            tags: ["shutdown"],
+            tags: ["shutdown"]
         });
     };
 
     try {
         serverLogger.debug("Creating server context", {
-            tags: ["startup"],
+            tags: ["startup"]
         });
         const context = await createServerContext();
         serverLogger.debug("Server context ready", {
-            tags: ["startup"],
+            tags: ["startup"]
         });
         network = await createNetwork(context);
         serverLogger.info("Network resources initialized", {
             tags: ["startup", "network"],
             peerId: network.libp2p.peerId.toString(),
-            protocols: [network.sentimentNetwork.protocol],
+            protocols: [network.sentimentNetwork.protocol]
         });
 
         const app = createBaseApp();
         frontend = await setupFrontend(app);
         serverLogger.debug("Frontend setup complete", {
-            tags: ["startup", "frontend"],
+            tags: ["startup", "frontend"]
         });
 
         server = app.listen(PORT, () => {
@@ -135,12 +135,12 @@ export const startServer = async () => {
             setNetworkStatus({
                 state: "ready",
                 protocol: network.sentimentNetwork.protocol,
-                peerId: network.libp2p.peerId.toString(),
+                peerId: network.libp2p.peerId.toString()
             });
             serverLogger.info("Server listening", {
                 tags: ["startup", "http"],
                 port: PORT,
-                protocol: network.sentimentNetwork.protocol,
+                protocol: network.sentimentNetwork.protocol
             });
         });
 
@@ -153,7 +153,7 @@ export const startServer = async () => {
                 }
                 Promise.resolve(afterServerStart(activeServer)).catch((error) => {
                     serverLogger.error("Failed to complete frontend startup", error, {
-                        tags: ["startup", "frontend"],
+                        tags: ["startup", "frontend"]
                     });
                 });
             });
@@ -162,46 +162,46 @@ export const startServer = async () => {
         server.on("error", (error) => {
             setNetworkStatus({
                 state: "error",
-                message: error instanceof Error ? error.message : String(error),
+                message: error instanceof Error ? error.message : String(error)
             });
             serverLogger.error("HTTP server error", error, {
-                tags: ["runtime", "http"],
+                tags: ["runtime", "http"]
             });
             shutdown({ reason: "server error", markOffline: false }).catch((shutdownError) => {
                 serverLogger.error("Error during shutdown", shutdownError, {
-                    tags: ["shutdown"],
+                    tags: ["shutdown"]
                 });
             });
         });
 
         process.once("SIGINT", () => {
             serverLogger.warn("SIGINT received", {
-                tags: ["shutdown", "signal"],
+                tags: ["shutdown", "signal"]
             });
             shutdown({ reason: "SIGINT" }).catch((error) => {
                 serverLogger.error("Error during shutdown", error, {
-                    tags: ["shutdown"],
+                    tags: ["shutdown"]
                 });
             });
         });
 
         process.once("SIGTERM", () => {
             serverLogger.warn("SIGTERM received", {
-                tags: ["shutdown", "signal"],
+                tags: ["shutdown", "signal"]
             });
             shutdown({ reason: "SIGTERM" }).catch((error) => {
                 serverLogger.error("Error during shutdown", error, {
-                    tags: ["shutdown"],
+                    tags: ["shutdown"]
                 });
             });
         });
     } catch (error) {
         setNetworkStatus({
             state: "error",
-            message: error instanceof Error ? error.message : String(error),
+            message: error instanceof Error ? error.message : String(error)
         });
         serverLogger.error("Failed to start server", error, {
-            tags: ["startup"],
+            tags: ["startup"]
         });
         await shutdown({ markOffline: false });
         process.exitCode = 1;

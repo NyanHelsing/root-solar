@@ -8,10 +8,10 @@ import type { ChallengeResponse, IdpChallenge } from "./types.ts";
 
 export const createChallengeResponse = async (
     challenge: IdpChallenge,
-    keyMaterial: BeingKeyMaterial,
+    keyMaterial: BeingKeyMaterial
 ): Promise<ChallengeResponse> => {
     const message = await openpgp.readMessage({
-        armoredMessage: challenge.encryptedNonce,
+        armoredMessage: challenge.encryptedNonce
     });
     const decryptionKey = await readPrivateKey(keyMaterial.encryption.privateKey);
     const idpSigningKey = await readPublicKey(challenge.idpSigningPublicKey);
@@ -20,7 +20,7 @@ export const createChallengeResponse = async (
         message,
         decryptionKeys: decryptionKey,
         expectSigned: true,
-        verificationKeys: idpSigningKey,
+        verificationKeys: idpSigningKey
     });
 
     const [signature] = decrypted.signatures ?? [];
@@ -29,7 +29,7 @@ export const createChallengeResponse = async (
             await signature.verified;
         } catch (error) {
             throw new Error("Unable to verify IDP challenge signature", {
-                cause: error,
+                cause: error
             });
         }
     }
@@ -37,7 +37,7 @@ export const createChallengeResponse = async (
     const nonceBase64 = await resolveArmoredString(decrypted.data);
 
     const responseMessage = await openpgp.createMessage({
-        text: buildChallengeMessageText(challenge.challengeId, nonceBase64),
+        text: buildChallengeMessageText(challenge.challengeId, nonceBase64)
     });
 
     const signingKey = await readPrivateKey(keyMaterial.signing.privateKey);
@@ -46,13 +46,13 @@ export const createChallengeResponse = async (
             message: responseMessage,
             signingKeys: signingKey,
             detached: true,
-            format: "armored",
-        }),
+            format: "armored"
+        })
     );
 
     return {
         challengeId: challenge.challengeId,
-        signature: signatureArmored,
+        signature: signatureArmored
     } satisfies ChallengeResponse;
 };
 

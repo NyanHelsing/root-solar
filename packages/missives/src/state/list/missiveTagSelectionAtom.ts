@@ -5,7 +5,7 @@ import { activeSentimentAtom } from "../sentiment/activeSentimentAtom.ts";
 
 const selectionStateAtom = atom({
     selection: null as string | null,
-    sentimentKey: null as string | null,
+    sentimentKey: null as string | null
 });
 
 export const missiveTagSelectionAtom = atom(
@@ -29,9 +29,9 @@ export const missiveTagSelectionAtom = atom(
         }
         set(selectionStateAtom, {
             selection: canonicalSelection,
-            sentimentKey: activeSentiment.filter,
+            sentimentKey: activeSentiment.filter
         });
-    },
+    }
 );
 
 export const useSelectedMissiveTag = () => useAtomValue(missiveTagSelectionAtom);

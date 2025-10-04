@@ -9,7 +9,7 @@ export const loadMissiveDetailAtom = atom(
             return;
         }
         set(detailQueryAtomFactory(missiveId));
-    },
+    }
 );
 
 export default loadMissiveDetailAtom;

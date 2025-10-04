@@ -17,7 +17,7 @@ const createStorage = () => {
         },
         removeItem(key) {
             map.delete(key);
-        },
+        }
     };
 };
 
@@ -38,7 +38,7 @@ describe("auth/session-atoms", () => {
         const storage = createStorage();
         Object.defineProperty(window, "localStorage", {
             configurable: true,
-            value: storage,
+            value: storage
         });
 
         const baseRecord = {
@@ -48,7 +48,7 @@ describe("auth/session-atoms", () => {
                 id: "being-1",
                 name: "Being One",
                 signingPublicKey: "sign-public",
-                encryptionPublicKey: "enc-public",
+                encryptionPublicKey: "enc-public"
             },
             encryptedBundle: {
                 algorithm: "AES-GCM",
@@ -57,8 +57,8 @@ describe("auth/session-atoms", () => {
                 salt: "salt",
                 iterations: 1,
                 hash: "SHA-256",
-                keyLength: 256,
-            },
+                keyLength: 256
+            }
         };
 
         storage.setItem(STORAGE_KEY, JSON.stringify(baseRecord));
@@ -80,8 +80,8 @@ describe("auth/session-atoms", () => {
             being: {
                 ...baseRecord.being,
                 id: "being-2",
-                name: "Second Being",
-            },
+                name: "Second Being"
+            }
         };
 
         store.set(atoms.beingSessionAtom, { type: "set", record: nextRecord });
@@ -103,8 +103,8 @@ describe("auth/session-atoms", () => {
                 loadBeingSessionRecord() {
                     throw new Error("boom");
                 },
-                clearBeingSessionRecord: sessionModule.clearBeingSessionRecord,
-            },
+                clearBeingSessionRecord: sessionModule.clearBeingSessionRecord
+            }
         });
 
         const atoms = await import(`../session-atoms.ts?test=${Date.now()}-error`);

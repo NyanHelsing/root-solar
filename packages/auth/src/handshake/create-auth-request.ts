@@ -10,13 +10,13 @@ import type { AuthIntent, AuthRequest } from "./types.ts";
 
 export const createAuthRequest = async (
     keyMaterial: BeingKeyMaterial,
-    options: { intent?: AuthIntent } = {},
+    options: { intent?: AuthIntent } = {}
 ): Promise<AuthRequest> => {
     const intentBytes = normalizeIntent(options.intent);
     const messageBytes = buildAuthMessage(
         keyMaterial.signing.publicKey,
         keyMaterial.encryption.publicKey,
-        intentBytes,
+        intentBytes
     );
 
     const message = await openpgp.createMessage({ binary: messageBytes });
@@ -26,8 +26,8 @@ export const createAuthRequest = async (
             message,
             signingKeys: signingKey,
             detached: true,
-            format: "armored",
-        }),
+            format: "armored"
+        })
     );
 
     return {
@@ -35,9 +35,9 @@ export const createAuthRequest = async (
             signingPublicKey: keyMaterial.signing.publicKey,
             encryptionPublicKey: keyMaterial.encryption.publicKey,
             signature,
-            intent: intentBytes ? toBase64(intentBytes) : undefined,
+            intent: intentBytes ? toBase64(intentBytes) : undefined
         },
-        message: toBase64(messageBytes),
+        message: toBase64(messageBytes)
     } satisfies AuthRequest;
 };
 

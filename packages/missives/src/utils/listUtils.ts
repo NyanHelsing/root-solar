@@ -37,7 +37,7 @@ export type MissiveListCopyContext = {
 export const createMissiveListCopy = ({
     tag,
     sentimentSlug,
-    sentimentLabel,
+    sentimentLabel
 }: MissiveListCopyContext): MissiveListCopy => {
     if (sentimentSlug === SENTIMENT_TAG_SLUG) {
         return {
@@ -48,7 +48,7 @@ export const createMissiveListCopy = ({
             loadingLabel: "Refreshing axioms…",
             errorLabel: "Unable to load axioms right now.",
             emptyLabel: "No axioms marked yet.",
-            moreInfoLabel: "More Info",
+            moreInfoLabel: "More Info"
         } satisfies MissiveListCopy;
     }
 
@@ -61,7 +61,7 @@ export const createMissiveListCopy = ({
             loadingLabel: "Refreshing missives…",
             errorLabel: "Unable to load missives right now.",
             emptyLabel: `No missives have ${label.toLowerCase()} weights yet.`,
-            moreInfoLabel: "Details",
+            moreInfoLabel: "Details"
         } satisfies MissiveListCopy;
     }
 
@@ -74,7 +74,7 @@ export const createMissiveListCopy = ({
             loadingLabel: "Refreshing missives…",
             errorLabel: "Unable to load missives right now.",
             emptyLabel: "No missives found for this filter.",
-            moreInfoLabel: "Details",
+            moreInfoLabel: "Details"
         } satisfies MissiveListCopy;
     }
 
@@ -85,6 +85,6 @@ export const createMissiveListCopy = ({
         loadingLabel: "Refreshing missives…",
         errorLabel: "Unable to load missives right now.",
         emptyLabel: "No missives found for this filter.",
-        moreInfoLabel: "Details",
+        moreInfoLabel: "Details"
     } satisfies MissiveListCopy;
 };
