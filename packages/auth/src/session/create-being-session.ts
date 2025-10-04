@@ -5,12 +5,12 @@ import { persistBeingSessionRecord } from "./persist-being-session-record.ts";
 import type { BeingSessionRecord } from "./schema.ts";
 
 export const createBeingSession = async (
-  bundle: BeingCredentialBundle,
+    bundle: BeingCredentialBundle,
 ): Promise<{ pin: string; record: BeingSessionRecord }> => {
-  const pin = generateSessionPin();
-  const record = await createBeingSessionRecord(bundle, pin);
-  persistBeingSessionRecord(record);
-  return { pin, record };
+    const pin = generateSessionPin();
+    const record = await createBeingSessionRecord(bundle, pin);
+    persistBeingSessionRecord(record);
+    return { pin, record };
 };
 
 export default createBeingSession;

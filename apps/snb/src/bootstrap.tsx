@@ -10,11 +10,11 @@ console.error("RUNNING SNB BOOTSTRAP");
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
-  throw new Error("Unable to locate #root element for rendering");
+    throw new Error("Unable to locate #root element for rendering");
 }
 
 createRoot(rootElement).render(
-  <BrowserRouter>
-    <SearchAndBrowseApp />
-  </BrowserRouter>,
+    <BrowserRouter>
+        <SearchAndBrowseApp />
+    </BrowserRouter>,
 );

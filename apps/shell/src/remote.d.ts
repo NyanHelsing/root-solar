@@ -1,33 +1,33 @@
 declare module "snb/App" {
-  import type { ComponentType } from "react";
+    import type { ComponentType } from "react";
 
-  export interface ShellRouteConfig {
-    path: string;
-    Component: ComponentType;
-  }
+    export interface ShellRouteConfig {
+        path: string;
+        Component: ComponentType;
+    }
 
-  export const Header: ComponentType;
-  export const Hero: ComponentType;
-  export const Main: ComponentType;
-  export const Footer: ComponentType;
-  export const ComponentHarness: ComponentType<{ componentName?: string }>;
-  export const shellRouteConfig: ShellRouteConfig;
-  export const ShellRoutes: ComponentType;
-  export const SearchAndBrowseApp: ComponentType;
-  export default SearchAndBrowseApp;
+    export const Header: ComponentType;
+    export const Hero: ComponentType;
+    export const Main: ComponentType;
+    export const Footer: ComponentType;
+    export const ComponentHarness: ComponentType<{ componentName?: string }>;
+    export const shellRouteConfig: ShellRouteConfig;
+    export const ShellRoutes: ComponentType;
+    export const SearchAndBrowseApp: ComponentType;
+    export default SearchAndBrowseApp;
 }
 
 declare module "auth/App" {
-  import type { ComponentType } from "react";
+    import type { ComponentType } from "react";
 
-  export interface ShellRouteConfig {
-    path: string;
-    Component: ComponentType;
-  }
+    export interface ShellRouteConfig {
+        path: string;
+        Component: ComponentType;
+    }
 
-  const AuthApp: ComponentType;
-  export default AuthApp;
-  export { AuthApp };
-  export const shellRouteConfig: ShellRouteConfig;
-  export const ShellRoutes: ComponentType;
+    const AuthApp: ComponentType;
+    export default AuthApp;
+    export { AuthApp };
+    export const shellRouteConfig: ShellRouteConfig;
+    export const ShellRoutes: ComponentType;
 }

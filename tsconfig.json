@@ -1,46 +1,40 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2023", "DOM"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "moduleDetection": "force",
-    "allowImportingTsExtensions": true,
-    "allowArbitraryExtensions": true,
-    "resolvePackageJsonExports": true,
-    "resolvePackageJsonImports": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "types": ["node"],
-    "typeRoots": ["./packages/types", "./node_modules/@types"],
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@root-solar/config": ["packages/config/src/index.ts"],
-      "@root-solar/config/*": ["packages/config/src/*"]
-    }
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "apps/**/*.ts",
-    "apps/**/*.tsx",
-    "packages/**/*.ts",
-    "packages/**/*.tsx",
-    "types/**/*.d.ts"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "**/node_modules",
-    "**/dist",
-    "**/__tests__/**"
-  ]
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": ["ES2023", "DOM"],
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "moduleDetection": "force",
+        "allowImportingTsExtensions": true,
+        "allowArbitraryExtensions": true,
+        "resolvePackageJsonExports": true,
+        "resolvePackageJsonImports": true,
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "types": ["node"],
+        "typeRoots": ["./packages/types", "./node_modules/@types"],
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@root-solar/config": ["packages/config/src/index.ts"],
+            "@root-solar/config/*": ["packages/config/src/*"]
+        }
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "apps/**/*.ts",
+        "apps/**/*.tsx",
+        "packages/**/*.ts",
+        "packages/**/*.tsx",
+        "types/**/*.d.ts"
+    ],
+    "exclude": ["dist", "node_modules", "**/node_modules", "**/dist", "**/__tests__/**"]
 }

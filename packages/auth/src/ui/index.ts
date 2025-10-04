@@ -1,6 +1,6 @@
 export {
-  BeingRegistration,
-  type BeingRegistrationComponentProps,
+    BeingRegistration,
+    type BeingRegistrationComponentProps,
 } from "./BeingRegistration.tsx";
 
 export { BeingLogin, type BeingLoginProps } from "./BeingLogin.tsx";

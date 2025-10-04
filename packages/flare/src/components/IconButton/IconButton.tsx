@@ -4,22 +4,22 @@ import styles from "./IconButton.module.scss";
 export type IconButtonVariant = "default" | "ghost" | "solid" | "danger";
 
 export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: IconButtonVariant;
+    variant?: IconButtonVariant;
 }
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
-  { variant = "default", className, ...props },
-  ref
+    { variant = "default", className, ...props },
+    ref,
 ) {
-  const classes = [
-    styles["icon-button"],
-    variant !== "default" ? styles[`icon-button--${variant}`] : undefined,
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+    const classes = [
+        styles["icon-button"],
+        variant !== "default" ? styles[`icon-button--${variant}`] : undefined,
+        className,
+    ]
+        .filter(Boolean)
+        .join(" ");
 
-  return <button ref={ref} className={classes} {...props} />;
+    return <button ref={ref} className={classes} {...props} />;
 });
 
 export default IconButton;

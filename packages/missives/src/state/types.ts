@@ -1,31 +1,31 @@
 export type MissiveSentimentInput = {
-  missiveId: string;
-  tagId: string;
-  weight: number;
+    missiveId: string;
+    tagId: string;
+    weight: number;
 };
 
 export type SentimentMutationVariables = {
-  beingId: string;
-  subjectId: string;
-  subjectTable: "missive";
-  tagId: string;
-  weight: number;
-  maxWeight?: number;
+    beingId: string;
+    subjectId: string;
+    subjectTable: "missive";
+    tagId: string;
+    weight: number;
+    maxWeight?: number;
 };
 
 export type SentimentMutationContext = {
-  payload: SentimentMutationVariables;
-  resolvedWeight: number;
+    payload: SentimentMutationVariables;
+    resolvedWeight: number;
 };
 
 export type MissiveCreationInput = {
-  title: string;
-  details?: string;
-  tagSlugs?: string[];
+    title: string;
+    details?: string;
+    tagSlugs?: string[];
 };
 
 export type MissiveUpdateInput = {
-  missiveId: string;
-  title: string;
-  details?: string;
+    missiveId: string;
+    title: string;
+    details?: string;
 };

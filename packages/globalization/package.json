@@ -1,22 +1,22 @@
 {
-  "name": "@root-solar/globalization",
-  "version": "0.0.1",
-  "private": true,
-  "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
-    "./inflection": {
-      "types": "./src/inflection/index.ts",
-      "default": "./src/inflection/index.ts"
-    },
-    "./slug": {
-      "types": "./src/slug/index.ts",
-      "default": "./src/slug/index.ts"
+    "name": "@root-solar/globalization",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        },
+        "./inflection": {
+            "types": "./src/inflection/index.ts",
+            "default": "./src/inflection/index.ts"
+        },
+        "./slug": {
+            "types": "./src/slug/index.ts",
+            "default": "./src/slug/index.ts"
+        }
     }
-  }
 }
